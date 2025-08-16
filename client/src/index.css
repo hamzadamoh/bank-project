@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0 0% 98%);
+  --foreground: hsl(20 14.3% 4.1%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(20 14.3% 4.1%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(20 14.3% 4.1%);
+  --primary: hsl(20 14.3% 4.1%);
+  --primary-foreground: hsl(60 9.1% 97.8%);
+  --secondary: hsl(60 4.8% 95.9%);
+  --secondary-foreground: hsl(24 9.8% 10%);
+  --muted: hsl(60 4.8% 95.9%);
+  --muted-foreground: hsl(25 5.3% 44.7%);
+  --accent: hsl(60 4.8% 95.9%);
+  --accent-foreground: hsl(24 9.8% 10%);
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(60 9.1% 97.8%);
+  --border: hsl(20 5.9% 90%);
+  --input: hsl(20 5.9% 90%);
+  --ring: hsl(20 14.3% 4.1%);
+  --radius: 0.75rem;
+  
+  /* Custom FiscAI colors */
+  --ink-950: hsl(0 0% 5.9%);
+  --ink-900: hsl(0 0% 10.2%);
+  --ink-800: hsl(210 3.8% 15%);
+  --slate-800: hsl(215 25% 27%);
+  --slate-700: hsl(215 16% 47%);
+  --slate-600: hsl(215 14% 34%);
+  --slate-500: hsl(215 16% 47%);
+  --alabaster-50: hsl(0 0% 98%);
+  --alabaster-100: hsl(0 0% 96.1%);
+  --alabaster-200: hsl(0 0% 89.8%);
+  --champagne-200: hsl(41 47% 89%);
+  --champagne-300: hsl(41 39% 81%);
+  --emerald-400: hsl(142 76% 36%);
+  --amber-400: hsl(48 96% 53%);
+  --rose-400: hsl(351 83% 65%);
+  
+  /* Typography */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+}
+
+.dark {
+  --background: hsl(20 14.3% 4.1%);
+  --foreground: hsl(60 9.1% 97.8%);
+  --card: hsl(20 14.3% 4.1%);
+  --card-foreground: hsl(60 9.1% 97.8%);
+  --popover: hsl(20 14.3% 4.1%);
+  --popover-foreground: hsl(60 9.1% 97.8%);
+  --primary: hsl(60 9.1% 97.8%);
+  --primary-foreground: hsl(20 14.3% 4.1%);
+  --secondary: hsl(12 6.5% 15.1%);
+  --secondary-foreground: hsl(60 9.1% 97.8%);
+  --muted: hsl(12 6.5% 15.1%);
+  --muted-foreground: hsl(24 5.4% 63.9%);
+  --accent: hsl(12 6.5% 15.1%);
+  --accent-foreground: hsl(60 9.1% 97.8%);
+  --destructive: hsl(0 62.8% 30.6%);
+  --destructive-foreground: hsl(60 9.1% 97.8%);
+  --border: hsl(12 6.5% 15.1%);
+  --input: hsl(12 6.5% 15.1%);
+  --ring: hsl(24 5.7% 82.9%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'cv02', 'cv03', 'cv04';
+    letter-spacing: -0.02em;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+  
+  .gradient-border {
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(45deg, hsl(var(--champagne-200)), hsl(var(--alabaster-200))) border-box;
+    border: 1px solid transparent;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  
+  .tracking-tighter {
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .text-ink-950 {
+    color: hsl(var(--ink-950));
+  }
+  
+  .text-ink-900 {
+    color: hsl(var(--ink-900));
+  }
+  
+  .text-slate-800 {
+    color: hsl(var(--slate-800));
+  }
+  
+  .text-slate-700 {
+    color: hsl(var(--slate-700));
+  }
+  
+  .text-slate-600 {
+    color: hsl(var(--slate-600));
+  }
+  
+  .text-alabaster-50 {
+    color: hsl(var(--alabaster-50));
+  }
+  
+  .text-alabaster-200 {
+    color: hsl(var(--alabaster-200));
+  }
+  
+  .bg-ink-950 {
+    background-color: hsl(var(--ink-950));
+  }
+  
+  .bg-ink-900 {
+    background-color: hsl(var(--ink-900));
+  }
+  
+  .bg-alabaster-50 {
+    background-color: hsl(var(--alabaster-50));
+  }
+  
+  .bg-alabaster-100 {
+    background-color: hsl(var(--alabaster-100));
+  }
+  
+  .bg-alabaster-200 {
+    background-color: hsl(var(--alabaster-200));
+  }
+  
+  .bg-champagne-200 {
+    background-color: hsl(var(--champagne-200));
+  }
+  
+  .bg-champagne-300 {
+    background-color: hsl(var(--champagne-300));
+  }
+  
+  .bg-emerald-400 {
+    background-color: hsl(var(--emerald-400));
+  }
+  
+  .bg-amber-400 {
+    background-color: hsl(var(--amber-400));
+  }
+  
+  .bg-rose-400 {
+    background-color: hsl(var(--rose-400));
+  }
+  
+  .border-alabaster-200 {
+    border-color: hsl(var(--alabaster-200));
+  }
+  
+  .hover\:bg-ink-900:hover {
+    background-color: hsl(var(--ink-900));
+  }
+  
+  .hover\:bg-alabaster-100:hover {
+    background-color: hsl(var(--alabaster-100));
+  }
+  
+  .hover\:text-ink-950:hover {
+    color: hsl(var(--ink-950));
+  }
+  
+  .hover\:text-slate-700:hover {
+    color: hsl(var(--slate-700));
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
