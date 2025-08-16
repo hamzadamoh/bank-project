@@ -1,0 +1,404 @@
+# MASTER PROMPT — Build **FiscAI.co** (Tax Advisory & Financial AI Suite)
+
+You are a senior product+full‑stack+ML team. Build **FiscAI.co**: a production‑grade website that hosts **seven** flagship AI tools for financial services:
+
+1. **FiscAI Tax Counsel** (Premium Tax Advisory)
+
+2. **Factoring Guardian** — Contrôle intelligent d’affacturage (NuMarkdown‑8B‑Thinking, fraude/anomalies, extraction layout‑aware).
+
+3. **Query Architect (NL ⇄ SQL)** — Expert Data Augmenté using **RAG architecture** and **Snowflake/Arctic‑Text2SQL‑R1‑7B** as the core generator.
+
+4. **SkillArcade** — Assessment augmenté des compétences (IA + Gamification RH)
+
+5. **OmniServe** — Voicebot / Chatbot intelligent (FR/AR/Darija, multicanal)
+
+6. **Rhalia** — bien‑être physique, mental, digital, social
+
+7. **SatisfAI** — mesure émotionnelle & personnalisée de la satisfaction client
+
+Deliver: UX, backend, data pipelines, prompts, guardrails, security, analytics, and CI/CD. The site must be modular, multi‑tenant, privacy‑first, and enterprise‑ready.
+
+---
+
+## 0) Global Brand & Site Requirements
+
+**Brand name:** FiscAI (domain: fiscai.co)
+**Tagline:** *Smarter finance, faster decisions.*
+**Audience:** Banks, fintechs, SMBs, auditors, accounting firms, treasury & risk teams.
+**Tone:** Expert, trustworthy, clear; no hype. Compliant by design.
+**Value promise:** We deliver **tailored solutions for each business** — vertical presets (Banking/Fintech/SMB/Audit), configurable workflows, and custom guardrails per tenant.
+**Visual style:** Clean fintech aesthetic with **luxury minimalism**: generous whitespace, editorial typography, delicate gradients, micro‑shadows; everything feels intentional and premium (no clutter).
+
+**Design system:**
+
+* Frontend: Next.js (App Router) + React + Tailwind + shadcn/ui + Framer Motion (micro‑interactions).
+* Icons: lucide-react; Charts: Recharts.
+* Layout: Swiss‑grid, responsive, soft shadows, rounded‑2xl, motion subtlety \~150–250ms.
+* Typography: Inter/Plus Jakarta Sans (variable) with tight tracking; numeric tabular for dashboards.
+* Color tokens (premium): `ink-950`, `slate-800`, `alabaster-50`, `champagne-200` (accents), `emerald-400` (success), `amber-400` (warning), `rose-400` (danger). No harsh primaries.
+* Components: frosted glass cards (backdrop‑blur), gradient borders (1px), elevated nav, sticky action bars.
+* Accessibility: WCAG 2.2 AA; keyboard/ARIA for all interactive components.
+
+**Core pages & navigation:**
+
+* Home (Hero, product cards for 7 tools, trust, testimonials, compliance badges)
+* Products: **FiscAI Tax Counsel**, **Factoring Guardian**, **Query Architect (NL⇄SQL)**, **SkillArcade**, **OmniServe**, **Rhalia**, **SatisfAI**
+* Solutions (Banking, Fintech, Audit, SMB Accounting)
+* Pricing (Free trial, Team, Enterprise; SOC 2‑ready add‑ons)
+* Docs (Developer, Admin, Data Governance)
+* Security & Compliance (GDPR, data residency, encryption, audit)
+* Company (About, Careers, Contact)
+* Legal (Terms, Privacy, DPA, Cookies)
+
+**Global functional requirements:**
+
+* Auth: SSO (SAML/OIDC), OAuth2, MFA, SCIM for user provisioning; roles: Admin, Analyst, Viewer.
+* Tenancy: org‑scoped data isolation; per‑tenant encryption keys; data residency selection (EU/MA/US).
+* Storage: Encrypted at rest (AES‑256), TLS 1.3 in transit; signed download URLs; virus/malware scanning.
+* Audit: immutable logs (append‑only) for queries, prompts, outputs, file access, admin actions.
+* Rate limits & quotas per plan; usage metering; billing hooks (Stripe); invoicing and downloadable receipts.
+* Observability: tracing (OpenTelemetry), logs (ELK/CloudWatch), metrics (Prometheus/Grafana); SLOs.
+* Content Safety: PII redaction where appropriate; output filters; no chain‑of‑thought exposure to end users.
+
+**Tech stack (suggested):**
+
+* Frontend: Next.js + TypeScript, Tailwind, shadcn/ui, React Query/TanStack Query.
+* Backend: Python (FastAPI) **or** Node (NestJS). Workers for async jobs (Celery/RQ or BullMQ).
+* DB: Postgres (primary), Redis (cache/queue), Object storage (S3‑compatible) for uploads.
+* Vector DB: pgvector **or** managed (e.g., Pinecone/Weaviate) depending on residency.
+* Models: see tool sections below. All models run **on‑prem/VPC**; no external data egress.
+* CI/CD: GitHub Actions; IaC: Terraform; Secrets: Vault/SM; Feature flags: LaunchDarkly.
+
+**Security & compliance:**
+
+* GDPR‑ready, DPA, DPIA templates; data minimization; configurable retention; right to erasure.
+* RLS/ABAC enforced at DB layer; per‑tenant RBAC in app; consent/notice management.
+* Pen‑test & threat modeling; OWASP ASVS; CSP/Headers; anti‑PDF exploit sanitization on upload.
+
+**Analytics/SEO:**
+
+* Server‑side event analytics (PostHog) opt‑in; cookie banner CMP; privacy‑safe defaults.
+* SEO: semantic markup, OpenGraph/Twitter cards; fast LCP/INP; sitemap & robots.
+
+---
+
+## 1) Tool #1 — **FiscAI Tax Counsel** (Premium Tax Advisory, RAG + Compliance)
+
+**Goal:** Convert natural‑language tax questions into **grounded answers** with citations + optional exportable documents (memos, letters, checklists). Multi‑jurisdiction (start with Morocco + EU VAT + generic OECD concepts), multilingual (FR/EN/AR).
+
+**Data sources (tenant‑scoped):**
+
+* Official tax code/guides (public), administrative bulletins, circulars, treaty excerpts; firm’s internal notes/policies; prior memos (redacted).
+* Index to vector DB with metadata: `jurisdiction`, `effective_date`, `article`, `topic`, `risk_level`, `doc_type`, `version`.
+
+**Pipeline:**
+
+1. Query understanding: normalize user question; extract entities (jurisdiction, period, taxpayer type, transaction type, thresholds); detect confidentiality.
+2. Retrieval: hybrid search (BM25+dense) + jurisdiction/time filters + reranking; top‑k contexts limited by token budget; diversity enforced.
+3. Answering model: strong reasoning model (server‑side) instructed **not** to reveal chain‑of‑thought; produce **structured answer**: (i) short answer, (ii) grounded explanation with numbered citations, (iii) compliance checklist, (iv) disclaimers/assumptions.
+4. Verification: contradiction/consistency pass; hallucination guard (answer must reference citations).
+5. Output: render markdown → PDF/Docx; offer *next actions* (forms, deadlines, alerts).
+
+**System prompt (Tax Advisor):**
+
+* Role: senior tax analyst. Provide **concise, jurisdiction‑aware answers** grounded in retrieved snippets.
+* Rules: cite sources; never invent law; state assumptions; if ambiguous, ask the **minimal clarifying question**; forbid legal advice without context; no chain‑of‑thought exposure; provide **checklist** & **timeline** when relevant.
+
+**UI/UX:**
+
+* Chat with **jurisdiction switcher**; **scope selector** (CIT/VAT/withholding); **time window**; **confidence badge**.
+* “View sources” side panel; export memo (PDF/Docx); save to knowledge base.
+* Admin: upload corpus, versioning, deprecation dates, legal holds.
+
+**Quality metrics:** groundedness (citation coverage), factual accuracy (expert review), latency, user satisfaction, memo export rate, zero‑answer/deflection rate.
+
+---
+
+## 2) Tool #2 — **Factoring Guardian** — Contrôle intelligent d’affacturage
+
+**Goal:** Automate fraud/quality checks for factoring: extract from invoices/POs/contracts/BLs, cross‑match, detect anomalies, propose triage (validate/reject/alert), and track KPIs.
+
+**Models & components:**
+
+* **NuMarkdown‑8B‑Thinking** for **layout‑aware Doc → Markdown** conversion (weird layouts, complex tables).
+* OCR fallback (tesseract/cloud/on‑prem) when images are poor; combine with NuMarkdown output for robustness.
+* Post‑processing: Markdown → structured JSON according to schema below.
+* Matching/Rules/ML: 2/3‑way match (Invoice↔PO↔Receipt), rules for critical anomalies, ML anomaly scoring (Isolation Forest/GBM), document forensics (PDF signatures, image tamper heuristics).
+
+**Structured JSON schema (example):**
+
+```json
+{
+  "invoice": {
+    "supplier": {"name":"","tax_id":"","iban":"","address":""},
+    "invoice_id":"","issue_date":"","due_date":"","currency":"",
+    "totals": {"ht":0.0, "tva":0.0, "ttc":0.0},
+    "lines": [{"sku":"","desc":"","qty":0,"uom":"","pu":0.0,"tva_rate":0.0,"line_total":0.0}]
+  },
+  "po_refs": ["PO-..."],
+  "contract_refs": ["..."],
+  "attachments_meta": [{"filename":"","hash":"","mime":"","pages":2}],
+  "extraction_confidence": 0.0
+}
+```
+
+**Matching & anomaly rules (non‑exhaustive):**
+
+* **Duplicates**: same `{supplier_tax_id, invoice_id, date, amount}` already processed.
+* **Amount mismatches**: totals vs sum(lines), tax breakdowns wrong, currency/FX mismatch.
+* **Line‑item mismatches**: invoice lines not present/over‑delivered vs PO/receipt (tolerances configurable).
+* **New/changed IBAN**: flag vs supplier master; require out‑of‑band verification.
+* **Date anomalies**: issue date after due date; invoice before PO; weekend/public holiday anomalies (optional).
+* **Document forensics**: invalid/absent signature; bitmap‑only with suspicious edits; mixed embedded/OCR text inconsistencies.
+
+**Decision & evidence:**
+
+* Output **decision**: `validate | reject | alert` with machine‑readable reasons (codes) and evidence (diffs, line refs, thumbnails).
+* Log full trace for audit.
+
+**UI/UX:**
+
+* Upload area (drag‑drop); processing timeline; extracted fields preview; anomaly panel with fix suggestions; side‑by‑side invoice↔PO comparer; final decision.
+* Dashboard: throughput, reject/alert rates, top anomaly codes, vendors at risk, cycle time.
+
+**APIs:**
+
+* `POST /affacturage/jobs` (files + metadata) → job\_id
+* `GET /affacturage/jobs/{id}` → status + extraction JSON + anomalies + decision
+* `GET /affacturage/dashboard` → KPIs (time‑bucketed)
+
+**Quality metrics:** field F1 on key fields, line‑item match accuracy, false positive rate on critical alerts, mean cycle time.
+
+**Compliance:** PII minimization; encrypted storage; per‑tenant keys; retention policies; audit trails.
+
+---
+
+## 3) Tool #3 — **Query Architect (NL ⇄ SQL)** — Expert Data Augmenté
+
+**Goal:** Translate business questions **NL→SQL** *and* explain/validate existing queries **SQL→NL**: plain‑language summaries, schema mapping, optimization hints, guardrails, volumetry estimates, and teaching notes.
+
+**Core model:** **Snowflake/Arctic‑Text2SQL‑R1‑7B** (on‑prem/VPC). Dialects: Snowflake (primary), plus Postgres, ANSI.
+
+**Architecture (RAG + Arctic):**
+
+* **Knowledge Base (KB)** (tenant‑scoped) indexing:
+
+  * **Schema docs**: DDL (tables, columns, PK/FK), views, materializations, `connected_tables` graph.
+  * **Business dictionary**: synonyms (ex. "encours" → `exposure_amount`), required filters (pays/BU), sensitive fields.
+  * **Join rules**: allowed join paths/keys & cardinality expectations.
+  * **Few‑shot pairs**: NL↔SQL examples validés; snippets optimisés.
+  * Metadata: `name`, `summary`, `columns`, `keys`, `connected_tables`, `sample_queries`, `jurisdiction`, `sensitivity`.
+
+**Orchestrator pipeline:**
+
+1. **Normalization (NL or SQL)**
+
+   * *NL input*: canoniser l’intent, extraire entités/mesures/filtres/période → “main clause”.
+   * *SQL input*: parser **AST**, détecter tables/colonnes, agrégations, filtres, joins; vérifier dialecte.
+2. **Retrieval multi‑paliers**
+
+   * Exemples proches (pair NL↔SQL), docs de tables reliées, reranking (cross‑encoder).
+3. **Generation**
+
+   * *NL→SQL*: prompt **Arctic‑R1‑7B** avec dialecte, sous‑schéma, join rules, few‑shots, contraintes sécurité; sortie **SQL‑only**.
+   * *SQL→NL*: LLM génère **explication structurée** (but, tables, clés, filtres, group‑by, métriques), **risques/perf** et **suggestions d’optimisation**.
+4. **Validation & Guardrails**
+
+   * Existence tables/champs, linter, blocage patterns risqués (cartésiens, `SELECT *` non justifié, scans larges non filtrés).
+5. **Performance & volumétrie**
+
+   * `EXPLAIN`/PROFILE → rowcount/cost; recommandations (pré‑filtres, partitions, LIMIT par défaut, index/hints si applicable).
+6. **Sécurité**
+
+   * RLS/ABAC injecte prédicats obligatoires (user/org/region); masquage PII; blocage tables interdites.
+7. **Pedagogy**
+
+   * Résumé mécanique (sans chaîne de pensée), lineage, chips de schéma et raisons de jointures.
+
+**System prompt (Arctic Text2SQL, bi‑mode):**
+
+* Mode = `<NL_TO_SQL | SQL_TO_NL>`; Dialect = `<DIALECT>`.
+* Respecter schéma & join rules; préférer prédicats sélectifs; éviter `SELECT *`; ajouter `LIMIT 200` si absent (NL→SQL).
+* En SQL→NL: produire **explication brève**, points de vigilance, et améliorations possibles.
+
+**APIs:**
+
+* `POST /text2sql/compile`  *(mode: nl\_to\_sql)* → `{ sql, warnings, plan_estimates, lineage }`
+* `POST /text2sql/explain`  *(mode: sql\_to\_nl)* → `{ explanation, detected_entities, risks, plan_estimates, lineage }`
+* `POST /text2sql/translate` *(mode: nl\_to\_sql | sql\_to\_nl)* → union des sorties ci‑dessus
+* `POST /text2sql/validate` → `{ lint, policy_flags, safety }`
+
+**UI/UX:**
+
+* **Mode switch** NL→SQL / SQL→NL; zone de saisie avec suggestions (tables/colonnes/filtres).
+* Panneaux: SQL généré **ou** Explication; **Explain/Volumetry**, Filtres sécurité, Teaching notes.
+* Actions: **Refine** (ajouter filtre/aggregation), **Save snippet**, **Create chart** (phase 2).
+
+**Quality metrics:** exec success, correctness vs réponses de référence, coût moyen, TTF‑result, taux de clarification, satisfaction.
+
+---
+
+## 4) Tool #4 — **SkillArcade — Assessment augmenté des compétences (IA + Gamification RH)**
+
+**Promise:** A **gorgeous**, game‑quality assessment experience that candidates love and managers trust.
+
+**Why it feels premium**
+
+* **Art‑directed UI**: glass cards, subtle depth, tasteful gradients; delight without noise.
+* **Smooth motion**: Framer Motion micro‑interactions (hover, progress rings, confetti on milestones).
+* **Typography**: display headers (weight 700), body clean (weight 400/500), generous line‑height.
+* **Sound design (optional)**: soft click/confirm tones with mute control.
+
+**Capabilities**
+
+* **Content Bank**: questions, cas métier, scénarios, mini‑jeux (QCM, mises en situation, drag‑drop, chronométrées), calibrés par difficulté.
+* **Item Generation Assistée (LLM)**: création/variation d’items contextualisés par métier; revue humaine; anti‑leakage; détection plagiat/copilot.
+* **Adaptive Engine**: **IRT/GRM** multi‑traits + **Deep Knowledge Tracing (DKT)** pour ajuster la difficulté et choisir l’item suivant; garde‑fous d’équité.
+* **Scoring**: score global & par compétence, **IC** (intervalle de confiance), niveaux (débutant→expert), **recommandations** (formations, missions, mentors).
+* **Telemetry**: temps de réponse, hésitations, abandon, répétitions; privacy‑by‑design (agrégation/anonymisation RH).
+
+**Pipeline**
+Référentiel → mapping compétences↔items → session adaptative → scoring + explications → **plan d’action** (LMS/LXP).
+
+**UI/UX specifics**
+
+* **Playful yet elegant**: badge tiers (Bronze/Argent/Or/Platine), quêtes hebdo, avatars discrets.
+* **Coach panel**: explique *pourquoi* telle compétence est notée X, sans dévoiler la chaîne de pensée.
+* **Manager dashboard**: heatmap des compétences, progression, risques; export PDF.
+
+**APIs**
+`POST /assessment/session`, `POST /assessment/answer`, `GET /assessment/report/{user}`, `GET /assessment/analytics`.
+
+**Metrics**
+Fiabilité (alpha/omega), RMSE prédictif, équité (Δ score par groupe), engagement, complétion, NPS.
+
+**Compliance**
+Consentement explicite; anonymisation analytique; explications non‑discriminantes; stockage chifré.
+
+---
+
+## 5) Tool #5 — **OmniServe — Voicebot / Chatbot intelligent (FR/AR/Darija)**
+
+**Goal:** Assistant 24/7 vocal & textuel couvrant cas récurrents (localisation d’agence, suivi d’opérations, produits, horaires…), **multicanal** (Web, WhatsApp, Téléphonie/IVR, Mobile), avec **escalade** fluide vers un humain.
+
+**Components (stack suggérée):**
+
+* **STT**: modèle multilingue (FR/AR/Darija) fine‑tuné sur données anonymisées; prise en charge **barge‑in**, word‑boosters; latence < 400 ms.
+* **NLU + Policy**: LLM + RAG sur **FAQ/procédures/offres**, slots & intents; gardes‑fous (KYC, sécurité, limites).
+* **TTS**: voix FR/AR/Darija naturelles; vitesse & prosodie adaptatives.
+* **Orchestration**: état de session, formulaires, confirmations, **handoff** (chat/call) avec contexte complet.
+* **Channels**: Web widget, WhatsApp/Business API, SIP/Asterisk/Twilio, mobile SDK.
+
+**Features:** détection d’intent, suivi de dossier, rappels, rendez‑vous; **auth sécurisée** (OTP/OAuth); **multilingue dynamique**; logs anonymisés.
+
+**KPIs & Supervision:** taux d’automatisation, FCR, AHT, taux d’escalade, CSAT/NPS; console d’observation (relectures, amélioration continue).
+
+**APIs:** `POST /assistant/query`, `POST /assistant/callhook`, `GET /assistant/kb/search`.
+
+**Compliance:** chiffrement bout‑en‑bout; consentement enregistrement; retention minimale; masquage PII.
+
+---
+
+## 6) Tool #6 — **Rhalia — Agent IA de coaching bien‑être**
+
+**Goal:** Coaching **personnalisé** sur 3 axes: **Healthy** (activité, nutrition, pleine conscience), **Digital** (temps d’écran, hygiène numérique), **Social** (activités collectives, engagement local). **Push quotidien** intelligent et interactions empathiques.
+
+**Components:**
+
+* **Profilage consenti**: préférences, objectifs, contraintes; données facultatives de capteurs (pas, sommeil) via connecteurs.
+* **Recommandation**: LLM + règles; calendrier d’habitudes; nudges contextuels; systèmes d’objectifs SMART.
+* **Empathie & Sécurité**: style conversationnel adapté; détection signaux de détresse → **escalade** vers ressources humaines/pros (non‑médical).
+* **Suivi**: tableaux de bord individuels; agrégés **anonymisés** pour RH (tendances, adoption, risques organisationnels non nominatif).
+
+**UI/UX:** routine du jour, micro‑défis, gamification légère; consentement granulaire; centre de préférences; mode sombre.
+
+**APIs:** `POST /rhalia/goal`, `POST /rhalia/checkin`, `GET /rhalia/insights`.
+
+**Compliance:** santé/bien‑être **non médical**; disclaimers; pas de diagnostic; données sensibles chiffrées; accès strict rôle‑based.
+
+---
+
+## 7) Tool #7 — **SatisfAI — mesure émotionnelle & personnalisée**
+
+**Goal:** Mesurer **en temps réel** la satisfaction et les **émotions** clients, identifier points de friction, et générer un **retour personnalisé** (incl. avatar visuel) envoyé par e‑mail ou canal digital.
+
+**Components:**
+
+* **Ingestion**: formulaires/QR en agence, kiosques, e‑mail, chat/call transcripts (anonymisés).
+* **NLP temps réel**: classification d’**émotions** (joie, confiance, surprise, colère, tristesse, peur), sentiment, topics; détection pain‑points.
+* **Avatar personnalisé**: synthèse visuelle symbolique de l’expérience (non biométrique); message personnalisé.
+* **Delivery**: e‑mail/sms/app; boucle de feedback.
+* **Dashboards**: tendances, heatmaps par agence/produit, corrélations avec opérations, alertes.
+
+**APIs:** `POST /satisfai/feedback`, `GET /satisfai/summary`, `POST /satisfai/deliver`.
+
+**KPIs:** couverture temps réel, précision émotion/topic, délai de réponse, taux d’ouverture/clics, amélioration CSAT/NPS.
+
+**Compliance:** anonymisation par défaut; opt‑in; pas de reconnaissance faciale; conservation courte.
+
+---
+
+## 8) Shared Prompting & Guardrails
+
+**Do not reveal chain‑of‑thought.** Provide concise explanations (mechanical rationale, no step‑by‑step inner deliberation).
+**Input sanitization:** block secrets, code injection, prompt leakage attempts.
+**Output controls:** max tokens, safe‑completions, profanity/off‑topic filters.
+**PII handling:** redaction on logs; structured outputs only.
+
+**Fallbacks & resilience:**
+
+* If retrieval is empty/low confidence → ask a minimal clarification or present relevant fields/examples.
+* If model returns invalid SQL/JSON → auto‑repair with linter/grammar; otherwise show actionable error.
+
+---
+
+## 9) DevOps & Deployment
+
+* Environments: Dev/Stage/Prod; blue‑green deploys; migration strategy; seed tenant.
+* Secrets: rotate; no credentials in logs; per‑tenant KMS keys.
+* Backups: PITR for Postgres; object storage lifecycle policies; disaster recovery runbooks.
+* Monitoring: latency/error budgets; model health (drift, anomaly rates); file processing failures.
+
+---
+
+## 10) Pricing & Plans (suggested)
+
+* **Starter** (free trial): limited docs/questions, community support.
+* **Team**: SSO, higher limits, dashboards, priority support.
+* **Enterprise**: SAML/SCIM, on‑prem/VPC, custom models, dedicated KMS, audit exports, SLA.
+
+---
+
+## 11) Acceptance Criteria (MVP)
+
+* ✅ Users can sign up, create an org, invite teammates, and run **all seven tools** end‑to‑end.
+* ✅ Tax Advisor: grounded answers with ≥2 citations; PDF memo export; latency < 8s p95.
+* ✅ Affacturage: upload → extraction JSON → anomalies/decision; dashboard; field F1 ≥ 0.98 key fields.
+* ✅ NL→SQL: valid SQL; `EXPLAIN` with rowcount estimate; RLS enforced; correctness ≥ 80% curated; exec success ≥ 95%.
+* ✅ **Assessment**: adaptive sessions live; reliability (α/ω ≥ 0.8) on pilot; manager report with actionable recos; fairness checks passed.
+* ✅ **Voicebot/Chatbot**: FR/AR/Darija live; automation rate ≥ 50% pilot; FCR & AHT dashboards; graceful human handoff.
+* ✅ **Rhalia**: daily push running; opt‑in consents; personal insights + anonymized org dashboard; safety/escalation working.
+* ✅ **SatisfAI**: real‑time feedback pipeline; emotion/topic accuracy > baseline; avatar emails delivered; CSAT/NPS panel live.
+
+---
+
+## 12) Deliverables
+
+* Source code (frontend, backend, workers) + Infra as Code + Helm charts (if K8s).
+* Prompt libraries (per tool), evaluation harnesses, seed KB content & example datasets.
+* Admin & Security docs; Runbooks; Postman collection; OpenAPI/Swagger specs.
+* Demo tenant with synthetic data.
+
+---
+
+## 13) Nice‑to‑Have (Phase 2+)
+
+* Tax Advisor: workflow automation (deadlines, forms), entity extraction from receipts, case management.
+* Affacturage: LLM‑assisted counter‑proposal generation (e.g., suggest corrected amounts); vendor risk scoring.
+* NL→SQL: NL→PySpark; data lineage graph; notebook export; BI embedding; scheduled queries & alerting.
+
+---
+
+### FINAL INSTRUCTIONS
+
+Implement exactly as specified; where details are ambiguous, choose the most secure/compliant default. Prefer local/VPC inference. Keep logs minimal and anonymized. Provide seed scripts and a 90‑minute demo script that exercises all 7 tools. Ensure all prompts block chain‑of‑thought exposure while providing succinct, auditable rationales.
