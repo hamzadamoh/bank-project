@@ -43,8 +43,8 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-ink-950 mb-4">Company</h3>
             <ul className="space-y-2 text-sm text-slate-700">
-              <li><a href="#" className="hover:text-ink-950 transition-colors">About</a></li>
-              <li><a href="#" className="hover:text-ink-950 transition-colors">Careers</a></li>
+              <li><Link href="/about"><a className="hover:text-ink-950 transition-colors">About</a></Link></li>
+              <li><Link href="/careers"><a className="hover:text-ink-950 transition-colors">Careers</a></Link></li>
               <li><Link href="/security"><a className="hover:text-ink-950 transition-colors">Security</a></Link></li>
               <li><Link href="/contact"><a className="hover:text-ink-950 transition-colors">Contact</a></Link></li>
             </ul>
@@ -56,9 +56,9 @@ export default function Footer() {
             © 2024 FiscAI. All rights reserved.
           </div>
           <div className="flex gap-6 text-sm text-slate-600">
-            <a href="#" className="hover:text-ink-950 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-ink-950 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-ink-950 transition-colors">Cookie Policy</a>
+            <Link href="/privacy-policy"><a className="hover:text-ink-950 transition-colors">Privacy Policy</a></Link>
+            <Link href="/terms-of-service"><a className="hover:text-ink-950 transition-colors">Terms of Service</a></Link>
+            <Link href="/cookie-policy"><a className="hover:text-ink-950 transition-colors">Cookie Policy</a></Link>
           </div>
         </div>
       </div>

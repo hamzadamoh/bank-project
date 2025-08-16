@@ -47,9 +47,11 @@ export default function Navigation() {
           </div>
           
           <div className="hidden md:flex items-center space-x-4">
-            <button className="text-sm font-medium text-slate-700 hover:text-ink-950 transition-colors duration-200">
-              Sign In
-            </button>
+            <Link href="/newsletter">
+              <button className="text-sm font-medium text-slate-700 hover:text-ink-950 transition-colors duration-200">
+                Newsletter
+              </button>
+            </Link>
             <Link href="/contact">
               <button className="bg-ink-950 text-alabaster-50 px-4 py-2 rounded-xl text-sm font-medium hover:bg-ink-900 transition-all duration-200 transform hover:scale-105">
                 Request Demo
@@ -83,9 +85,14 @@ export default function Navigation() {
                 </Link>
               ))}
               <div className="border-t border-alabaster-200 pt-4">
-                <button className="block w-full text-left px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors">
-                  Sign In
-                </button>
+                <Link href="/newsletter">
+                  <button 
+                    className="block w-full text-left px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Newsletter
+                  </button>
+                </Link>
                 <Link href="/contact">
                   <button 
                     className="block w-full mt-2 bg-ink-950 text-alabaster-50 px-3 py-2 rounded-xl text-sm font-medium hover:bg-ink-900 transition-colors"
