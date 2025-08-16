@@ -11,6 +11,15 @@ import Solutions from "@/pages/solutions";
 import Security from "@/pages/security";
 import Pricing from "@/pages/pricing";
 import Contact from "@/pages/contact";
+import Newsletter from "@/pages/newsletter";
+import PrivacyPolicy from "@/pages/privacy-policy";
+import TermsOfService from "@/pages/terms-of-service";
+import CookiePolicy from "@/pages/cookie-policy";
+import DedicatedSupport from "@/pages/dedicated-support";
+import CustomTraining from "@/pages/custom-training";
+import OnSiteDeployment from "@/pages/on-site-deployment";
+import About from "@/pages/about";
+import Careers from "@/pages/careers";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -24,6 +33,15 @@ function Router() {
       <Route path="/security" component={Security} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/contact" component={Contact} />
+      <Route path="/newsletter" component={Newsletter} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/terms-of-service" component={TermsOfService} />
+      <Route path="/cookie-policy" component={CookiePolicy} />
+      <Route path="/dedicated-support" component={DedicatedSupport} />
+      <Route path="/custom-training" component={CustomTraining} />
+      <Route path="/on-site-deployment" component={OnSiteDeployment} />
+      <Route path="/about" component={About} />
+      <Route path="/careers" component={Careers} />
       <Route component={NotFound} />
     </Switch>
   );

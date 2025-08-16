@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Mail, Phone, MapPin, Calendar } from "lucide-react";
+import { Link } from "wouter";
 
 type FormType = "demo" | "contact";
 
@@ -448,7 +449,9 @@ export default function Contact() {
                 <p className="text-slate-700 text-sm mb-4">
                   Get a dedicated customer success manager and technical account manager for white-glove service.
                 </p>
-                <Button variant="outline" size="sm">Learn More</Button>
+                <Link href="/dedicated-support">
+                  <Button variant="outline" size="sm">Learn More</Button>
+                </Link>
               </GlassCard>
 
               <GlassCard className="p-8 text-center">
@@ -459,7 +462,9 @@ export default function Contact() {
                 <p className="text-slate-700 text-sm mb-4">
                   On-site training, custom workshops, and certification programs for your team members.
                 </p>
-                <Button variant="outline" size="sm">Schedule Training</Button>
+                <Link href="/custom-training">
+                  <Button variant="outline" size="sm">Schedule Training</Button>
+                </Link>
               </GlassCard>
 
               <GlassCard className="p-8 text-center">
@@ -470,7 +475,9 @@ export default function Contact() {
                 <p className="text-slate-700 text-sm mb-4">
                   Complete on-premises deployment with air-gapped environments and custom integrations.
                 </p>
-                <Button variant="outline" size="sm">Request Quote</Button>
+                <Link href="/on-site-deployment">
+                  <Button variant="outline" size="sm">Request Quote</Button>
+                </Link>
               </GlassCard>
             </div>
           </div>
