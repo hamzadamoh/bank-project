@@ -71,7 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the tax counsel service
-      const { getTaxAdvice } = await import("./services/tax-counsel.js");
+      const { getTaxAdvice } = await import("./services/tax-counsel");
       const taxResponse = await getTaxAdvice({ query, jurisdiction });
 
       const taxQuery = await storage.createTaxQuery({
@@ -89,6 +89,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Tax query error:", error);
+      console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
       console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
       res.status(500).json({ 
         success: false, 
@@ -111,7 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the query architect service
-      const { convertQuery } = await import("./services/query-architect.js");
+      const { convertQuery } = await import("./services/query-architect");
       const conversionResult = await convertQuery({ type, input });
 
       const sqlQuery = await storage.createSqlQuery({
@@ -150,7 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the factoring guardian service
-      const { analyzeDocument } = await import("./services/factoring-guardian.js");
+      const { analyzeDocument } = await import("./services/factoring-guardian");
       const analysisResult = await analyzeDocument({ filename });
 
       const analysis = await storage.createDocumentAnalysis({
@@ -219,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { assessSkills } = await import("./services/skillarcade.js");
+      const { assessSkills } = await import("./services/skillarcade");
       const assessment = await assessSkills({ category, responses });
 
       res.json({
@@ -249,7 +250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { chat } = await import("./services/omniserve.js");
+      const { chat } = await import("./services/omniserve");
       const chatResponse = await chat({ message, conversationId, language });
 
       res.json({
@@ -271,7 +272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { physicalMetrics, mentalMetrics, socialMetrics } = req.body;
       
-      const { analyzeWellbeing } = await import("./services/rhalia.js");
+      const { analyzeWellbeing } = await import("./services/rhalia");
       const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
 
       res.json({
@@ -300,7 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { analyzeSatisfaction } = await import("./services/satisfai.js");
+      const { analyzeSatisfaction } = await import("./services/satisfai");
       const analysis = await analyzeSatisfaction({ responses, context });
 
       res.json({
