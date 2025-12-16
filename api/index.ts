@@ -39,7 +39,7 @@ async function initializeApp() {
   
   try {
     // Register routes (returns a server but we don't need to use it in serverless)
-    const { registerRoutes } = await import('../server/routes');
+    const { registerRoutes } = await import('../server/routes.js');
     serverInstance = await registerRoutes(app);
     
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
