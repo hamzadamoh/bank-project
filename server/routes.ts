@@ -71,7 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the tax counsel service
-      const { getTaxAdvice } = await import("./services/tax-counsel");
+      const { getTaxAdvice } = await import("./services/tax-counsel.js");
       const taxResponse = await getTaxAdvice({ query, jurisdiction });
 
       const taxQuery = await storage.createTaxQuery({
@@ -89,9 +89,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Tax query error:", error);
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
       res.status(500).json({ 
         success: false, 
-        message: error instanceof Error ? error.message : "Internal server error" 
+        message: error instanceof Error ? error.message : "Internal server error",
+        error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
       });
     }
   });
@@ -109,7 +111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the query architect service
-      const { convertQuery } = await import("./services/query-architect");
+      const { convertQuery } = await import("./services/query-architect.js");
       const conversionResult = await convertQuery({ type, input });
 
       const sqlQuery = await storage.createSqlQuery({
@@ -148,7 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the factoring guardian service
-      const { analyzeDocument } = await import("./services/factoring-guardian");
+      const { analyzeDocument } = await import("./services/factoring-guardian.js");
       const analysisResult = await analyzeDocument({ filename });
 
       const analysis = await storage.createDocumentAnalysis({
@@ -217,7 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { assessSkills } = await import("./services/skillarcade");
+      const { assessSkills } = await import("./services/skillarcade.js");
       const assessment = await assessSkills({ category, responses });
 
       res.json({
@@ -227,6 +229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Skill assessment error:", error);
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
       res.status(500).json({
         success: false,
         message: error instanceof Error ? error.message : "Internal server error"
@@ -246,7 +249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { chat } = await import("./services/omniserve");
+      const { chat } = await import("./services/omniserve.js");
       const chatResponse = await chat({ message, conversationId, language });
 
       res.json({
@@ -268,7 +271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { physicalMetrics, mentalMetrics, socialMetrics } = req.body;
       
-      const { analyzeWellbeing } = await import("./services/rhalia");
+      const { analyzeWellbeing } = await import("./services/rhalia.js");
       const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
 
       res.json({
@@ -297,7 +300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { analyzeSatisfaction } = await import("./services/satisfai");
+      const { analyzeSatisfaction } = await import("./services/satisfai.js");
       const analysis = await analyzeSatisfaction({ responses, context });
 
       res.json({
