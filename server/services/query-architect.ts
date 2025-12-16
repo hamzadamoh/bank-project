@@ -24,8 +24,11 @@ export async function convertQuery(request: QueryConversionRequest): Promise<Que
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
+    console.warn('OPENAI_API_KEY not found, using mock data');
     return getMockConversion(request);
   }
+
+  console.log('Using OpenAI API for query conversion (key present)');
 
   try {
     if (request.type === 'nl_to_sql') {
@@ -78,10 +81,18 @@ Return ONLY the SQL query, nothing else.`;
   });
 
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`);
+    const errorText = await response.text();
+    console.error(`OpenAI API error (${response.status}):`, errorText);
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
   }
 
   const data = await response.json();
+  
+  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    console.error('Invalid OpenAI response format:', JSON.stringify(data));
+    throw new Error('Invalid response format from OpenAI API');
+  }
+
   const sql = data.choices[0].message.content.trim();
 
   return {
@@ -127,10 +138,18 @@ Provide a clear, concise explanation that a non-technical person could understan
   });
 
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`);
+    const errorText = await response.text();
+    console.error(`OpenAI API error (${response.status}):`, errorText);
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
   }
 
   const data = await response.json();
+  
+  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    console.error('Invalid OpenAI response format:', JSON.stringify(data));
+    throw new Error('Invalid response format from OpenAI API');
+  }
+
   const explanation = data.choices[0].message.content.trim();
 
   // Extract SQL keywords for metadata

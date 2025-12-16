@@ -137,10 +137,18 @@ async function getAIResponse(
   });
 
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`);
+    const errorText = await response.text();
+    console.error(`OpenAI API error (${response.status}):`, errorText);
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
   }
 
   const data = await response.json();
+  
+  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    console.error('Invalid OpenAI response format:', JSON.stringify(data));
+    throw new Error('Invalid response format from OpenAI API');
+  }
+
   return data.choices[0].message.content.trim();
 }
 
