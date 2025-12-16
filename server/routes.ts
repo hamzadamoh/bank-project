@@ -71,8 +71,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the tax counsel service
-      const { getTaxAdvice } = await import("./services/tax-counsel");
-      const taxResponse = await getTaxAdvice({ query, jurisdiction });
+      let taxResponse;
+      try {
+        const taxCounselModule = await import("./services/tax-counsel");
+        if (!taxCounselModule || !taxCounselModule.getTaxAdvice) {
+          throw new Error("Tax counsel service module not found or getTaxAdvice function missing");
+        }
+        taxResponse = await taxCounselModule.getTaxAdvice({ query, jurisdiction });
+      } catch (importError) {
+        console.error("Import error:", importError);
+        throw new Error(`Failed to import tax counsel service: ${importError instanceof Error ? importError.message : String(importError)}`);
+      }
 
       const taxQuery = await storage.createTaxQuery({
         query,
