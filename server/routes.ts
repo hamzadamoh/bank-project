@@ -9,13 +9,6 @@ import {
   insertDocumentAnalysisSchema
 } from "@shared/schema";
 import { z } from "zod";
-import { getTaxAdvice } from "./services/tax-counsel";
-import { convertQuery } from "./services/query-architect";
-import { analyzeDocument } from "./services/factoring-guardian";
-import { assessSkills } from "./services/skillarcade";
-import { chat } from "./services/omniserve";
-import { analyzeWellbeing } from "./services/rhalia";
-import { analyzeSatisfaction } from "./services/satisfai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -78,6 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the tax counsel service
+      const { getTaxAdvice } = await import("./services/tax-counsel.js");
       const taxResponse = await getTaxAdvice({ query, jurisdiction });
 
       const taxQuery = await storage.createTaxQuery({
@@ -117,6 +111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the query architect service
+      const { convertQuery } = await import("./services/query-architect.js");
       const conversionResult = await convertQuery({ type, input });
 
       const sqlQuery = await storage.createSqlQuery({
@@ -155,6 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the factoring guardian service
+      const { analyzeDocument } = await import("./services/factoring-guardian.js");
       const analysisResult = await analyzeDocument({ filename });
 
       const analysis = await storage.createDocumentAnalysis({
@@ -223,6 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      const { assessSkills } = await import("./services/skillarcade.js");
       const assessment = await assessSkills({ category, responses });
 
       res.json({
@@ -252,6 +249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      const { chat } = await import("./services/omniserve.js");
       const chatResponse = await chat({ message, conversationId, language });
 
       res.json({
@@ -273,6 +271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { physicalMetrics, mentalMetrics, socialMetrics } = req.body;
       
+      const { analyzeWellbeing } = await import("./services/rhalia.js");
       const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
 
       res.json({
@@ -301,6 +300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      const { analyzeSatisfaction } = await import("./services/satisfai.js");
       const analysis = await analyzeSatisfaction({ responses, context });
 
       res.json({
