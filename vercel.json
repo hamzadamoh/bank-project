@@ -6,7 +6,9 @@
   "installCommand": "npm install",
   "functions": {
     "api/**/*.ts": {
-      "includeFiles": "dist/**"
+      "includeFiles": "dist/**",
+      "memory": 1024,
+      "maxDuration": 30
     }
   },
   "rewrites": [

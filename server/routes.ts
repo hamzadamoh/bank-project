@@ -9,6 +9,14 @@ import {
   insertDocumentAnalysisSchema
 } from "@shared/schema";
 import { z } from "zod";
+// Import all services statically to ensure they're bundled
+import { getTaxAdvice } from "./services/tax-counsel";
+import { convertQuery } from "./services/query-architect";
+import { analyzeDocument } from "./services/factoring-guardian";
+import { assessSkills } from "./services/skillarcade";
+import { chat } from "./services/omniserve";
+import { analyzeWellbeing } from "./services/rhalia";
+import { analyzeSatisfaction } from "./services/satisfai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -72,17 +80,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the tax counsel service
-      let taxResponse;
-      try {
-        const taxCounselModule = await import("./services/tax-counsel");
-        if (!taxCounselModule || !taxCounselModule.getTaxAdvice) {
-          throw new Error("Tax counsel service module not found or getTaxAdvice function missing");
-        }
-        taxResponse = await taxCounselModule.getTaxAdvice({ query, jurisdiction });
-      } catch (importError) {
-        console.error("Import error:", importError);
-        throw new Error(`Failed to import tax counsel service: ${importError instanceof Error ? importError.message : String(importError)}`);
-      }
+      const taxResponse = await getTaxAdvice({ query, jurisdiction });
 
       const taxQuery = await storage.createTaxQuery({
         query,
@@ -122,17 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the query architect service
-      let conversionResult;
-      try {
-        const queryArchitectModule = await import("./services/query-architect");
-        if (!queryArchitectModule || !queryArchitectModule.convertQuery) {
-          throw new Error("Query architect service module not found or convertQuery function missing");
-        }
-        conversionResult = await queryArchitectModule.convertQuery({ type, input });
-      } catch (importError) {
-        console.error("Import error:", importError);
-        throw new Error(`Failed to import query architect service: ${importError instanceof Error ? importError.message : String(importError)}`);
-      }
+      const conversionResult = await convertQuery({ type, input });
 
       const sqlQuery = await storage.createSqlQuery({
         type,
@@ -173,17 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the factoring guardian service
-      let analysisResult;
-      try {
-        const factoringGuardianModule = await import("./services/factoring-guardian");
-        if (!factoringGuardianModule || !factoringGuardianModule.analyzeDocument) {
-          throw new Error("Factoring guardian service module not found or analyzeDocument function missing");
-        }
-        analysisResult = await factoringGuardianModule.analyzeDocument({ filename });
-      } catch (importError) {
-        console.error("Import error:", importError);
-        throw new Error(`Failed to import factoring guardian service: ${importError instanceof Error ? importError.message : String(importError)}`);
-      }
+      const analysisResult = await analyzeDocument({ filename });
 
       const analysis = await storage.createDocumentAnalysis({
         filename,
@@ -254,17 +232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      let assessment;
-      try {
-        const skillarcadeModule = await import("./services/skillarcade");
-        if (!skillarcadeModule || !skillarcadeModule.assessSkills) {
-          throw new Error("SkillArcade service module not found or assessSkills function missing");
-        }
-        assessment = await skillarcadeModule.assessSkills({ category, responses });
-      } catch (importError) {
-        console.error("Import error:", importError);
-        throw new Error(`Failed to import SkillArcade service: ${importError instanceof Error ? importError.message : String(importError)}`);
-      }
+      const assessment = await assessSkills({ category, responses });
 
       res.json({
         success: true,
@@ -293,17 +261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      let chatResponse;
-      try {
-        const omniserveModule = await import("./services/omniserve");
-        if (!omniserveModule || !omniserveModule.chat) {
-          throw new Error("OmniServe service module not found or chat function missing");
-        }
-        chatResponse = await omniserveModule.chat({ message, conversationId, language });
-      } catch (importError) {
-        console.error("Import error:", importError);
-        throw new Error(`Failed to import OmniServe service: ${importError instanceof Error ? importError.message : String(importError)}`);
-      }
+      const chatResponse = await chat({ message, conversationId, language });
 
       res.json({
         success: true,
@@ -327,17 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { physicalMetrics, mentalMetrics, socialMetrics } = req.body;
       
-      let analysis;
-      try {
-        const rhaliaModule = await import("./services/rhalia");
-        if (!rhaliaModule || !rhaliaModule.analyzeWellbeing) {
-          throw new Error("Rhalia service module not found or analyzeWellbeing function missing");
-        }
-        analysis = await rhaliaModule.analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
-      } catch (importError) {
-        console.error("Import error:", importError);
-        throw new Error(`Failed to import Rhalia service: ${importError instanceof Error ? importError.message : String(importError)}`);
-      }
+      const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
 
       res.json({
         success: true,
@@ -368,17 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      let analysis;
-      try {
-        const satisfaiModule = await import("./services/satisfai");
-        if (!satisfaiModule || !satisfaiModule.analyzeSatisfaction) {
-          throw new Error("SatisfAI service module not found or analyzeSatisfaction function missing");
-        }
-        analysis = await satisfaiModule.analyzeSatisfaction({ responses, context });
-      } catch (importError) {
-        console.error("Import error:", importError);
-        throw new Error(`Failed to import SatisfAI service: ${importError instanceof Error ? importError.message : String(importError)}`);
-      }
+      const analysis = await analyzeSatisfaction({ responses, context });
 
       res.json({
         success: true,
