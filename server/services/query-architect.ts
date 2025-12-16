@@ -62,7 +62,7 @@ Return ONLY the SQL query, nothing else.`;
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4-turbo-preview',
+        model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -111,7 +111,7 @@ Provide a clear, concise explanation that a non-technical person could understan
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4-turbo-preview',
+        model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',

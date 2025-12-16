@@ -130,7 +130,7 @@ async function getAIResponse(
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4-turbo-preview',
+        model: 'gpt-4o-mini',
       messages,
       temperature: 0.7,
     }),
