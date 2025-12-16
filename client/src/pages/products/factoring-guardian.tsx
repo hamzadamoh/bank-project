@@ -77,56 +77,6 @@ export default function FactoringGuardian() {
       confidence: 98.5
     };
   };
-    extractedData: {
-      supplier: {
-        name: "ABC Construction SARL",
-        taxId: "123456789",
-        address: "123 Rue Mohammed V, Casablanca",
-        iban: "MA64011090000001234567890"
-      },
-      invoice: {
-        number: "INV-2024-001",
-        date: "2024-01-15",
-        dueDate: "2024-02-15",
-        currency: "MAD",
-        totalHT: 104542.00,
-        totalTVA: 20908.40,
-        totalTTC: 125450.40
-      },
-      lineItems: [
-        { description: "Construction Materials", quantity: 100, unitPrice: 524.21, total: 52421.00 },
-        { description: "Labor Services", quantity: 40, unitPrice: 1303.03, total: 52121.00 }
-      ]
-    },
-    anomalies: [
-      {
-        type: "IBAN_MISMATCH",
-        severity: "HIGH",
-        message: "IBAN differs from supplier master record",
-        expected: "MA64011090000001234567123",
-        found: "MA64011090000001234567890"
-      },
-      {
-        type: "AMOUNT_VARIANCE", 
-        severity: "MEDIUM",
-        message: "Line total variance exceeds threshold",
-        variance: "0.02%"
-      }
-    ],
-    poMatching: {
-      poNumber: "PO-2024-0156",
-      matchAccuracy: 98.5,
-      lineItemMatches: [
-        { matched: true, description: "Construction Materials", variance: 0 },
-        { matched: true, description: "Labor Services", variance: 0.02 }
-      ]
-    },
-    decision: {
-      status: "ALERT",
-      confidence: 85,
-      recommendation: "Review IBAN change with supplier before processing"
-    }
-  };
 
   return (
     <div className="min-h-screen">
