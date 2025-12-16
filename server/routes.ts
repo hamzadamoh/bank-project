@@ -205,6 +205,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SkillArcade assessment endpoint
+  app.post("/api/skill-assessments", async (req, res) => {
+    try {
+      const { category, responses } = req.body;
+      
+      if (!category || !responses || !Array.isArray(responses)) {
+        return res.status(400).json({
+          success: false,
+          message: "Category and responses array are required"
+        });
+      }
+
+      const { assessSkills } = await import("./services/skillarcade");
+      const assessment = await assessSkills({ category, responses });
+
+      res.json({
+        success: true,
+        assessment
+      });
+
+    } catch (error) {
+      console.error("Skill assessment error:", error);
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : "Internal server error"
+      });
+    }
+  });
+
+  // OmniServe chat endpoint
+  app.post("/api/chat", async (req, res) => {
+    try {
+      const { message, conversationId, language } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({
+          success: false,
+          message: "Message is required"
+        });
+      }
+
+      const { chat } = await import("./services/omniserve");
+      const chatResponse = await chat({ message, conversationId, language });
+
+      res.json({
+        success: true,
+        ...chatResponse
+      });
+
+    } catch (error) {
+      console.error("Chat error:", error);
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : "Internal server error"
+      });
+    }
+  });
+
+  // Rhalia wellbeing analysis endpoint
+  app.post("/api/wellbeing-analysis", async (req, res) => {
+    try {
+      const { physicalMetrics, mentalMetrics, socialMetrics } = req.body;
+      
+      const { analyzeWellbeing } = await import("./services/rhalia");
+      const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
+
+      res.json({
+        success: true,
+        analysis
+      });
+
+    } catch (error) {
+      console.error("Wellbeing analysis error:", error);
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : "Internal server error"
+      });
+    }
+  });
+
+  // SatisfAI satisfaction analysis endpoint
+  app.post("/api/satisfaction-analysis", async (req, res) => {
+    try {
+      const { responses, context } = req.body;
+      
+      if (!responses || !Array.isArray(responses)) {
+        return res.status(400).json({
+          success: false,
+          message: "Responses array is required"
+        });
+      }
+
+      const { analyzeSatisfaction } = await import("./services/satisfai");
+      const analysis = await analyzeSatisfaction({ responses, context });
+
+      res.json({
+        success: true,
+        analysis
+      });
+
+    } catch (error) {
+      console.error("Satisfaction analysis error:", error);
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : "Internal server error"
+      });
+    }
+  });
+
   // Health check endpoint
   app.get("/api/health", (req, res) => {
     res.json({ 

@@ -7,6 +7,10 @@ import Home from "@/pages/home";
 import TaxCounsel from "@/pages/products/tax-counsel";
 import QueryArchitect from "@/pages/products/query-architect";
 import FactoringGuardian from "@/pages/products/factoring-guardian";
+import SkillArcade from "@/pages/products/skillarcade";
+import OmniServe from "@/pages/products/omniserve";
+import Rhalia from "@/pages/products/rhalia";
+import SatisfAI from "@/pages/products/satisfai";
 import Solutions from "@/pages/solutions";
 import Security from "@/pages/security";
 import Pricing from "@/pages/pricing";
@@ -29,6 +33,10 @@ function Router() {
       <Route path="/products/tax-counsel" component={TaxCounsel} />
       <Route path="/products/query-architect" component={QueryArchitect} />
       <Route path="/products/factoring-guardian" component={FactoringGuardian} />
+      <Route path="/products/skillarcade" component={SkillArcade} />
+      <Route path="/products/omniserve" component={OmniServe} />
+      <Route path="/products/rhalia" component={Rhalia} />
+      <Route path="/products/satisfai" component={SatisfAI} />
       <Route path="/solutions" component={Solutions} />
       <Route path="/security" component={Security} />
       <Route path="/pricing" component={Pricing} />
