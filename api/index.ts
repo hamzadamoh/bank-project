@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { registerRoutes } from '../server/routes';
-import { serveStatic } from '../server/vite';
 import express, { type Request, Response, NextFunction } from 'express';
+import path from 'path';
+import fs from 'fs';
 
 // Create a single Express app instance
 const app = express();
@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: false }));
 // Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
-  const path = req.path;
+  const requestPath = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
   const originalResJson = res.json;
@@ -22,8 +22,8 @@ app.use((req, res, next) => {
 
   res.on('finish', () => {
     const duration = Date.now() - start;
-    if (path.startsWith('/api')) {
-      console.log(`${req.method} ${path} ${res.statusCode} in ${duration}ms`);
+    if (requestPath.startsWith('/api')) {
+      console.log(`${req.method} ${requestPath} ${res.statusCode} in ${duration}ms`);
     }
   });
 
@@ -37,19 +37,57 @@ let serverInstance: any = null;
 async function initializeApp() {
   if (routesInitialized) return;
   
-  // Register routes (returns a server but we don't need to use it in serverless)
-  serverInstance = await registerRoutes(app);
-  
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || 'Internal Server Error';
-    res.status(status).json({ message });
-  });
+  try {
+    // Register routes (returns a server but we don't need to use it in serverless)
+    const { registerRoutes } = await import('../server/routes');
+    serverInstance = await registerRoutes(app);
+    
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || 'Internal Server Error';
+      res.status(status).json({ message });
+    });
 
-  // Serve static files in production
-  serveStatic(app);
-  
-  routesInitialized = true;
+    // Serve static files in production - handle path resolution for Vercel
+    const possiblePaths = [
+      path.resolve(process.cwd(), 'dist', 'public'),
+      path.resolve(process.cwd(), '.vercel', 'output', 'static'),
+      path.resolve(__dirname || process.cwd(), '..', 'dist', 'public'),
+    ];
+
+    let distPath: string | null = null;
+    for (const possiblePath of possiblePaths) {
+      if (fs.existsSync(possiblePath)) {
+        distPath = possiblePath;
+        break;
+      }
+    }
+
+    if (distPath) {
+      console.log(`Serving static files from: ${distPath}`);
+      app.use(express.static(distPath));
+      app.use('*', (req, res) => {
+        const indexPath = path.resolve(distPath!, 'index.html');
+        if (fs.existsSync(indexPath)) {
+          res.sendFile(indexPath);
+        } else {
+          res.status(404).json({ error: 'index.html not found' });
+        }
+      });
+    } else {
+      console.warn('Static files directory not found, only API routes will work');
+      app.use('*', (req, res) => {
+        if (!req.path.startsWith('/api')) {
+          res.status(404).json({ error: 'Static files not found. Build may have failed.' });
+        }
+      });
+    }
+    
+    routesInitialized = true;
+  } catch (error) {
+    console.error('Error initializing app:', error);
+    throw error;
+  }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
