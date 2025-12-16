@@ -12,33 +12,71 @@ export default function FactoringGuardian() {
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const simulateAnalysis = () => {
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+  const simulateAnalysis = async () => {
     setIsAnalyzing(true);
     setAnalysisComplete(false);
     setUploadProgress(0);
+    setAnalysisResult(null);
 
     // Simulate upload progress
-    const interval = setInterval(() => {
+    const progressInterval = setInterval(() => {
       setUploadProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setIsAnalyzing(false);
-            setAnalysisComplete(true);
-          }, 1000);
-          return 100;
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90;
         }
         return prev + 10;
       });
     }, 200);
+
+    try {
+      // Call the actual API
+      const response = await fetch('/api/document-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filename: 'demo_invoice.pdf',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze document');
+      }
+
+      const data = await response.json();
+      setUploadProgress(100);
+      setTimeout(() => {
+        setIsAnalyzing(false);
+        setAnalysisComplete(true);
+        setAnalysisResult(data);
+      }, 500);
+    } catch (error) {
+      console.error('Error analyzing document:', error);
+      clearInterval(progressInterval);
+      setIsAnalyzing(false);
+      alert('Failed to analyze document. Please try again.');
+    }
   };
 
-  const mockAnalysisResults = {
-    documentInfo: {
+  // Keep mock data structure for reference but use actual API response
+  const getDocumentInfo = () => {
+    if (analysisResult) {
+      return {
+        filename: "Invoice_ABC_Corp_INV-2024-001.pdf",
+        pages: 2,
+        confidence: analysisResult.confidence
+      };
+    }
+    return {
       filename: "Invoice_ABC_Corp_INV-2024-001.pdf",
       pages: 2,
       confidence: 98.5
-    },
+    };
+  };
     extractedData: {
       supplier: {
         name: "ABC Construction SARL",
@@ -135,63 +173,66 @@ export default function FactoringGuardian() {
                 )}
               </div>
 
-              {analysisComplete && (
+              {analysisComplete && analysisResult && (
                 <div className="space-y-6">
                   {/* Document Info */}
                   <div className="bg-white rounded-xl p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-semibold text-ink-950">Document Processed</h4>
                       <Badge className="bg-emerald-400 text-ink-950">
-                        {mockAnalysisResults.documentInfo.confidence}% Confidence
+                        {analysisResult.confidence}% Confidence
                       </Badge>
                     </div>
                     <div className="grid md:grid-cols-3 gap-4 text-sm">
                       <div>
                         <span className="font-medium text-slate-600">Filename:</span>
-                        <p className="text-ink-950">{mockAnalysisResults.documentInfo.filename}</p>
+                        <p className="text-ink-950">{analysisResult.extractedData?.invoice?.number || 'N/A'}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-slate-600">Pages:</span>
-                        <p className="text-ink-950">{mockAnalysisResults.documentInfo.pages}</p>
+                        <span className="font-medium text-slate-600">Decision:</span>
+                        <p className="text-ink-950">{analysisResult.decision}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-slate-600">Processing Time:</span>
-                        <p className="text-ink-950">2.3 seconds</p>
+                        <span className="font-medium text-slate-600">Confidence:</span>
+                        <p className="text-ink-950">{analysisResult.confidence}%</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Extracted Data */}
-                  <div className="bg-white rounded-xl p-6">
-                    <h4 className="font-semibold text-ink-950 mb-4">Extracted Invoice Data</h4>
-                    <div className="grid lg:grid-cols-2 gap-6">
-                      <div>
-                        <h5 className="font-medium text-slate-700 mb-3">Supplier Information</h5>
-                        <div className="space-y-2 text-sm">
-                          <div><span className="font-medium">Name:</span> {mockAnalysisResults.extractedData.supplier.name}</div>
-                          <div><span className="font-medium">Tax ID:</span> {mockAnalysisResults.extractedData.supplier.taxId}</div>
-                          <div><span className="font-medium">IBAN:</span> {mockAnalysisResults.extractedData.supplier.iban}</div>
+                  {analysisResult.extractedData && (
+                    <div className="bg-white rounded-xl p-6">
+                      <h4 className="font-semibold text-ink-950 mb-4">Extracted Invoice Data</h4>
+                      <div className="grid lg:grid-cols-2 gap-6">
+                        <div>
+                          <h5 className="font-medium text-slate-700 mb-3">Supplier Information</h5>
+                          <div className="space-y-2 text-sm">
+                            <div><span className="font-medium">Name:</span> {analysisResult.extractedData.supplier?.name || 'N/A'}</div>
+                            <div><span className="font-medium">Tax ID:</span> {analysisResult.extractedData.supplier?.taxId || 'N/A'}</div>
+                            <div><span className="font-medium">IBAN:</span> {analysisResult.extractedData.supplier?.iban || 'N/A'}</div>
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                        <h5 className="font-medium text-slate-700 mb-3">Invoice Details</h5>
-                        <div className="space-y-2 text-sm">
-                          <div><span className="font-medium">Number:</span> {mockAnalysisResults.extractedData.invoice.number}</div>
-                          <div><span className="font-medium">Date:</span> {mockAnalysisResults.extractedData.invoice.date}</div>
-                          <div><span className="font-medium">Total TTC:</span> {mockAnalysisResults.extractedData.invoice.totalTTC.toLocaleString()} {mockAnalysisResults.extractedData.invoice.currency}</div>
+                        <div>
+                          <h5 className="font-medium text-slate-700 mb-3">Invoice Details</h5>
+                          <div className="space-y-2 text-sm">
+                            <div><span className="font-medium">Number:</span> {analysisResult.extractedData.invoice?.number || 'N/A'}</div>
+                            <div><span className="font-medium">Date:</span> {analysisResult.extractedData.invoice?.date || 'N/A'}</div>
+                            <div><span className="font-medium">Total TTC:</span> {analysisResult.extractedData.invoice?.totalTTC?.toLocaleString() || '0'} {analysisResult.extractedData.invoice?.currency || ''}</div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Anomaly Detection */}
-                  <div className="bg-white rounded-xl p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <AlertTriangle className="h-5 w-5 text-amber-400" />
-                      <h4 className="font-semibold text-ink-950">Anomalies Detected</h4>
-                    </div>
-                    <div className="space-y-3">
-                      {mockAnalysisResults.anomalies.map((anomaly, index) => (
+                  {analysisResult.anomalies && analysisResult.anomalies.length > 0 && (
+                    <div className="bg-white rounded-xl p-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <AlertTriangle className="h-5 w-5 text-amber-400" />
+                        <h4 className="font-semibold text-ink-950">Anomalies Detected</h4>
+                      </div>
+                      <div className="space-y-3">
+                        {analysisResult.anomalies.map((anomaly: any, index: number) => (
                         <div key={index} className={`border-l-4 pl-4 ${
                           anomaly.severity === 'HIGH' ? 'border-rose-400' : 'border-amber-400'
                         }`}>
@@ -211,56 +252,30 @@ export default function FactoringGuardian() {
                             </div>
                           )}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* PO Matching */}
-                  <div className="bg-white rounded-xl p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <CheckCircle className="h-5 w-5 text-emerald-400" />
-                      <h4 className="font-semibold text-ink-950">Purchase Order Matching</h4>
-                    </div>
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">PO #{mockAnalysisResults.poMatching.poNumber}</span>
-                        <Badge className="bg-emerald-400 text-ink-950">
-                          {mockAnalysisResults.poMatching.matchAccuracy}% Match
-                        </Badge>
+                        ))}
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      {mockAnalysisResults.poMatching.lineItemMatches.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between text-sm">
-                          <span className="text-slate-700">{item.description}</span>
-                          <div className="flex items-center gap-2">
-                            {item.matched ? (
-                              <CheckCircle className="h-4 w-4 text-emerald-400" />
-                            ) : (
-                              <X className="h-4 w-4 text-rose-400" />
-                            )}
-                            <span className="text-xs text-slate-500">
-                              {item.variance > 0 ? `+${item.variance}%` : 'Match'}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  )}
 
                   {/* Decision */}
                   <div className={`rounded-xl p-6 ${
-                    mockAnalysisResults.decision.status === 'ALERT' ? 'bg-amber-50' : 'bg-emerald-50'
+                    analysisResult.decision === 'ALERT' ? 'bg-amber-50' : analysisResult.decision === 'REJECTED' ? 'bg-rose-50' : 'bg-emerald-50'
                   }`}>
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-semibold text-ink-950">Processing Decision</h4>
                       <Badge className={`${
-                        mockAnalysisResults.decision.status === 'ALERT' ? 'bg-amber-400' : 'bg-emerald-400'
+                        analysisResult.decision === 'ALERT' ? 'bg-amber-400' : analysisResult.decision === 'REJECTED' ? 'bg-rose-400' : 'bg-emerald-400'
                       } text-ink-950`}>
-                        {mockAnalysisResults.decision.status}
+                        {analysisResult.decision}
                       </Badge>
                     </div>
-                    <p className="text-slate-700 mb-4">{mockAnalysisResults.decision.recommendation}</p>
+                    <p className="text-slate-700 mb-4">
+                      {analysisResult.decision === 'VALIDATED' 
+                        ? 'Document validated successfully. No anomalies detected.'
+                        : analysisResult.decision === 'ALERT'
+                        ? 'Review recommended due to detected anomalies.'
+                        : 'Document rejected due to critical anomalies.'}
+                    </p>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm">Approve with Review</Button>
                       <Button variant="outline" size="sm">Request Clarification</Button>
@@ -273,6 +288,7 @@ export default function FactoringGuardian() {
                     <Button onClick={() => {
                       setAnalysisComplete(false);
                       setUploadProgress(0);
+                      setAnalysisResult(null);
                     }}>
                       Analyze Another Document
                     </Button>

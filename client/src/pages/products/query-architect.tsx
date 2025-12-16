@@ -28,29 +28,37 @@ export default function QueryArchitect() {
   };
 
   const handleGenerate = async () => {
+    if (!input.trim()) {
+      return;
+    }
+
     setIsLoading(true);
+    setOutput("");
     
-    setTimeout(() => {
-      if (mode === "nl_to_sql") {
-        setOutput(`SELECT 
-    r.region_name,
-    SUM(o.total_amount) as total_revenue,
-    COUNT(o.id) as order_count,
-    AVG(o.total_amount) as avg_order_value
-FROM orders o
-JOIN customers c ON o.customer_id = c.id
-JOIN regions r ON c.region_id = r.id
-WHERE o.created_at >= '2024-10-01'
-    AND o.created_at < '2025-01-01'
-    AND o.status = 'completed'
-GROUP BY r.region_name, r.id
-ORDER BY total_revenue DESC
-LIMIT 100;`);
-      } else {
-        setOutput("This query identifies high-value customers by finding customer IDs that have made more than 5 transactions with individual amounts exceeding $1,000. It groups all transactions by customer_id, counts the number of transactions per customer, and then filters to only show customers who meet both criteria (>5 transactions AND each transaction >$1,000). The result shows customer IDs and their qualifying transaction counts.");
+    try {
+      const response = await fetch('/api/sql-queries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: mode,
+          input: input.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to convert query');
       }
+
+      const data = await response.json();
+      setOutput(data.output);
+    } catch (error) {
+      console.error('Error converting query:', error);
+      alert('Failed to convert query. Please try again.');
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleSampleClick = (sample: string) => {

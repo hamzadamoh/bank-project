@@ -16,43 +16,37 @@ export default function TaxCounsel() {
   const [response, setResponse] = useState<any>(null);
 
   const handleQuery = async () => {
+    if (!query.trim()) {
+      return;
+    }
+
     setIsLoading(true);
+    setResponse(null);
     
-    // Simulate API call
-    setTimeout(() => {
-      setResponse({
-        shortAnswer: "Moroccan SaaS companies serving EU clients must apply 20% VAT domestically and trigger EU OSS registration above €10,000 annual sales.",
-        explanation: "For Moroccan SaaS providers serving EU clients, the VAT treatment involves both domestic Moroccan obligations and potential EU compliance requirements.",
-        details: [
-          {
-            title: "Moroccan VAT Application",
-            content: "Under Article 87 of the General Tax Code (CGI), SaaS services are subject to 20% VAT when provided from Morocco, regardless of client location."
-          },
-          {
-            title: "EU VAT Obligations", 
-            content: "For B2B clients in the EU, the reverse charge mechanism applies under EU Directive 2006/112/EC. EU businesses account for VAT in their member state."
-          },
-          {
-            title: "OSS Registration Threshold",
-            content: "Once annual EU B2C sales exceed €10,000, registration for the One-Stop Shop (OSS) system becomes mandatory per Note 728/2023."
-          }
-        ],
-        checklist: [
-          "Register for Moroccan VAT if not already done",
-          "Implement reverse charge invoicing for EU B2B clients",
-          "Monitor annual EU B2C sales threshold",
-          "Consider OSS registration preparation",
-          "Maintain proper documentation for cross-border services"
-        ],
-        citations: [
-          { code: "Art. 87 CGI", description: "Morocco General Tax Code - Digital Services VAT" },
-          { code: "EU Dir. 2006/112", description: "EU VAT Directive - Reverse Charge Mechanism" },
-          { code: "Note 728/2023", description: "Morocco Tax Authority - Digital Services Clarification" }
-        ],
-        confidence: 95
+    try {
+      const response = await fetch('/api/tax-queries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+          jurisdiction,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to get tax advice');
+      }
+
+      const data = await response.json();
+      setResponse(data.response);
+    } catch (error) {
+      console.error('Error fetching tax advice:', error);
+      alert('Failed to get tax advice. Please try again.');
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (
