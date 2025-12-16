@@ -50,6 +50,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           errors: error.errors 
         });
       } else {
+        console.error("Internal server error:", error);
         res.status(500).json({ 
           success: false, 
           message: "Internal server error" 
@@ -121,8 +122,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the query architect service
-      const { convertQuery } = await import("./services/query-architect");
-      const conversionResult = await convertQuery({ type, input });
+      let conversionResult;
+      try {
+        const queryArchitectModule = await import("./services/query-architect");
+        if (!queryArchitectModule || !queryArchitectModule.convertQuery) {
+          throw new Error("Query architect service module not found or convertQuery function missing");
+        }
+        conversionResult = await queryArchitectModule.convertQuery({ type, input });
+      } catch (importError) {
+        console.error("Import error:", importError);
+        throw new Error(`Failed to import query architect service: ${importError instanceof Error ? importError.message : String(importError)}`);
+      }
 
       const sqlQuery = await storage.createSqlQuery({
         type,
@@ -140,9 +150,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("SQL query error:", error);
+      console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
       res.status(500).json({
         success: false,
-        message: error instanceof Error ? error.message : "Internal server error"
+        message: error instanceof Error ? error.message : "Internal server error",
+        error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
       });
     }
   });
@@ -160,8 +173,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use the factoring guardian service
-      const { analyzeDocument } = await import("./services/factoring-guardian");
-      const analysisResult = await analyzeDocument({ filename });
+      let analysisResult;
+      try {
+        const factoringGuardianModule = await import("./services/factoring-guardian");
+        if (!factoringGuardianModule || !factoringGuardianModule.analyzeDocument) {
+          throw new Error("Factoring guardian service module not found or analyzeDocument function missing");
+        }
+        analysisResult = await factoringGuardianModule.analyzeDocument({ filename });
+      } catch (importError) {
+        console.error("Import error:", importError);
+        throw new Error(`Failed to import factoring guardian service: ${importError instanceof Error ? importError.message : String(importError)}`);
+      }
 
       const analysis = await storage.createDocumentAnalysis({
         filename,
@@ -182,9 +204,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Document analysis error:", error);
+      console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
       res.status(500).json({
         success: false,
-        message: error instanceof Error ? error.message : "Internal server error"
+        message: error instanceof Error ? error.message : "Internal server error",
+        error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
       });
     }
   });
@@ -229,8 +254,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { assessSkills } = await import("./services/skillarcade");
-      const assessment = await assessSkills({ category, responses });
+      let assessment;
+      try {
+        const skillarcadeModule = await import("./services/skillarcade");
+        if (!skillarcadeModule || !skillarcadeModule.assessSkills) {
+          throw new Error("SkillArcade service module not found or assessSkills function missing");
+        }
+        assessment = await skillarcadeModule.assessSkills({ category, responses });
+      } catch (importError) {
+        console.error("Import error:", importError);
+        throw new Error(`Failed to import SkillArcade service: ${importError instanceof Error ? importError.message : String(importError)}`);
+      }
 
       res.json({
         success: true,
@@ -259,8 +293,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { chat } = await import("./services/omniserve");
-      const chatResponse = await chat({ message, conversationId, language });
+      let chatResponse;
+      try {
+        const omniserveModule = await import("./services/omniserve");
+        if (!omniserveModule || !omniserveModule.chat) {
+          throw new Error("OmniServe service module not found or chat function missing");
+        }
+        chatResponse = await omniserveModule.chat({ message, conversationId, language });
+      } catch (importError) {
+        console.error("Import error:", importError);
+        throw new Error(`Failed to import OmniServe service: ${importError instanceof Error ? importError.message : String(importError)}`);
+      }
 
       res.json({
         success: true,
@@ -269,9 +312,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Chat error:", error);
+      console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
       res.status(500).json({
         success: false,
-        message: error instanceof Error ? error.message : "Internal server error"
+        message: error instanceof Error ? error.message : "Internal server error",
+        error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
       });
     }
   });
@@ -281,8 +327,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { physicalMetrics, mentalMetrics, socialMetrics } = req.body;
       
-      const { analyzeWellbeing } = await import("./services/rhalia");
-      const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
+      let analysis;
+      try {
+        const rhaliaModule = await import("./services/rhalia");
+        if (!rhaliaModule || !rhaliaModule.analyzeWellbeing) {
+          throw new Error("Rhalia service module not found or analyzeWellbeing function missing");
+        }
+        analysis = await rhaliaModule.analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
+      } catch (importError) {
+        console.error("Import error:", importError);
+        throw new Error(`Failed to import Rhalia service: ${importError instanceof Error ? importError.message : String(importError)}`);
+      }
 
       res.json({
         success: true,
@@ -291,9 +346,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Wellbeing analysis error:", error);
+      console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
       res.status(500).json({
         success: false,
-        message: error instanceof Error ? error.message : "Internal server error"
+        message: error instanceof Error ? error.message : "Internal server error",
+        error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
       });
     }
   });
@@ -310,8 +368,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { analyzeSatisfaction } = await import("./services/satisfai");
-      const analysis = await analyzeSatisfaction({ responses, context });
+      let analysis;
+      try {
+        const satisfaiModule = await import("./services/satisfai");
+        if (!satisfaiModule || !satisfaiModule.analyzeSatisfaction) {
+          throw new Error("SatisfAI service module not found or analyzeSatisfaction function missing");
+        }
+        analysis = await satisfaiModule.analyzeSatisfaction({ responses, context });
+      } catch (importError) {
+        console.error("Import error:", importError);
+        throw new Error(`Failed to import SatisfAI service: ${importError instanceof Error ? importError.message : String(importError)}`);
+      }
 
       res.json({
         success: true,
@@ -320,9 +387,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Satisfaction analysis error:", error);
+      console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
       res.status(500).json({
         success: false,
-        message: error instanceof Error ? error.message : "Internal server error"
+        message: error instanceof Error ? error.message : "Internal server error",
+        error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
       });
     }
   });
