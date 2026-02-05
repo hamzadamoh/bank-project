@@ -36,13 +36,36 @@ export default function Navigation() {
               </div>
             </Link>
             <div className="hidden md:flex space-x-6 text-sm font-medium">
-              {navLinks.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <a className="text-slate-700 hover:text-ink-950 transition-colors duration-200">
-                    {link.label}
-                  </a>
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                // Handle hash links with smooth scroll
+                const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+                  if (link.href.startsWith('/#')) {
+                    e.preventDefault();
+                    const hash = link.href.replace('/#', '');
+                    if (location === '/') {
+                      // Already on home page, scroll to section
+                      const element = document.getElementById(hash);
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    } else {
+                      // Navigate to home first, then scroll
+                      window.location.href = `/#${hash}`;
+                    }
+                  }
+                };
+                
+                return (
+                  <Link key={link.href} href={link.href}>
+                    <a 
+                      onClick={handleClick}
+                      className="text-slate-700 hover:text-ink-950 transition-colors duration-200 cursor-pointer"
+                    >
+                      {link.label}
+                    </a>
+                  </Link>
+                );
+              })}
             </div>
           </div>
           
@@ -74,16 +97,34 @@ export default function Navigation() {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-alabaster-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {navLinks.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <a 
-                    className="block px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.label}
-                  </a>
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+                  setIsMobileMenuOpen(false);
+                  if (link.href.startsWith('/#')) {
+                    e.preventDefault();
+                    const hash = link.href.replace('/#', '');
+                    if (location === '/') {
+                      const element = document.getElementById(hash);
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    } else {
+                      window.location.href = `/#${hash}`;
+                    }
+                  }
+                };
+                
+                return (
+                  <Link key={link.href} href={link.href}>
+                    <a 
+                      className="block px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors cursor-pointer"
+                      onClick={handleClick}
+                    >
+                      {link.label}
+                    </a>
+                  </Link>
+                );
+              })}
               <div className="border-t border-alabaster-200 pt-4">
                 <Link href="/newsletter">
                   <button 

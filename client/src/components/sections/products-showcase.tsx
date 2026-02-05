@@ -6,7 +6,7 @@ import { GlassCard } from "@/components/ui/glass-card";
 
 export default function ProductsShowcase() {
   return (
-    <section id="products" className="py-24 px-6 lg:px-8">
+    <section id="products" className="py-24 px-6 lg:px-8 scroll-mt-20">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="font-display font-bold text-4xl md:text-5xl text-ink-950 mb-6">

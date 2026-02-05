@@ -4,8 +4,34 @@ import Hero from "@/components/sections/hero";
 import TrustIndicators from "@/components/sections/trust-indicators";
 import ProductsShowcase from "@/components/sections/products-showcase";
 import Testimonials from "@/components/sections/testimonials";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 
 export default function Home() {
+  const [location] = useLocation();
+
+  // Handle hash navigation on mount and hash change
+  useEffect(() => {
+    const handleHashScroll = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash) {
+        setTimeout(() => {
+          const element = document.getElementById(hash);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }
+    };
+
+    // Handle initial hash
+    handleHashScroll();
+
+    // Handle hash changes
+    window.addEventListener('hashchange', handleHashScroll);
+    return () => window.removeEventListener('hashchange', handleHashScroll);
+  }, [location]);
+
   return (
     <div className="min-h-screen">
       <Navigation />
