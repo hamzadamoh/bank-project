@@ -18,16 +18,13 @@ export default function SkillArcade() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
 
-  // Load questions when category changes
-  useEffect(() => {
-    const categoryQuestions = questionsByCategory[category] || [];
-    setQuestions(categoryQuestions);
-    setCurrentQuestionIndex(0);
-    setAnswers({});
-    setAssessment(null);
-  }, [category]);
+  // Don't load questions automatically - only when user starts assessment
+  // Questions will be loaded in handleStartAssessment
 
   const handleStartAssessment = () => {
+    // Load questions for selected category
+    const categoryQuestions = questionsByCategory[category] || [];
+    setQuestions(categoryQuestions);
     setStartTime(Date.now());
     setCurrentQuestionIndex(0);
     setAnswers({});
@@ -112,13 +109,13 @@ export default function SkillArcade() {
 
             {/* Interactive Demo */}
             <GlassCard className="max-w-4xl mx-auto p-8">
-              {!assessment && questions.length === 0 && (
+              {!assessment && questions.length === 0 && !isAssessing && (
                 <div className="mb-6">
                   <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">Take an Assessment</h3>
                   
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-slate-700 mb-2">Skill Category</label>
-                    <Select value={category} onValueChange={setCategory}>
+                    <Select value={category} onValueChange={setCategory} disabled={isAssessing}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
@@ -131,7 +128,7 @@ export default function SkillArcade() {
                     </Select>
                   </div>
 
-                  <Button onClick={handleStartAssessment} className="w-full">
+                  <Button onClick={handleStartAssessment} disabled={isAssessing} className="w-full">
                     Start Assessment
                   </Button>
                 </div>
