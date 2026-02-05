@@ -95,26 +95,95 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await initializeApp();
     
     return new Promise<void>((resolve) => {
-      // Convert Vercel request/response to Express format
-      const expressReq = req as any;
-      const expressRes = res as any;
+      // Track if response was sent
+      let responseSent = false;
+      
+      // Wrap res.end to detect when response completes
+      const originalEnd = res.end.bind(res);
+      res.end = function(...args: any[]) {
+        if (!responseSent) {
+          responseSent = true;
+          originalEnd(...args);
+          resolve();
+        }
+      };
       
       // Handle the request through Express
+      // Convert Vercel request/response to Express-compatible format
+      const expressReq = {
+        ...req,
+        method: req.method || 'GET',
+        url: req.url || '/',
+        path: req.url?.split('?')[0] || '/',
+        query: req.query || {},
+        body: req.body,
+        headers: req.headers || {},
+        get: (name: string) => req.headers[name.toLowerCase()],
+      } as any;
+      
+      const expressRes = {
+        ...res,
+        status: (code: number) => {
+          res.statusCode = code;
+          return expressRes;
+        },
+        json: (body: any) => {
+          if (!responseSent) {
+            responseSent = true;
+            res.setHeader('Content-Type', 'application/json');
+            res.status(res.statusCode || 200);
+            res.end(JSON.stringify(body));
+          }
+          return expressRes;
+        },
+        send: (body: any) => {
+          if (!responseSent) {
+            responseSent = true;
+            res.end(body);
+          }
+          return expressRes;
+        },
+        setHeader: (name: string, value: string) => {
+          res.setHeader(name, value);
+          return expressRes;
+        },
+        headersSent: res.headersSent,
+      } as any;
+      
+      // Handle the request
       app(expressReq, expressRes, (err?: any) => {
         if (err) {
-          if (!res.headersSent) {
-            res.status(500).json({ error: err.message || 'Internal Server Error' });
+          console.error('Express error:', err);
+          if (!responseSent && !res.headersSent) {
+            res.status(500).json({ 
+              success: false,
+              error: err.message || 'Internal Server Error',
+              stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+            });
+          } else if (!responseSent) {
+            resolve();
           }
-        } else if (!res.headersSent) {
-          res.status(404).json({ error: 'Not Found' });
+        } else if (!responseSent && !res.headersSent) {
+          res.status(404).json({ 
+            success: false,
+            error: 'Not Found' 
+          });
+        } else if (!responseSent) {
+          resolve();
         }
-        resolve();
       });
     });
   } catch (error) {
     console.error('Handler error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
     if (!res.headersSent) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ 
+        success: false,
+        error: errorMessage,
+        stack: process.env.NODE_ENV === 'development' ? errorStack : undefined
+      });
     }
   }
 }

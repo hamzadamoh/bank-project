@@ -70,24 +70,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Tax counsel query endpoint
   app.post("/api/tax-queries", async (req, res) => {
     try {
+      console.log("Tax query request received:", { 
+        body: req.body, 
+        hasQuery: !!req.body?.query, 
+        hasJurisdiction: !!req.body?.jurisdiction 
+      });
+      
       const { query, jurisdiction } = req.body;
       
       if (!query || !jurisdiction) {
+        console.warn("Missing required fields:", { query: !!query, jurisdiction: !!jurisdiction });
         return res.status(400).json({
           success: false,
           message: "Query and jurisdiction are required"
         });
       }
 
+      console.log("Calling getTaxAdvice service...");
       // Use the tax counsel service
       const taxResponse = await getTaxAdvice({ query, jurisdiction });
+      console.log("Tax advice received, confidence:", taxResponse.confidence);
 
+      console.log("Creating tax query record...");
       const taxQuery = await storage.createTaxQuery({
         query,
         jurisdiction,
         response: taxResponse,
         confidence: taxResponse.confidence >= 80 ? "high" : taxResponse.confidence >= 60 ? "medium" : "low"
       });
+      console.log("Tax query created with ID:", taxQuery.id);
 
       res.json({ 
         success: true, 
@@ -97,12 +108,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Tax query error:", error);
+      console.error("Error type:", error?.constructor?.name);
       console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
       console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
+      
+      const errorMessage = error instanceof Error ? error.message : "Internal server error";
+      const errorStack = process.env.NODE_ENV === 'development' 
+        ? (error instanceof Error ? error.stack : String(error)) 
+        : undefined;
+      
       res.status(500).json({ 
         success: false, 
-        message: error instanceof Error ? error.message : "Internal server error",
-        error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
+        message: errorMessage,
+        error: errorStack
       });
     }
   });
