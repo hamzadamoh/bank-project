@@ -235,7 +235,7 @@ export default function FactoringGuardian() {
                     <div className="grid md:grid-cols-3 gap-4 text-sm">
                       <div>
                         <span className="font-medium text-slate-600">Filename:</span>
-                        <p className="text-ink-950">{analysisResult.extractedData?.invoice?.number || 'N/A'}</p>
+                        <p className="text-ink-950">{fileName || analysisResult.extractedData?.invoice?.number || 'N/A'}</p>
                       </div>
                       <div>
                         <span className="font-medium text-slate-600">Decision:</span>
