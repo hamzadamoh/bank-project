@@ -35,10 +35,8 @@ export default function ProductsShowcase() {
                 <div className="text-sm text-slate-600">
                   <span className="font-medium">Features:</span> Multi-jurisdiction • Citations • Export memos
                 </div>
-                <Link href="/products/tax-counsel">
-                  <button className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
-                    Try Demo →
-                  </button>
+                <Link href="/products/tax-counsel" className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
+                  Try Demo →
                 </Link>
               </div>
             </GlassCard>
@@ -69,10 +67,8 @@ export default function ProductsShowcase() {
               <p className="text-slate-700 mb-6">Bidirectional NL ⇄ SQL conversion with expert guidance</p>
             </div>
             <div>
-              <Link href="/products/query-architect">
-                <button className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
-                  Try Full Demo →
-                </button>
+              <Link href="/products/query-architect" className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
+                Try Full Demo →
               </Link>
             </div>
           </div>

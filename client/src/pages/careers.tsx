@@ -380,15 +380,18 @@ export default function Careers() {
               or building great products, we'd love to hear from you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact">
-                <Button className="bg-ink-950 text-alabaster-50 hover:bg-ink-900 px-8 py-4 text-lg font-semibold">
-                  Send Us Your Resume
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+              <Link href="/contact" className="bg-ink-950 text-alabaster-50 hover:bg-ink-900 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center transition-colors">
+                Send Us Your Resume
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-              <Button variant="outline" className="px-8 py-4 text-lg font-semibold">
+              <a 
+                href="https://www.linkedin.com/company/fiscai" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="border border-ink-950 bg-alabaster-50 text-ink-950 hover:bg-alabaster-100 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center transition-colors"
+              >
                 Follow Us on LinkedIn
-              </Button>
+              </a>
             </div>
             
             <div className="mt-8 text-center text-sm text-slate-600">

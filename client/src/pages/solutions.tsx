@@ -257,10 +257,8 @@ export default function Solutions() {
                       </div>
 
                       <div className="mt-6 pt-6 border-t border-champagne-200">
-                        <Link href="/contact">
-                          <button className="w-full bg-ink-950 text-alabaster-50 py-3 rounded-xl font-semibold hover:bg-ink-900 transition-colors">
-                            Discuss Your Use Case
-                          </button>
+                        <Link href="/contact" className="w-full bg-ink-950 text-alabaster-50 py-3 rounded-xl font-semibold hover:bg-ink-900 transition-colors block text-center">
+                          Discuss Your Use Case
                         </Link>
                       </div>
                     </GlassCard>
@@ -281,15 +279,11 @@ export default function Solutions() {
               Join industry leaders who've already deployed FiscAI solutions for measurable business impact.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact">
-                <button className="bg-alabaster-50 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-100 transition-all duration-200 transform hover:scale-105">
-                  Get Industry Assessment
-                </button>
+              <Link href="/contact" className="bg-alabaster-50 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-100 transition-all duration-200 transform hover:scale-105">
+                Get Industry Assessment
               </Link>
-              <Link href="/pricing">
-                <button className="border-2 border-alabaster-50 text-alabaster-50 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-50 hover:text-ink-950 transition-all duration-200">
-                  View Pricing
-                </button>
+              <Link href="/pricing" className="border-2 border-alabaster-50 text-alabaster-50 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-50 hover:text-ink-950 transition-all duration-200">
+                View Pricing
               </Link>
             </div>
           </div>

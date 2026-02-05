@@ -56,13 +56,13 @@ export default function Navigation() {
                 };
                 
                 return (
-                  <Link key={link.href} href={link.href}>
-                    <a 
-                      onClick={handleClick}
-                      className="text-slate-700 hover:text-ink-950 transition-colors duration-200 cursor-pointer"
-                    >
-                      {link.label}
-                    </a>
+                  <Link 
+                    key={link.href} 
+                    href={link.href}
+                    onClick={handleClick}
+                    className="text-slate-700 hover:text-ink-950 transition-colors duration-200 cursor-pointer"
+                  >
+                    {link.label}
                   </Link>
                 );
               })}
@@ -115,32 +115,30 @@ export default function Navigation() {
                 };
                 
                 return (
-                  <Link key={link.href} href={link.href}>
-                    <a 
-                      className="block px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors cursor-pointer"
-                      onClick={handleClick}
-                    >
-                      {link.label}
-                    </a>
+                  <Link 
+                    key={link.href} 
+                    href={link.href}
+                    onClick={handleClick}
+                    className="block px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors cursor-pointer"
+                  >
+                    {link.label}
                   </Link>
                 );
               })}
               <div className="border-t border-alabaster-200 pt-4">
-                <Link href="/newsletter">
-                  <button 
-                    className="block w-full text-left px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Newsletter
-                  </button>
+                <Link 
+                  href="/newsletter"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block w-full text-left px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors"
+                >
+                  Newsletter
                 </Link>
-                <Link href="/contact">
-                  <button 
-                    className="block w-full mt-2 bg-ink-950 text-alabaster-50 px-3 py-2 rounded-xl text-sm font-medium hover:bg-ink-900 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Request Demo
-                  </button>
+                <Link 
+                  href="/contact"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block w-full mt-2 bg-ink-950 text-alabaster-50 px-3 py-2 rounded-xl text-sm font-medium hover:bg-ink-900 transition-colors"
+                >
+                  Request Demo
                 </Link>
               </div>
             </div>

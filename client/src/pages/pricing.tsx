@@ -191,16 +191,15 @@ export default function Pricing() {
                     </div>
                   )}
 
-                  <Link href="/contact">
-                    <Button 
-                      className={`w-full ${
-                        plan.ctaVariant === 'default' 
-                          ? 'bg-ink-950 text-alabaster-50 hover:bg-ink-900' 
-                          : 'bg-alabaster-50 border border-ink-950 text-ink-950 hover:bg-alabaster-100'
-                      }`}
-                    >
-                      {plan.cta}
-                    </Button>
+                  <Link 
+                    href="/contact"
+                    className={`w-full block text-center px-6 py-3 rounded-xl font-semibold transition-colors ${
+                      plan.ctaVariant === 'default' 
+                        ? 'bg-ink-950 text-alabaster-50 hover:bg-ink-900' 
+                        : 'bg-alabaster-50 border border-ink-950 text-ink-950 hover:bg-alabaster-100'
+                    }`}
+                  >
+                    {plan.cta}
                   </Link>
                 </GlassCard>
               ))}
@@ -244,9 +243,11 @@ export default function Pricing() {
                       <span className="font-display font-bold text-2xl text-ink-950">{addon.price}</span>
                       <span className="text-slate-600 text-sm ml-2">{addon.period}</span>
                     </div>
-                    <Button variant="outline" size="sm">
-                      Add to Plan
-                    </Button>
+                    <Link href="/contact">
+                      <Button variant="outline" size="sm">
+                        Add to Plan
+                      </Button>
+                    </Link>
                   </div>
                 </GlassCard>
               ))}

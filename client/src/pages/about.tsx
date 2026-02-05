@@ -360,16 +360,12 @@ export default function About() {
               we'd love to hear from you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact">
-                <Button className="bg-ink-950 text-alabaster-50 hover:bg-ink-900 px-8 py-4 text-lg font-semibold">
-                  Get in Touch
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+              <Link href="/contact" className="bg-ink-950 text-alabaster-50 hover:bg-ink-900 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center transition-colors">
+                Get in Touch
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-              <Link href="/careers">
-                <Button variant="outline" className="px-8 py-4 text-lg font-semibold">
-                  View Careers
-                </Button>
+              <Link href="/careers" className="border border-ink-950 bg-alabaster-50 text-ink-950 hover:bg-alabaster-100 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center transition-colors">
+                View Careers
               </Link>
             </div>
           </div>

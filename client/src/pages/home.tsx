@@ -5,7 +5,7 @@ import TrustIndicators from "@/components/sections/trust-indicators";
 import ProductsShowcase from "@/components/sections/products-showcase";
 import Testimonials from "@/components/sections/testimonials";
 import { useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 
 export default function Home() {
   const [location] = useLocation();
@@ -59,9 +59,9 @@ export default function Home() {
                 <p className="text-slate-700 text-sm mb-4">
                   Risk assessment, regulatory reporting, and compliance automation for traditional banks.
                 </p>
-                <button className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
+                <Link href="/solutions#banking" className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
                   Explore Banking →
-                </button>
+                </Link>
               </div>
 
               <div className="gradient-border bg-alabaster-50 rounded-2xl p-8 text-center hover:scale-[1.02] transition-all duration-300">
@@ -72,9 +72,9 @@ export default function Home() {
                 <p className="text-slate-700 text-sm mb-4">
                   Rapid deployment for digital-first financial services and embedded finance platforms.
                 </p>
-                <button className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
+                <Link href="/solutions#fintech" className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
                   Explore Fintech →
-                </button>
+                </Link>
               </div>
 
               <div className="gradient-border bg-alabaster-50 rounded-2xl p-8 text-center hover:scale-[1.02] transition-all duration-300">
@@ -85,9 +85,9 @@ export default function Home() {
                 <p className="text-slate-700 text-sm mb-4">
                   Document analysis, anomaly detection, and audit trail automation for accounting firms.
                 </p>
-                <button className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
+                <Link href="/solutions#audit" className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
                   Explore Audit →
-                </button>
+                </Link>
               </div>
 
               <div className="gradient-border bg-alabaster-50 rounded-2xl p-8 text-center hover:scale-[1.02] transition-all duration-300">
@@ -103,9 +103,9 @@ export default function Home() {
                 <p className="text-slate-700 text-sm mb-4">
                   Simplified workflows and automated bookkeeping for small and medium businesses.
                 </p>
-                <button className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
+                <Link href="/solutions#smb" className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
                   Explore SMB →
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -202,12 +202,12 @@ export default function Home() {
               Join leading financial institutions already using FiscAI to make smarter decisions faster.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-alabaster-50 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-100 transition-all duration-200 transform hover:scale-105">
+              <Link href="/contact" className="bg-alabaster-50 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-100 transition-all duration-200 transform hover:scale-105">
                 Start Free Trial
-              </button>
-              <button className="border-2 border-alabaster-50 text-alabaster-50 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-50 hover:text-ink-950 transition-all duration-200">
+              </Link>
+              <Link href="/contact" className="border-2 border-alabaster-50 text-alabaster-50 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-50 hover:text-ink-950 transition-all duration-200">
                 Schedule Demo
-              </button>
+              </Link>
             </div>
           </div>
         </section>
