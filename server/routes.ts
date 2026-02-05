@@ -169,20 +169,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Document analysis endpoint
   app.post("/api/document-analysis", async (req, res) => {
     try {
-      const { filename } = req.body;
+      const { filename, fileContent, fileType } = req.body;
       
-      if (!filename) {
+      if (!filename && !fileContent) {
         return res.status(400).json({
           success: false,
-          message: "Filename is required"
+          message: "Filename or file content is required"
         });
       }
 
       // Use the factoring guardian service
-      const analysisResult = await analyzeDocument({ filename });
+      const analysisResult = await analyzeDocument({ 
+        filename: filename || 'uploaded_document',
+        fileContent: fileContent ? Buffer.from(fileContent, 'base64') : undefined,
+        fileType
+      });
 
       const analysis = await storage.createDocumentAnalysis({
-        filename,
+        filename: filename || 'uploaded_document',
         extractedData: analysisResult.extractedData,
         anomalies: analysisResult.anomalies,
         decision: analysisResult.decision,

@@ -11,10 +11,52 @@ export default function FactoringGuardian() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileName, setFileName] = useState<string>('');
 
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const fileInputRef = useState<HTMLInputElement | null>(null)[0];
 
-  const simulateAnalysis = async () => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+      if (!validTypes.includes(file.type)) {
+        alert('Please upload a PDF, JPG, or PNG file');
+        return;
+      }
+      
+      // Validate file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB');
+        return;
+      }
+
+      setSelectedFile(file);
+      setFileName(file.name);
+    }
+  };
+
+  const handleUploadClick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.jpg,.jpeg,.png';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        handleFileSelect({ target: { files: [file] } } as any);
+      }
+    };
+    input.click();
+  };
+
+  const analyzeDocument = async () => {
+    if (!selectedFile) {
+      alert('Please select a file first');
+      return;
+    }
+
     setIsAnalyzing(true);
     setAnalysisComplete(false);
     setUploadProgress(0);
@@ -32,33 +74,59 @@ export default function FactoringGuardian() {
     }, 200);
 
     try {
-      // Call the actual API
-      const response = await fetch('/api/document-analysis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          filename: 'demo_invoice.pdf',
-        }),
-      });
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Data = reader.result as string;
+        const base64Content = base64Data.split(',')[1]; // Remove data:image/png;base64, prefix
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze document');
-      }
+        try {
+          // Call the actual API with file data
+          const response = await fetch('/api/document-analysis', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              filename: selectedFile.name,
+              fileContent: base64Content,
+              fileType: selectedFile.type,
+            }),
+          });
 
-      const data = await response.json();
-      setUploadProgress(100);
-      setTimeout(() => {
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to analyze document');
+          }
+
+          const data = await response.json();
+          setUploadProgress(100);
+          setTimeout(() => {
+            setIsAnalyzing(false);
+            setAnalysisComplete(true);
+            setAnalysisResult(data);
+            clearInterval(progressInterval);
+          }, 500);
+        } catch (error) {
+          console.error('Error analyzing document:', error);
+          clearInterval(progressInterval);
+          setIsAnalyzing(false);
+          alert(error instanceof Error ? error.message : 'Failed to analyze document. Please try again.');
+        }
+      };
+
+      reader.onerror = () => {
+        clearInterval(progressInterval);
         setIsAnalyzing(false);
-        setAnalysisComplete(true);
-        setAnalysisResult(data);
-      }, 500);
+        alert('Failed to read file');
+      };
+
+      reader.readAsDataURL(selectedFile);
     } catch (error) {
-      console.error('Error analyzing document:', error);
+      console.error('Error reading file:', error);
       clearInterval(progressInterval);
       setIsAnalyzing(false);
-      alert('Failed to analyze document. Please try again.');
+      alert('Failed to process file. Please try again.');
     }
   };
 
@@ -100,13 +168,44 @@ export default function FactoringGuardian() {
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">Document Analysis Demo</h3>
                 
                 {!isAnalyzing && !analysisComplete && (
-                  <div 
-                    className="border-2 border-dashed border-champagne-200 rounded-2xl p-12 hover:border-champagne-300 transition-colors cursor-pointer"
-                    onClick={simulateAnalysis}
-                  >
-                    <Upload className="h-12 w-12 text-slate-500 mx-auto mb-4" />
-                    <p className="text-slate-700 mb-2">Click to simulate document upload</p>
-                    <p className="text-sm text-slate-500">Supports PDF, JPG, PNG (Max 10MB)</p>
+                  <div>
+                    {!selectedFile ? (
+                      <div 
+                        className="border-2 border-dashed border-champagne-200 rounded-2xl p-12 hover:border-champagne-300 transition-colors cursor-pointer"
+                        onClick={handleUploadClick}
+                      >
+                        <Upload className="h-12 w-12 text-slate-500 mx-auto mb-4" />
+                        <p className="text-slate-700 mb-2">Click to upload document</p>
+                        <p className="text-sm text-slate-500">Supports PDF, JPG, PNG (Max 10MB)</p>
+                      </div>
+                    ) : (
+                      <div className="border-2 border-champagne-200 rounded-2xl p-6 bg-alabaster-50">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <FileText className="h-8 w-8 text-ink-950" />
+                            <div>
+                              <p className="font-medium text-ink-950">{fileName}</p>
+                              <p className="text-sm text-slate-500">
+                                {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedFile(null);
+                              setFileName('');
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <Button onClick={analyzeDocument} className="w-full">
+                          Analyze Document
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -239,6 +338,8 @@ export default function FactoringGuardian() {
                       setAnalysisComplete(false);
                       setUploadProgress(0);
                       setAnalysisResult(null);
+                      setSelectedFile(null);
+                      setFileName('');
                     }}>
                       Analyze Another Document
                     </Button>
