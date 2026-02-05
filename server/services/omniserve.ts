@@ -12,7 +12,7 @@ interface ChatMessage {
 interface ChatRequest {
   message: string;
   conversationId?: string;
-  language?: 'fr' | 'ar' | 'darija' | 'auto';
+  language?: 'fr' | 'ar' | 'darija' | 'en' | 'auto';
   context?: string;
 }
 
@@ -78,10 +78,11 @@ export async function chat(request: ChatRequest): Promise<ChatResponse> {
   };
 }
 
-function detectLanguage(text: string): 'fr' | 'ar' | 'darija' {
+function detectLanguage(text: string): 'fr' | 'ar' | 'darija' | 'en' {
   // Simple language detection
   const arabicPattern = /[\u0600-\u06FF]/;
   const frenchPattern = /[àâäéèêëïîôùûüÿç]/i;
+  const englishPattern = /^(hello|hi|how|what|when|where|why|can|could|would|should|please|thank|thanks|yes|no|ok|okay)/i;
   
   if (arabicPattern.test(text)) {
     // Could be Arabic or Darija - simple heuristic
@@ -95,7 +96,11 @@ function detectLanguage(text: string): 'fr' | 'ar' | 'darija' {
     return 'fr';
   }
   
-  return 'fr'; // default
+  if (englishPattern.test(text) || /^[a-zA-Z\s]+$/.test(text.trim()) && !frenchPattern.test(text)) {
+    return 'en';
+  }
+  
+  return 'en'; // default to English
 }
 
 async function getAIResponse(
@@ -105,12 +110,13 @@ async function getAIResponse(
   apiKey: string
 ): Promise<string> {
   const systemPrompts: Record<string, string> = {
+    en: 'You are a professional AI assistant for financial services. Respond in English in a clear and concise manner.',
     fr: 'Tu es un assistant IA professionnel pour services financiers. Réponds en français de manière claire et concise.',
     ar: 'أنت مساعد ذكي محترف للخدمات المالية. أجب بالعربية بشكل واضح ومختصر.',
     darija: 'نتي مساعد ذكي محترف ديال الخدمات المالية. رد بالدارجة المغربية بشكل واضح ومختصر.',
   };
 
-  const systemPrompt = systemPrompts[language] || systemPrompts.fr;
+  const systemPrompt = systemPrompts[language] || systemPrompts.en;
 
   const messages = [
     {
@@ -160,6 +166,7 @@ async function getAIResponse(
 
 function getDefaultResponse(message: string, language: string): string {
   const responses: Record<string, string> = {
+    en: "Hello! I'm OmniServe, your multilingual AI assistant. How can I help you today with your financial questions?",
     fr: "Bonjour ! Je suis OmniServe, votre assistant IA multilingue. Comment puis-je vous aider aujourd'hui avec vos questions financières ?",
     ar: "مرحباً! أنا OmniServe، مساعدك الذكي متعدد اللغات. كيف يمكنني مساعدتك اليوم في أسئلتك المالية؟",
     darija: "أهلاً! أنا OmniServe، مساعدك الذكي ديال الخدمات المالية. كيفاش يمكنني نخدمك اليوم؟",
@@ -167,16 +174,20 @@ function getDefaultResponse(message: string, language: string): string {
 
   const lowerMessage = message.toLowerCase();
   
-  if (lowerMessage.includes('salut') || lowerMessage.includes('bonjour') || lowerMessage.includes('hello')) {
-    return responses[language] || responses.fr;
+  if (lowerMessage.includes('salut') || lowerMessage.includes('bonjour') || lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+    return responses[language] || responses.en;
   }
   
-  if (lowerMessage.includes('tax') || lowerMessage.includes('impôt')) {
-    return language === 'fr' 
-      ? "Pour les questions fiscales, je recommande d'utiliser notre outil FiscAI Tax Counsel pour des conseils détaillés avec citations légales."
-      : "بالنسبة للأسئلة الضريبية، أنصحك باستخدام أداة FiscAI Tax Counsel للحصول على نصائح مفصلة مع المراجع القانونية.";
+  if (lowerMessage.includes('tax') || lowerMessage.includes('impôt') || lowerMessage.includes('ضريبة')) {
+    if (language === 'en') {
+      return "For tax questions, I recommend using our FiscAI Tax Counsel tool for detailed advice with legal citations.";
+    } else if (language === 'fr') {
+      return "Pour les questions fiscales, je recommande d'utiliser notre outil FiscAI Tax Counsel pour des conseils détaillés avec citations légales.";
+    } else {
+      return "بالنسبة للأسئلة الضريبية، أنصحك باستخدام أداة FiscAI Tax Counsel للحصول على نصائح مفصلة مع المراجع القانونية.";
+    }
   }
   
-  return responses[language] || responses.fr;
+  return responses[language] || responses.en;
 }
 

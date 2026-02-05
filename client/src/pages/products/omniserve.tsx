@@ -15,7 +15,7 @@ interface Message {
 }
 
 export default function OmniServe() {
-  const [language, setLanguage] = useState<"fr" | "ar" | "darija" | "auto">("auto");
+  const [language, setLanguage] = useState<"fr" | "ar" | "darija" | "en" | "auto">("auto");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +23,16 @@ export default function OmniServe() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Only scroll within the chat container, not the whole page
+    if (messagesEndRef.current) {
+      const chatContainer = messagesEndRef.current.closest('.overflow-y-auto');
+      if (chatContainer) {
+        chatContainer.scrollTo({
+          top: chatContainer.scrollHeight,
+          behavior: "smooth"
+        });
+      }
+    }
   };
 
   useEffect(() => {
@@ -33,7 +42,10 @@ export default function OmniServe() {
 
   useEffect(() => {
     // Scroll to bottom only when messages change (for chat)
-    scrollToBottom();
+    // Use setTimeout to ensure DOM is updated
+    setTimeout(() => {
+      scrollToBottom();
+    }, 100);
   }, [messages]);
 
   const handleSend = async () => {
@@ -106,7 +118,7 @@ export default function OmniServe() {
                 OmniServe
               </h1>
               <p className="text-xl text-slate-700 max-w-3xl mx-auto">
-                Multilingual AI chatbot supporting French, Arabic, and Darija. Get instant answers in your preferred language.
+                Multilingual AI chatbot supporting English, French, Arabic, and Darija. Get instant answers in your preferred language.
               </p>
             </div>
 
@@ -124,6 +136,7 @@ export default function OmniServe() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="auto">Auto Detect</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
                     <SelectItem value="fr">Français</SelectItem>
                     <SelectItem value="ar">العربية</SelectItem>
                     <SelectItem value="darija">الدارجة</SelectItem>
@@ -138,7 +151,7 @@ export default function OmniServe() {
                     <Bot className="h-12 w-12 text-slate-400 mb-4" />
                     <p className="text-slate-600 mb-2">Start a conversation</p>
                     <p className="text-sm text-slate-500">
-                      I speak French, Arabic, and Darija. Ask me anything!
+                      I speak English, French, Arabic, and Darija. Ask me anything!
                     </p>
                   </div>
                 ) : (
@@ -183,7 +196,7 @@ export default function OmniServe() {
               {/* Input */}
               <div className="flex gap-2">
                 <Input
-                  placeholder={language === 'ar' || language === 'darija' ? 'اكتب رسالتك...' : 'Type your message...'}
+                  placeholder={language === 'ar' || language === 'darija' ? 'اكتب رسالتك...' : language === 'fr' ? 'Tapez votre message...' : 'Type your message...'}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
@@ -200,7 +213,7 @@ export default function OmniServe() {
                 <div className="mt-4 flex justify-center">
                   <Badge variant="outline" className="bg-alabaster-50">
                     <Globe className="h-3 w-3 mr-2" />
-                    Detected: {language === 'fr' ? 'Français' : language === 'ar' ? 'العربية' : language === 'darija' ? 'الدارجة' : 'Auto'}
+                    Detected: {language === 'en' ? 'English' : language === 'fr' ? 'Français' : language === 'ar' ? 'العربية' : language === 'darija' ? 'الدارجة' : 'Auto'}
                   </Badge>
                 </div>
               )}
@@ -218,7 +231,7 @@ export default function OmniServe() {
                 </div>
                 <h3 className="font-display font-bold text-xl text-ink-950 mb-3">Multilingual</h3>
                 <p className="text-slate-700">
-                  Seamlessly switch between French, Arabic, and Darija with automatic language detection.
+                  Seamlessly switch between English, French, Arabic, and Darija with automatic language detection.
                 </p>
               </div>
 
