@@ -103,14 +103,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Track if response was sent
       let responseSent = false;
       
+      // Track response completion via 'finish' event
+      res.once('finish', () => {
+        if (!responseSent) {
+          responseSent = true;
+          resolve();
+        }
+      });
+      
       // Wrap res.end to detect when response completes
       const originalEnd = res.end.bind(res);
       res.end = function(...args: any[]) {
+        const result = originalEnd.apply(res, args);
         if (!responseSent) {
           responseSent = true;
-          originalEnd(...args);
-          resolve();
+          // Use setImmediate to ensure response is fully sent
+          setImmediate(() => resolve());
         }
+        return result;
+      };
+      
+      // Also wrap res.writeHead to track when headers are sent
+      const originalWriteHead = res.writeHead.bind(res);
+      res.writeHead = function(...args: any[]) {
+        return originalWriteHead.apply(res, args);
       };
       
       // Handle the request through Express
@@ -123,7 +139,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         query: req.query || {},
         body: req.body,
         headers: req.headers || {},
-        get: (name: string) => req.headers[name.toLowerCase()],
+        get: (name: string) => req.headers[name?.toLowerCase()],
       } as any;
       
       const expressRes = {
@@ -137,7 +153,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             responseSent = true;
             res.setHeader('Content-Type', 'application/json');
             res.status(res.statusCode || 200);
-            res.end(JSON.stringify(body));
+            const jsonStr = JSON.stringify(body);
+            res.end(jsonStr);
           }
           return expressRes;
         },
@@ -148,11 +165,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
           return expressRes;
         },
-        setHeader: (name: string, value: string) => {
+        setHeader: (name: string, value: string | string[]) => {
           res.setHeader(name, value);
           return expressRes;
         },
+        getHeader: (name: string) => {
+          return res.getHeader(name);
+        },
         headersSent: res.headersSent,
+        on: res.on.bind(res),
+        once: res.once.bind(res),
+        emit: res.emit.bind(res),
       } as any;
       
       // Handle the request
@@ -160,6 +183,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (err) {
           console.error('Express error:', err);
           if (!responseSent && !res.headersSent) {
+            responseSent = true;
             res.status(500).json({ 
               success: false,
               error: err.message || 'Internal Server Error',
@@ -169,14 +193,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             resolve();
           }
         } else if (!responseSent && !res.headersSent) {
+          // No route matched - 404
+          responseSent = true;
           res.status(404).json({ 
             success: false,
             error: 'Not Found' 
           });
         } else if (!responseSent) {
+          // Response was sent but Promise not resolved
           resolve();
         }
       });
+      
+      // Safety timeout - resolve after 25 seconds if still not resolved
+      setTimeout(() => {
+        if (!responseSent) {
+          console.warn('Handler timeout safety: forcing resolve');
+          responseSent = true;
+          resolve();
+        }
+      }, 25000);
     });
   } catch (error) {
     console.error('Handler error:', error);
