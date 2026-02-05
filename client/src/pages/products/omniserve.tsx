@@ -27,6 +27,12 @@ export default function OmniServe() {
   };
 
   useEffect(() => {
+    // Scroll to top on mount
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    // Scroll to bottom only when messages change (for chat)
     scrollToBottom();
   }, [messages]);
 
