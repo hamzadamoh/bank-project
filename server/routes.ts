@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 import { 
   insertDemoRequestSchema, 
   insertContactSubmissionSchema,
@@ -10,13 +10,13 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 // Import all services statically to ensure they're bundled
-import { getTaxAdvice } from "./services/tax-counsel";
-import { convertQuery } from "./services/query-architect";
-import { analyzeDocument } from "./services/factoring-guardian";
-import { assessSkills } from "./services/skillarcade";
-import { chat } from "./services/omniserve";
-import { analyzeWellbeing } from "./services/rhalia";
-import { analyzeSatisfaction } from "./services/satisfai";
+import { getTaxAdvice } from "./services/tax-counsel.js";
+import { convertQuery } from "./services/query-architect.js";
+import { analyzeDocument } from "./services/factoring-guardian.js";
+import { assessSkills } from "./services/skillarcade.js";
+import { chat } from "./services/omniserve.js";
+import { analyzeWellbeing } from "./services/rhalia.js";
+import { analyzeSatisfaction } from "./services/satisfai.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
