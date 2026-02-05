@@ -65,7 +65,7 @@ Return ONLY the SQL query, nothing else.`;
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-        model: 'gpt-4o-mini',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -93,7 +93,13 @@ Return ONLY the SQL query, nothing else.`;
     throw new Error('Invalid response format from OpenAI API');
   }
 
-  const sql = data.choices[0].message.content.trim();
+  const content = data.choices[0].message.content;
+  if (!content || typeof content !== 'string') {
+    console.error('Empty or invalid content in OpenAI response:', JSON.stringify(data));
+    throw new Error('Empty or invalid content in OpenAI response');
+  }
+
+  const sql = content.trim();
 
   return {
     output: sql,
@@ -122,7 +128,7 @@ Provide a clear, concise explanation that a non-technical person could understan
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-        model: 'gpt-4o-mini',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',

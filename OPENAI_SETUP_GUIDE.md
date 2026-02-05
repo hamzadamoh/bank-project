@@ -148,3 +148,12 @@ The services will use your API key in development.
 - Verify API key is set in Vercel environment variables
 - Test API key directly: https://platform.openai.com/playground
 
+
+
+
+
+
+
+
+
+

@@ -151,3 +151,12 @@ const conversionResult = await convertQuery({ type, input });
 - [ ] POST /api/satisfaction-analysis
 - [ ] GET /api/health
 
+
+
+
+
+
+
+
+
+

@@ -130,7 +130,7 @@ async function getAIResponse(
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-        model: 'gpt-4o-mini',
+      model: 'gpt-4o-mini',
       messages,
       temperature: 0.7,
     }),
@@ -149,7 +149,13 @@ async function getAIResponse(
     throw new Error('Invalid response format from OpenAI API');
   }
 
-  return data.choices[0].message.content.trim();
+  const content = data.choices[0].message.content;
+  if (!content || typeof content !== 'string') {
+    console.error('Empty or invalid content in OpenAI response:', JSON.stringify(data));
+    throw new Error('Empty or invalid content in OpenAI response');
+  }
+
+  return content.trim();
 }
 
 function getDefaultResponse(message: string, language: string): string {

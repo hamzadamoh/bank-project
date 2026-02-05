@@ -132,7 +132,7 @@ Respond in JSON format:
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-        model: 'gpt-4o-mini',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -164,7 +164,11 @@ Respond in JSON format:
   let content;
   try {
     const messageContent = data.choices[0].message.content;
-    content = typeof messageContent === 'string' ? JSON.parse(messageContent) : messageContent;
+    if (!messageContent || typeof messageContent !== 'string') {
+      console.error('Empty or invalid content in OpenAI response:', JSON.stringify(data));
+      throw new Error('Empty or invalid content in OpenAI response');
+    }
+    content = JSON.parse(messageContent);
   } catch (parseError) {
     console.error('JSON parse error:', parseError);
     throw new Error('Failed to parse OpenAI response as JSON');
