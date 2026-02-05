@@ -38,16 +38,11 @@ export default function SkillArcade() {
     const currentQuestion = questions[currentQuestionIndex];
     if (!currentQuestion) return;
 
+    // Only save the answer, don't auto-advance
     setAnswers({
       ...answers,
       [currentQuestion.id]: answerIndex,
     });
-
-    // Move to next question (don't auto-submit)
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setStartTime(Date.now());
-    }
   };
 
   const handlePrevious = () => {
@@ -206,10 +201,8 @@ export default function SkillArcade() {
                     {currentQuestionIndex < questions.length - 1 ? (
                       <Button
                         onClick={() => {
-                          if (answers[questions[currentQuestionIndex]?.id] !== undefined) {
-                            setCurrentQuestionIndex(currentQuestionIndex + 1);
-                            setStartTime(Date.now());
-                          }
+                          setCurrentQuestionIndex(currentQuestionIndex + 1);
+                          setStartTime(Date.now());
                         }}
                         disabled={answers[questions[currentQuestionIndex]?.id] === undefined}
                         className="ml-auto"
