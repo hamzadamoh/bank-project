@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, Search } from "lucide-react";
+import { FileText, Download, Search, ThumbsUp, Brain } from "lucide-react";
 
 export default function TaxCounsel() {
   const [query, setQuery] = useState("");
@@ -14,6 +14,7 @@ export default function TaxCounsel() {
   const [confidence, setConfidence] = useState("high");
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<any>(null);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   const handleQuery = async () => {
     if (!query.trim()) {
@@ -67,6 +68,14 @@ export default function TaxCounsel() {
 
             {/* Interactive Demo */}
             <GlassCard className="max-w-4xl mx-auto p-8">
+              {/* Continuous Learning Badge */}
+              <div className="mb-6 flex items-center gap-2 text-sm text-slate-600 bg-champagne-50 rounded-lg p-3">
+                <Brain className="h-4 w-4 text-ink-950" />
+                <span>
+                  <strong className="text-ink-950">Continuous Learning:</strong> This AI system learns from each interaction to improve accuracy and provide better tax advice over time.
+                </span>
+              </div>
+
               <div className="mb-6">
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">Try the Demo</h3>
                 
@@ -191,6 +200,37 @@ export default function TaxCounsel() {
                           <span className="text-sm text-slate-700">{citation.description}</span>
                         </div>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Feedback Section */}
+                  <div className="bg-white rounded-xl p-6 border-2 border-champagne-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold text-ink-950 mb-2">Was this helpful?</h4>
+                        <p className="text-sm text-slate-600">
+                          Your feedback helps us improve our tax advice accuracy through continuous learning.
+                        </p>
+                      </div>
+                      {!feedbackSubmitted ? (
+                        <Button
+                          onClick={() => {
+                            setFeedbackSubmitted(true);
+                            // In production, this would send feedback to the API
+                            console.log('Feedback submitted: helpful');
+                          }}
+                          variant="outline"
+                          className="flex items-center gap-2 hover:bg-emerald-50 hover:border-emerald-400 transition-colors"
+                        >
+                          <ThumbsUp className="h-5 w-5 text-emerald-400" />
+                          <span>Helpful</span>
+                        </Button>
+                      ) : (
+                        <div className="flex items-center gap-2 text-emerald-400">
+                          <ThumbsUp className="h-5 w-5" />
+                          <span className="font-medium">Thank you for your feedback!</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
