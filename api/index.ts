@@ -2,6 +2,11 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import express, { type Request, Response, NextFunction } from 'express';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+// ESM-compatible __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Create a single Express app instance
 const app = express();
@@ -52,7 +57,7 @@ async function initializeApp() {
     const possiblePaths = [
       path.resolve(process.cwd(), 'dist', 'public'),
       path.resolve(process.cwd(), '.vercel', 'output', 'static'),
-      path.resolve(__dirname || process.cwd(), '..', 'dist', 'public'),
+      path.resolve(__dirname, '..', 'dist', 'public'),
     ];
 
     let distPath: string | null = null;
