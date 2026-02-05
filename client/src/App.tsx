@@ -25,6 +25,7 @@ import CustomTraining from "@/pages/custom-training";
 import OnSiteDeployment from "@/pages/on-site-deployment";
 import About from "@/pages/about";
 import Careers from "@/pages/careers";
+import Waitlist from "@/pages/waitlist";
 import NotFound from "@/pages/not-found";
 
 // Component to handle scroll to top on route change
@@ -67,6 +68,7 @@ function Router() {
         <Route path="/on-site-deployment" component={OnSiteDeployment} />
         <Route path="/about" component={About} />
         <Route path="/careers" component={Careers} />
+        <Route path="/waitlist" component={Waitlist} />
         <Route component={NotFound} />
       </Switch>
     </>

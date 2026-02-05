@@ -6,7 +6,8 @@ import {
   insertContactSubmissionSchema,
   insertTaxQuerySchema,
   insertSqlQuerySchema,
-  insertDocumentAnalysisSchema
+  insertDocumentAnalysisSchema,
+  insertWaitlistSchema
 } from "../shared/schema.js";
 import { z } from "zod";
 // Import all services statically to ensure they're bundled
@@ -323,6 +324,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: error instanceof Error ? error.message : "Internal server error",
         error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
       });
+    }
+  });
+
+  // Waitlist endpoint
+  app.post("/api/waitlist", async (req, res) => {
+    try {
+      const validatedData = insertWaitlistSchema.parse(req.body);
+      const waitlistEntry = await storage.createWaitlistEntry(validatedData);
+      res.json({ 
+        success: true, 
+        id: waitlistEntry.id,
+        message: "Successfully added to waitlist"
+      });
+    } catch (error) {
+      console.error("Waitlist error:", error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ 
+          success: false, 
+          message: "Invalid request data",
+          errors: error.errors 
+        });
+      } else if (error instanceof Error && error.message.includes('already registered')) {
+        res.status(409).json({ 
+          success: false, 
+          message: error.message 
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: error instanceof Error ? error.message : "Internal server error" 
+        });
+      }
     }
   });
 

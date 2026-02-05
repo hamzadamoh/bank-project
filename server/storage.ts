@@ -10,7 +10,9 @@ import {
   type SqlQuery,
   type InsertSqlQuery,
   type DocumentAnalysis,
-  type InsertDocumentAnalysis
+  type InsertDocumentAnalysis,
+  type Waitlist,
+  type InsertWaitlist
 } from "../shared/schema.js";
 import { randomUUID } from "crypto";
 
@@ -43,6 +45,12 @@ export interface IStorage {
   createDocumentAnalysis(analysis: InsertDocumentAnalysis): Promise<DocumentAnalysis>;
   getAllDocumentAnalysis(): Promise<DocumentAnalysis[]>;
   getDocumentAnalysis(id: string): Promise<DocumentAnalysis | undefined>;
+  
+  // Waitlist
+  createWaitlistEntry(waitlist: InsertWaitlist): Promise<Waitlist>;
+  getAllWaitlistEntries(): Promise<Waitlist[]>;
+  getWaitlistEntry(id: string): Promise<Waitlist | undefined>;
+  getWaitlistEntryByEmail(email: string): Promise<Waitlist | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -52,6 +60,7 @@ export class MemStorage implements IStorage {
   private taxQueries: Map<string, TaxQuery>;
   private sqlQueries: Map<string, SqlQuery>;
   private documentAnalysis: Map<string, DocumentAnalysis>;
+  private waitlist: Map<string, Waitlist>;
 
   constructor() {
     this.users = new Map();
@@ -60,6 +69,7 @@ export class MemStorage implements IStorage {
     this.taxQueries = new Map();
     this.sqlQueries = new Map();
     this.documentAnalysis = new Map();
+    this.waitlist = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -185,6 +195,40 @@ export class MemStorage implements IStorage {
 
   async getDocumentAnalysis(id: string): Promise<DocumentAnalysis | undefined> {
     return this.documentAnalysis.get(id);
+  }
+
+  // Waitlist
+  async createWaitlistEntry(insertWaitlist: InsertWaitlist): Promise<Waitlist> {
+    // Check if email already exists
+    const existing = await this.getWaitlistEntryByEmail(insertWaitlist.email);
+    if (existing) {
+      throw new Error('Email already registered on waitlist');
+    }
+
+    const id = randomUUID();
+    const waitlistEntry: Waitlist = {
+      ...insertWaitlist,
+      name: insertWaitlist.name ?? null,
+      id,
+      createdAt: new Date()
+    };
+    this.waitlist.set(id, waitlistEntry);
+    return waitlistEntry;
+  }
+
+  async getAllWaitlistEntries(): Promise<Waitlist[]> {
+    return Array.from(this.waitlist.values())
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async getWaitlistEntry(id: string): Promise<Waitlist | undefined> {
+    return this.waitlist.get(id);
+  }
+
+  async getWaitlistEntryByEmail(email: string): Promise<Waitlist | undefined> {
+    return Array.from(this.waitlist.values()).find(
+      (entry) => entry.email.toLowerCase() === email.toLowerCase()
+    );
   }
 }
 

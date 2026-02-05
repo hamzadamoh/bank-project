@@ -58,6 +58,13 @@ export const documentAnalysis = pgTable("document_analysis", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const waitlist = pgTable("waitlist", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull().unique(),
+  name: text("name"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Zod schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -89,6 +96,11 @@ export const insertDocumentAnalysisSchema = createInsertSchema(documentAnalysis)
   createdAt: true,
 });
 
+export const insertWaitlistSchema = createInsertSchema(waitlist).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -107,3 +119,6 @@ export type SqlQuery = typeof sqlQueries.$inferSelect;
 
 export type InsertDocumentAnalysis = z.infer<typeof insertDocumentAnalysisSchema>;
 export type DocumentAnalysis = typeof documentAnalysis.$inferSelect;
+
+export type InsertWaitlist = z.infer<typeof insertWaitlistSchema>;
+export type Waitlist = typeof waitlist.$inferSelect;
