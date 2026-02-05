@@ -1,28 +1,81 @@
 import Navigation from "@/components/layout/navigation";
 import Footer from "@/components/layout/footer";
 import { GlassCard } from "@/components/ui/glass-card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Trophy, Target, TrendingUp, Award } from "lucide-react";
+import { Trophy, Target, TrendingUp, Award, ArrowRight, ArrowLeft } from "lucide-react";
+import { questionsByCategory, type Question } from "@/lib/skillarcade-questions";
 
 export default function SkillArcade() {
   const [category, setCategory] = useState("technical");
   const [isAssessing, setIsAssessing] = useState(false);
   const [assessment, setAssessment] = useState<any>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
 
-  const handleAssess = async () => {
-    setIsAssessing(true);
+  // Load questions when category changes
+  useEffect(() => {
+    const categoryQuestions = questionsByCategory[category] || [];
+    setQuestions(categoryQuestions);
+    setCurrentQuestionIndex(0);
+    setAnswers({});
     setAssessment(null);
+  }, [category]);
 
-    // Generate mock responses for demo
-    const mockResponses = Array.from({ length: 10 }, (_, i) => ({
-      questionId: `q${i + 1}`,
-      answer: Math.floor(Math.random() * 5) + 1,
-      timeSpent: Math.floor(Math.random() * 30) + 10,
-    }));
+  const handleStartAssessment = () => {
+    setStartTime(Date.now());
+    setCurrentQuestionIndex(0);
+    setAnswers({});
+    setAssessment(null);
+  };
+
+  const handleAnswer = (answerIndex: number) => {
+    const currentQuestion = questions[currentQuestionIndex];
+    if (!currentQuestion) return;
+
+    const questionStartTime = startTime || Date.now();
+    const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
+
+    setAnswers({
+      ...answers,
+      [currentQuestion.id]: answerIndex,
+    });
+
+    // Move to next question or submit
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setStartTime(Date.now());
+    } else {
+      // Last question answered, submit assessment
+      submitAssessment();
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setStartTime(Date.now());
+    }
+  };
+
+  const submitAssessment = async () => {
+    setIsAssessing(true);
+
+    // Convert answers to API format
+    const responses = questions.map((q, index) => {
+      const answerIndex = answers[q.id];
+      const questionStartTime = startTime || Date.now();
+      return {
+        questionId: q.id,
+        answer: answerIndex !== undefined ? answerIndex : 0, // Default to first option if not answered
+        timeSpent: Math.floor((Date.now() - questionStartTime) / 1000),
+      };
+    });
 
     try {
       const response = await fetch('/api/skill-assessments', {
@@ -32,7 +85,7 @@ export default function SkillArcade() {
         },
         body: JSON.stringify({
           category,
-          responses: mockResponses,
+          responses,
         }),
       });
 
@@ -42,6 +95,8 @@ export default function SkillArcade() {
 
       const data = await response.json();
       setAssessment(data.assessment);
+      setCurrentQuestionIndex(0);
+      setAnswers({});
     } catch (error) {
       console.error('Error assessing skills:', error);
       alert('Failed to assess skills. Please try again.');
@@ -68,37 +123,120 @@ export default function SkillArcade() {
 
             {/* Interactive Demo */}
             <GlassCard className="max-w-4xl mx-auto p-8">
-              <div className="mb-6">
-                <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">Take an Assessment</h3>
-                
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Skill Category</label>
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="technical">Technical Skills</SelectItem>
-                      <SelectItem value="soft">Soft Skills</SelectItem>
-                      <SelectItem value="leadership">Leadership</SelectItem>
-                      <SelectItem value="analytical">Analytical</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              {!assessment && questions.length === 0 && (
+                <div className="mb-6">
+                  <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">Take an Assessment</h3>
+                  
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Skill Category</label>
+                    <Select value={category} onValueChange={setCategory}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="technical">Technical Skills</SelectItem>
+                        <SelectItem value="soft">Soft Skills</SelectItem>
+                        <SelectItem value="leadership">Leadership</SelectItem>
+                        <SelectItem value="analytical">Analytical</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                {!assessment && (
-                  <Button onClick={handleAssess} disabled={isAssessing} className="w-full">
-                    {isAssessing ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                        Assessing Skills...
-                      </>
-                    ) : (
-                      "Start Assessment"
-                    )}
+                  <Button onClick={handleStartAssessment} className="w-full">
+                    Start Assessment
                   </Button>
-                )}
-              </div>
+                </div>
+              )}
+
+              {/* Question Interface */}
+              {!assessment && questions.length > 0 && currentQuestionIndex < questions.length && (
+                <div className="space-y-6">
+                  {/* Progress */}
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm font-medium text-slate-700">
+                        Question {currentQuestionIndex + 1} of {questions.length}
+                      </span>
+                      <span className="text-sm text-slate-600">
+                        {Math.round(((currentQuestionIndex + 1) / questions.length) * 100)}%
+                      </span>
+                    </div>
+                    <Progress value={((currentQuestionIndex + 1) / questions.length) * 100} className="h-2" />
+                  </div>
+
+                  {/* Question */}
+                  <div className="bg-white rounded-xl p-6">
+                    <h3 className="font-semibold text-ink-950 text-lg mb-6">
+                      {questions[currentQuestionIndex]?.text}
+                    </h3>
+
+                    {/* Answer Options */}
+                    <div className="space-y-3">
+                      {questions[currentQuestionIndex]?.options.map((option, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleAnswer(index)}
+                          className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                            answers[questions[currentQuestionIndex].id] === index
+                              ? 'border-ink-950 bg-champagne-100'
+                              : 'border-slate-200 hover:border-champagne-200 hover:bg-alabaster-50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                              answers[questions[currentQuestionIndex].id] === index
+                                ? 'border-ink-950 bg-ink-950'
+                                : 'border-slate-300'
+                            }`}>
+                              {answers[questions[currentQuestionIndex].id] === index && (
+                                <div className="w-2 h-2 bg-white rounded-full" />
+                              )}
+                            </div>
+                            <span className="text-slate-700">{option}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Navigation */}
+                  <div className="flex justify-between">
+                    <Button
+                      onClick={handlePrevious}
+                      disabled={currentQuestionIndex === 0}
+                      variant="outline"
+                    >
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Previous
+                    </Button>
+                    <Button
+                      onClick={submitAssessment}
+                      disabled={answers[questions[currentQuestionIndex]?.id] === undefined}
+                      className="ml-auto"
+                    >
+                      {currentQuestionIndex === questions.length - 1 ? (
+                        <>
+                          Submit Assessment
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </>
+                      ) : (
+                        <>
+                          Next
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Loading State */}
+              {isAssessing && (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-ink-950 border-t-transparent mx-auto mb-4" />
+                  <p className="text-slate-700">Analyzing your responses...</p>
+                </div>
+              )}
 
               {/* Assessment Results */}
               {assessment && (

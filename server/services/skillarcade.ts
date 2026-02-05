@@ -83,9 +83,6 @@ export async function assessSkills(request: SkillAssessmentRequest): Promise<Ski
 }
 
 function calculateScores(responses: SkillAssessmentRequest['responses'], category: string): Record<string, number> {
-  // Mock scoring logic - in production, this would use actual assessment criteria
-  const baseScore = Math.random() * 30 + 60; // 60-90 range
-  
   const categories: Record<string, string[]> = {
     technical: ['Programming', 'System Design', 'Problem Solving', 'Architecture'],
     soft: ['Communication', 'Teamwork', 'Adaptability', 'Creativity'],
@@ -96,8 +93,55 @@ function calculateScores(responses: SkillAssessmentRequest['responses'], categor
   const categoryList = categories[category] || categories.technical;
   const scores: Record<string, number> = {};
   
-  categoryList.forEach((cat, index) => {
-    scores[cat] = Math.round(baseScore + (Math.random() * 20 - 10)); // Add some variation
+  // Initialize scores for each skill
+  categoryList.forEach((skill) => {
+    scores[skill] = 0;
+  });
+
+  // Map questions to skills based on question index
+  // Questions are distributed across skills (2 questions per skill for 8 questions)
+  const answersBySkill: Record<string, number[]> = {};
+  
+  responses.forEach((response, index) => {
+    // Distribute questions evenly across skills
+    // For 8 questions and 4 skills: each skill gets 2 questions
+    const questionsPerSkill = Math.ceil(responses.length / categoryList.length);
+    const skillIndex = Math.floor(index / questionsPerSkill);
+    const skill = categoryList[skillIndex] || categoryList[0];
+    
+    if (!answersBySkill[skill]) {
+      answersBySkill[skill] = [];
+    }
+    
+    // Convert answer (0-3) to score contribution
+    // Answer 0 = 0 points (0%), Answer 1 = 8 points (33%), Answer 2 = 17 points (67%), Answer 3 = 25 points (100%)
+    const answerValue = typeof response.answer === 'number' ? response.answer : 0;
+    // Normalize to 0-100 scale: (answer / 3) * 100
+    const normalizedScore = Math.round((answerValue / 3) * 100);
+    answersBySkill[skill].push(normalizedScore);
+  });
+
+  // Calculate average score for each skill
+  Object.entries(answersBySkill).forEach(([skill, skillScores]) => {
+    if (skillScores.length > 0) {
+      const averageScore = skillScores.reduce((sum, s) => sum + s, 0) / skillScores.length;
+      scores[skill] = Math.round(averageScore);
+    } else {
+      // Default score if no answers for this skill
+      scores[skill] = 50;
+    }
+  });
+
+  // Ensure all skills have a score (fill missing ones with average of answered skills)
+  const existingScores = Object.values(scores).filter(s => s > 0);
+  const averageScore = existingScores.length > 0 
+    ? existingScores.reduce((sum, s) => sum + s, 0) / existingScores.length 
+    : 60;
+  
+  categoryList.forEach((skill) => {
+    if (!scores[skill] || scores[skill] === 0) {
+      scores[skill] = Math.round(averageScore);
+    }
   });
 
   return scores;
