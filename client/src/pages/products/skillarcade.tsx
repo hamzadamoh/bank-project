@@ -38,21 +38,15 @@ export default function SkillArcade() {
     const currentQuestion = questions[currentQuestionIndex];
     if (!currentQuestion) return;
 
-    const questionStartTime = startTime || Date.now();
-    const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
-
     setAnswers({
       ...answers,
       [currentQuestion.id]: answerIndex,
     });
 
-    // Move to next question or submit
+    // Move to next question (don't auto-submit)
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setStartTime(Date.now());
-    } else {
-      // Last question answered, submit assessment
-      submitAssessment();
     }
   };
 
@@ -209,23 +203,39 @@ export default function SkillArcade() {
                       <ArrowLeft className="h-4 w-4 mr-2" />
                       Previous
                     </Button>
-                    <Button
-                      onClick={submitAssessment}
-                      disabled={answers[questions[currentQuestionIndex]?.id] === undefined}
-                      className="ml-auto"
-                    >
-                      {currentQuestionIndex === questions.length - 1 ? (
-                        <>
-                          Submit Assessment
-                          <ArrowRight className="h-4 w-4 ml-2" />
-                        </>
-                      ) : (
-                        <>
-                          Next
-                          <ArrowRight className="h-4 w-4 ml-2" />
-                        </>
-                      )}
-                    </Button>
+                    {currentQuestionIndex < questions.length - 1 ? (
+                      <Button
+                        onClick={() => {
+                          if (answers[questions[currentQuestionIndex]?.id] !== undefined) {
+                            setCurrentQuestionIndex(currentQuestionIndex + 1);
+                            setStartTime(Date.now());
+                          }
+                        }}
+                        disabled={answers[questions[currentQuestionIndex]?.id] === undefined}
+                        className="ml-auto"
+                      >
+                        Next
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={submitAssessment}
+                        disabled={answers[questions[currentQuestionIndex]?.id] === undefined || isAssessing}
+                        className="ml-auto"
+                      >
+                        {isAssessing ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                            Submitting...
+                          </>
+                        ) : (
+                          <>
+                            Submit Assessment
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </div>
                 </div>
               )}
