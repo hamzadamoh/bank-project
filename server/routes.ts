@@ -7,7 +7,7 @@ import {
   insertTaxQuerySchema,
   insertSqlQuerySchema,
   insertDocumentAnalysisSchema
-} from "@shared/schema";
+} from "../shared/schema.js";
 import { z } from "zod";
 // Import all services statically to ensure they're bundled
 import { getTaxAdvice } from "./services/tax-counsel.js";
