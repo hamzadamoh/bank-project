@@ -64,9 +64,115 @@ export async function analyzeDocument(request: DocumentAnalysisRequest): Promise
     }
   }
 
+  // Check for Groq API key for fraud detection
+  const groqApiKey = process.env.GROQ_API_KEY;
+
+  // If we have file content and OpenAI API key, use real OCR
+  if (request.fileContent && apiKey) {
+    try {
+      const extractionResult = await extractAndAnalyzeWithAI(request.fileContent, request.fileType || 'application/pdf', apiKey);
+
+      // If Groq API key is available, run additional fraud detection
+      if (groqApiKey) {
+        try {
+          const fraudAnomalies = await detectFraudWithGroq(extractionResult.extractedData, groqApiKey);
+          extractionResult.anomalies = [...extractionResult.anomalies, ...fraudAnomalies];
+
+          // Re-evaluate decision based on new anomalies
+          extractionResult.decision = makeDecision(extractionResult.anomalies, extractionResult.extractedData);
+        } catch (error) {
+          console.error('Error in Groq fraud detection:', error);
+          // Continue with OpenAI results if Groq fails
+        }
+      }
+
+      return extractionResult;
+    } catch (error) {
+      console.error('Error in AI extraction, falling back to mock:', error);
+      // Fallback to mock if AI extraction fails
+      return getMockAnalysis(request);
+    }
+  }
+
   // Fallback to mock if no file content or API key
   return getMockAnalysis(request);
 }
+
+async function detectFraudWithGroq(extractedData: ExtractedData, apiKey: string): Promise<Anomaly[]> {
+  console.log('Using Groq API for advanced fraud detection');
+
+  const prompt = `
+  You are an expert financial fraud detection AI. Analyze the following invoice data for potential fraud, inconsistencies, or anomalies.
+  
+  Focus on:
+  1. Business logic inconsistencies (e.g., unit price * quantity != total)
+  2. Suspicious patterns (e.g., round numbers, unusual dates)
+  3. High-risk indicators (e.g., missing critical info, unusual ratios)
+  4. Compare with standard business practices.
+
+  Invoice Data:
+  ${JSON.stringify(extractedData, null, 2)}
+
+  Return a JSON object with a list of anomalies found. If no anomalies are found, return an empty list.
+  Format:
+  {
+    "anomalies": [
+      {
+        "type": "TYPE_CODE",
+        "severity": "HIGH" | "MEDIUM" | "LOW",
+        "message": "Description of the issue",
+        "found": "The problematic value found",
+        "expected": "What was expected (optional)"
+      }
+    ]
+  }
+  
+  Return ONLY valid JSON.
+  `;
+
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile', // Using a powerful model available on Groq
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a specialized fraud detection AI. You output ONLY valid JSON.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.1,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Groq API error (${response.status}):`, errorText);
+      throw new Error(`Groq API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content;
+
+    if (!content) return [];
+
+    const result = JSON.parse(content);
+    return result.anomalies || [];
+  } catch (error) {
+    console.error('Error contacting Groq API:', error);
+    return [];
+  }
+}
+
 
 async function getMockAnalysis(request: DocumentAnalysisRequest): Promise<DocumentAnalysisResponse> {
   // Enhanced mock that simulates real analysis
@@ -125,19 +231,19 @@ async function getMockAnalysis(request: DocumentAnalysisRequest): Promise<Docume
 }
 
 async function extractAndAnalyzeWithAI(
-  fileContent: Buffer, 
-  fileType: string, 
+  fileContent: Buffer,
+  fileType: string,
   apiKey: string
 ): Promise<DocumentAnalysisResponse> {
   console.log('Using OpenAI Vision API for document extraction', { fileType });
 
   // Convert buffer to base64
   const base64Content = fileContent.toString('base64');
-  
+
   // Determine image format for OpenAI Vision API
   let imageFormat = 'png';
   let mimeType = 'image/png';
-  
+
   if (fileType.includes('jpeg') || fileType.includes('jpg')) {
     imageFormat = 'jpeg';
     mimeType = 'image/jpeg';
@@ -226,7 +332,7 @@ Extract all visible text and data. If a field is not visible, use null. Return O
     }
 
     const data = await response.json();
-    
+
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
       throw new Error('Invalid response format from OpenAI Vision API');
     }
@@ -280,13 +386,13 @@ function normalizeExtractedData(data: any): ExtractedData {
       totalTVA: typeof data.invoice?.totalTVA === 'number' ? data.invoice.totalTVA : 0,
       totalTTC: typeof data.invoice?.totalTTC === 'number' ? data.invoice.totalTTC : 0,
     },
-    lineItems: Array.isArray(data.lineItems) 
+    lineItems: Array.isArray(data.lineItems)
       ? data.lineItems.map((item: any) => ({
-          description: item.description || 'N/A',
-          quantity: typeof item.quantity === 'number' ? item.quantity : 0,
-          unitPrice: typeof item.unitPrice === 'number' ? item.unitPrice : 0,
-          total: typeof item.total === 'number' ? item.total : 0,
-        }))
+        description: item.description || 'N/A',
+        quantity: typeof item.quantity === 'number' ? item.quantity : 0,
+        unitPrice: typeof item.unitPrice === 'number' ? item.unitPrice : 0,
+        total: typeof item.total === 'number' ? item.total : 0,
+      }))
       : [],
   };
 }
@@ -311,8 +417,8 @@ async function detectAnomalies(extractedData: ExtractedData): Promise<Anomaly[]>
   if (extractedData.lineItems.length > 0) {
     const calculatedTotalHT = extractedData.lineItems.reduce((sum, item) => sum + item.total, 0);
     const variance = Math.abs(calculatedTotalHT - extractedData.invoice.totalHT);
-    const variancePercent = extractedData.invoice.totalHT > 0 
-      ? (variance / extractedData.invoice.totalHT) * 100 
+    const variancePercent = extractedData.invoice.totalHT > 0
+      ? (variance / extractedData.invoice.totalHT) * 100
       : 0;
 
     if (variancePercent > 0.1) { // More than 0.1% variance

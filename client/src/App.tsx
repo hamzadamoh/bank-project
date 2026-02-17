@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect } from "react";
+import { VoiceChatbot } from "@/components/voice-chatbot";
 import Home from "@/pages/home";
 import TaxCounsel from "@/pages/products/tax-counsel";
 import QueryArchitect from "@/pages/products/query-architect";
@@ -82,6 +83,7 @@ function App() {
         <div className="min-h-screen bg-alabaster-50">
           <Toaster />
           <Router />
+          <VoiceChatbot />
         </div>
       </TooltipProvider>
     </QueryClientProvider>

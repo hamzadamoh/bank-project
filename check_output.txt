@@ -1,0 +1,5 @@
+﻿
+> rest-express@1.0.0 check
+> tsc
+
+server/services/factoring-guardian.ts(551,1): error TS1005: '}' expected.

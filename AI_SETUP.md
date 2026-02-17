@@ -90,11 +90,42 @@ Monitor usage at: https://platform.openai.com/usage
 
 ## Troubleshooting
 
+
+### Groq API (Optional but Recommended for High Speed)
+
+For **Factoring Guardian** to use the Groq API for ultra-fast fraud detection:
+
+1. Get your API key from [Groq Console](https://console.groq.com/keys)
+2. Add it to your `.env` file:
+   ```
+   GROQ_API_KEY=gsk_your_key_here
+   ```
+
+### Hugging Face API (Required for Query Architect)
+
+For **Query Architect** to use the dedicated SQL generation model:
+
+1. Get your API token from [Hugging Face Settings](https://huggingface.co/settings/tokens)
+2. Add it to your `.env` file:
+   ```
+   HUGGINGFACE_API_TOKEN=hf_your_token_here
+   ```
+
+### Voice Chatbot (Requires Groq)
+
+For the **Voice Chatbot** to function:
+1. Ensure `GROQ_API_KEY` is set (see above).
+2. The system uses `whisper-large-v3` for speech-to-text and `llama-3.3-70b-versatile` for responses.
+3. Browser permission for microphone access is required.
+
+### Troubleshooting
+
 ### Tools not working with AI?
-- Check that `OPENAI_API_KEY` is set in environment variables
+- Check that `OPENAI_API_KEY`, `GROQ_API_KEY`, or `HUGGINGFACE_API_TOKEN` is set in environment variables
 - Verify the API key is valid and has credits
 - Check server logs for API errors
 - Tools will fallback to mock data if API fails
+
 
 ### Getting errors?
 - Ensure your OpenAI account has credits

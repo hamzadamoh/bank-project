@@ -27,14 +27,14 @@ const conversations = new Map<string, ChatMessage[]>();
 
 export async function chat(request: ChatRequest): Promise<ChatResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
-  
+
   // Detect language if auto
   const language = request.language === 'auto' ? detectLanguage(request.message) : request.language || 'fr';
-  
+
   // Get or create conversation
   const conversationId = request.conversationId || `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   const conversation = conversations.get(conversationId) || [];
-  
+
   // Add user message
   conversation.push({
     role: 'user',
@@ -43,8 +43,27 @@ export async function chat(request: ChatRequest): Promise<ChatResponse> {
   });
 
   let response: string;
-  
-  if (apiKey) {
+
+  const groqApiKey = process.env.GROQ_API_KEY;
+
+  if (groqApiKey) {
+    try {
+      console.log('Using Groq API for chat response');
+      response = await getGroqResponse(request.message, conversation, language, groqApiKey);
+    } catch (error) {
+      console.error('Error getting Groq response, falling back to OpenAI:', error);
+      if (apiKey) {
+        try {
+          response = await getAIResponse(request.message, conversation, language, apiKey);
+        } catch (openaiError) {
+          console.error('Error getting OpenAI response:', openaiError);
+          response = getDefaultResponse(request.message, language);
+        }
+      } else {
+        response = getDefaultResponse(request.message, language);
+      }
+    }
+  } else if (apiKey) {
     try {
       response = await getAIResponse(request.message, conversation, language, apiKey);
     } catch (error) {
@@ -64,7 +83,7 @@ export async function chat(request: ChatRequest): Promise<ChatResponse> {
 
   // Store conversation (in production, use database)
   conversations.set(conversationId, conversation);
-  
+
   // Keep only last 20 messages
   if (conversation.length > 20) {
     conversations.set(conversationId, conversation.slice(-20));
@@ -83,7 +102,7 @@ function detectLanguage(text: string): 'fr' | 'ar' | 'darija' | 'en' {
   const arabicPattern = /[\u0600-\u06FF]/;
   const frenchPattern = /[àâäéèêëïîôùûüÿç]/i;
   const englishPattern = /^(hello|hi|how|what|when|where|why|can|could|would|should|please|thank|thanks|yes|no|ok|okay)/i;
-  
+
   if (arabicPattern.test(text)) {
     // Could be Arabic or Darija - simple heuristic
     if (text.includes('د') || text.includes('ة')) {
@@ -91,15 +110,15 @@ function detectLanguage(text: string): 'fr' | 'ar' | 'darija' | 'en' {
     }
     return 'darija';
   }
-  
+
   if (frenchPattern.test(text) || /^(bonjour|salut|merci|oui|non)/i.test(text)) {
     return 'fr';
   }
-  
+
   if (englishPattern.test(text) || /^[a-zA-Z\s]+$/.test(text.trim()) && !frenchPattern.test(text)) {
     return 'en';
   }
-  
+
   return 'en'; // default to English
 }
 
@@ -393,7 +412,7 @@ FiscAI كتقدم تلاتة خطط ديال التسعير:
   }
 
   const data = await response.json();
-  
+
   if (!data.choices || !data.choices[0] || !data.choices[0].message) {
     console.error('Invalid OpenAI response format:', JSON.stringify(data));
     throw new Error('Invalid response format from OpenAI API');
@@ -417,11 +436,11 @@ function getDefaultResponse(message: string, language: string): string {
   };
 
   const lowerMessage = message.toLowerCase();
-  
+
   if (lowerMessage.includes('salut') || lowerMessage.includes('bonjour') || lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
     return responses[language] || responses.en;
   }
-  
+
   if (lowerMessage.includes('tax') || lowerMessage.includes('impôt') || lowerMessage.includes('ضريبة')) {
     if (language === 'en') {
       return "For tax questions, I recommend using our FiscAI Tax Counsel tool for detailed advice with legal citations.";
@@ -431,7 +450,102 @@ function getDefaultResponse(message: string, language: string): string {
       return "بالنسبة للأسئلة الضريبية، أنصحك باستخدام أداة FiscAI Tax Counsel للحصول على نصائح مفصلة مع المراجع القانونية.";
     }
   }
-  
+
   return responses[language] || responses.en;
+}
+
+async function getGroqResponse(
+  message: string,
+  conversation: ChatMessage[],
+  language: string,
+  apiKey: string
+): Promise<string> {
+  const systemPrompts: Record<string, string> = {
+    en: `You are OmniServe, the multilingual AI assistant for FiscAI. Respond in English. Be concise and helpful.`,
+    fr: `Tu es OmniServe, l'assistant IA multilingue de FiscAI. Réponds en français. Sois concis et utile.`,
+    ar: `أنت OmniServe، المساعد الذكي متعدد اللغات لـ FiscAI. أجب باللغة العربية. كن موجزاً ومفيداً.`,
+    darija: `نتي OmniServe، المساعد الذكي ديال FiscAI. جاوبي بالدارجة المغربية. كوني مختصرة ومفيدة.`,
+  };
+
+  const systemPrompt = systemPrompts[language] || systemPrompts.en;
+
+  const messages = [
+    {
+      role: 'system',
+      content: systemPrompt,
+    },
+    ...conversation.slice(-5).map(msg => ({
+      role: msg.role,
+      content: msg.content,
+    })),
+    {
+      role: 'user',
+      content: message,
+    }
+  ];
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages,
+      temperature: 0.7,
+      max_tokens: 300,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Groq API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0]?.message?.content?.trim() || getDefaultResponse(message, language);
+}
+
+export async function transcribeAudioWithGroq(audioBuffer: Buffer): Promise<string> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) {
+    throw new Error('GROQ_API_KEY not found');
+  }
+
+  // Create a boundary for the multipart form data
+  const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
+
+  // Construct the multipart body manually since we're in Node environment
+  // and FormData handling can be tricky with buffers without external libs like form-data
+  // However, for simplicity and reliability with modern Node fetch, we can use the 'form-data' library if available
+  // or construct it carefully. 
+
+  // Let's use a simpler approach: passing a blob if possible, or using a library.
+  // Since we don't want to add too many dependencies, let's try to construct the body.
+
+  // NOTE: Groq API expects 'file' and 'model'.
+
+  const blob = new Blob([new Uint8Array(audioBuffer)], { type: 'audio/webm' });
+  const formData = new FormData();
+  formData.append('file', blob, 'audio.webm');
+  formData.append('model', 'whisper-large-v3');
+
+  const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Groq Transcription Error:', errorText);
+    throw new Error(`Groq Transcription API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.text;
 }
 
