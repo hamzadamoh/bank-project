@@ -98,10 +98,21 @@ export async function chat(request: ChatRequest): Promise<ChatResponse> {
 }
 
 function detectLanguage(text: string): 'fr' | 'ar' | 'darija' | 'en' {
+  const lowerText = text.toLowerCase().trim();
+
+  // Strong signal for English greetings
+  if (/^(hi|hello|hey|how|what|when|where|why|who|can|could|would|should|is|are|do|does|did)/i.test(lowerText)) {
+    return 'en';
+  }
+
+  // Strong signal for French greetings
+  if (/^(bonjour|salut|bonsoir|comment|quoi|quand|ou|pourquoi|qui|est-ce|sont|fais|fait)/i.test(lowerText)) {
+    return 'fr';
+  }
+
   // Simple language detection
   const arabicPattern = /[\u0600-\u06FF]/;
   const frenchPattern = /[àâäéèêëïîôùûüÿç]/i;
-  const englishPattern = /^(hello|hi|how|what|when|where|why|can|could|would|should|please|thank|thanks|yes|no|ok|okay)/i;
 
   if (arabicPattern.test(text)) {
     // Could be Arabic or Darija - simple heuristic
@@ -111,15 +122,12 @@ function detectLanguage(text: string): 'fr' | 'ar' | 'darija' | 'en' {
     return 'darija';
   }
 
-  if (frenchPattern.test(text) || /^(bonjour|salut|merci|oui|non)/i.test(text)) {
+  if (frenchPattern.test(text)) {
     return 'fr';
   }
 
-  if (englishPattern.test(text) || /^[a-zA-Z\s]+$/.test(text.trim()) && !frenchPattern.test(text)) {
-    return 'en';
-  }
-
-  return 'en'; // default to English
+  // Default fallback
+  return 'en';
 }
 
 async function getAIResponse(
@@ -491,7 +499,7 @@ async function getGroqResponse(
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: 'openai/gpt-oss-120b',
       messages,
       temperature: 0.7,
       max_tokens: 300,

@@ -115,7 +115,7 @@ For **Query Architect** to use the dedicated SQL generation model:
 
 For the **Voice Chatbot** to function:
 1. Ensure `GROQ_API_KEY` is set (see above).
-2. The system uses `whisper-large-v3` for speech-to-text and `llama-3.3-70b-versatile` for responses.
+2. The system uses `whisper-large-v3` for speech-to-text and `openai/gpt-oss-120b` for responses.
 3. Browser permission for microphone access is required.
 
 ### Troubleshooting

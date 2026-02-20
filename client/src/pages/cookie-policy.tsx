@@ -7,7 +7,7 @@ export default function CookiePolicy() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-champagne-100">
       <Navigation />
-      
+
       <div className="pt-32 pb-20 px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -32,8 +32,8 @@ export default function CookiePolicy() {
             <section className="mb-8">
               <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">What Are Cookies?</h2>
               <p className="text-slate-700 leading-relaxed">
-                Cookies are small text files stored on your device when you visit our website. They help us 
-                provide you with a better, faster, and safer experience by remembering your preferences, 
+                Cookies are small text files stored on your device when you visit our website. They help us
+                provide you with a better, faster, and safer experience by remembering your preferences,
                 analyzing site performance, and enabling essential functionality.
               </p>
             </section>
@@ -41,7 +41,7 @@ export default function CookiePolicy() {
             {/* Types of Cookies */}
             <section className="mb-8">
               <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">Types of Cookies We Use</h2>
-              
+
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div className="bg-champagne-200/20 p-6 rounded-2xl">
                   <div className="flex items-start gap-3">
@@ -49,7 +49,7 @@ export default function CookiePolicy() {
                     <div>
                       <h4 className="font-semibold text-ink-950 mb-2">Essential Cookies</h4>
                       <p className="text-slate-700 text-sm">
-                        Required for basic website functionality, security, and user authentication. 
+                        Required for basic website functionality, security, and user authentication.
                         These cannot be disabled.
                       </p>
                     </div>
@@ -62,7 +62,7 @@ export default function CookiePolicy() {
                     <div>
                       <h4 className="font-semibold text-ink-950 mb-2">Analytics Cookies</h4>
                       <p className="text-slate-700 text-sm">
-                        Help us understand how visitors interact with our website to improve 
+                        Help us understand how visitors interact with our website to improve
                         performance and user experience.
                       </p>
                     </div>
@@ -75,7 +75,7 @@ export default function CookiePolicy() {
                     <div>
                       <h4 className="font-semibold text-ink-950 mb-2">Functional Cookies</h4>
                       <p className="text-slate-700 text-sm">
-                        Remember your preferences and settings to provide a personalized 
+                        Remember your preferences and settings to provide a personalized
                         experience across sessions.
                       </p>
                     </div>
@@ -88,7 +88,7 @@ export default function CookiePolicy() {
                     <div>
                       <h4 className="font-semibold text-ink-950 mb-2">Marketing Cookies</h4>
                       <p className="text-slate-700 text-sm">
-                        Used to deliver relevant advertisements and track campaign effectiveness. 
+                        Used to deliver relevant advertisements and track campaign effectiveness.
                         These require your consent.
                       </p>
                     </div>
@@ -100,7 +100,7 @@ export default function CookiePolicy() {
             {/* Specific Cookies */}
             <section className="mb-8">
               <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">Specific Cookies We Use</h2>
-              
+
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
@@ -151,6 +151,7 @@ export default function CookiePolicy() {
                 <li><strong>Google Analytics:</strong> Website traffic and user behavior analysis</li>
                 <li><strong>Intercom:</strong> Customer support and communication</li>
                 <li><strong>Stripe:</strong> Payment processing (for billing pages only)</li>
+                <li><strong>PayPal:</strong> Payment processing and fraud detection (for billing pages only)</li>
                 <li><strong>Cloudflare:</strong> Security and performance optimization</li>
               </ul>
             </section>
@@ -158,7 +159,7 @@ export default function CookiePolicy() {
             {/* Managing Cookies */}
             <section className="mb-8">
               <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">Managing Your Cookie Preferences</h2>
-              
+
               <h3 className="font-semibold text-xl text-ink-950 mb-3">Cookie Banner Controls</h3>
               <p className="text-slate-700 leading-relaxed mb-4">
                 When you first visit our site, you'll see a cookie banner allowing you to:
@@ -201,8 +202,8 @@ export default function CookiePolicy() {
             <section className="mb-8">
               <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">Updates to This Policy</h2>
               <p className="text-slate-700 leading-relaxed">
-                We may update this Cookie Policy from time to time to reflect changes in our practices or 
-                for legal, operational, or regulatory reasons. We'll notify you of material changes through 
+                We may update this Cookie Policy from time to time to reflect changes in our practices or
+                for legal, operational, or regulatory reasons. We'll notify you of material changes through
                 our website or by email.
               </p>
             </section>

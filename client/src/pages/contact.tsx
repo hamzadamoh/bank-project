@@ -32,7 +32,7 @@ export default function Contact() {
     budget: "",
     employees: ""
   });
-  
+
   const { toast } = useToast();
 
   const submitMutation = useMutation({
@@ -43,7 +43,7 @@ export default function Contact() {
     onSuccess: () => {
       toast({
         title: "Success!",
-        description: formType === "demo" 
+        description: formType === "demo"
           ? "Your demo request has been submitted. We'll contact you within 24 hours."
           : "Your message has been sent. We'll get back to you soon.",
       });
@@ -73,7 +73,7 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formType === "demo") {
       submitMutation.mutate({
         name: formData.name,
@@ -97,7 +97,7 @@ export default function Contact() {
   const handleToolChange = (tool: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
-      tools: checked 
+      tools: checked
         ? [...prev.tools, tool]
         : prev.tools.filter(t => t !== tool)
     }));
@@ -105,7 +105,7 @@ export default function Contact() {
 
   const tools = [
     "FiscAI Tax Counsel",
-    "Factoring Guardian", 
+    "Factoring Guardian",
     "Query Architect",
     "SkillArcade",
     "OmniServe",
@@ -134,7 +134,7 @@ export default function Contact() {
               <div className="space-y-8">
                 <div>
                   <h3 className="font-display font-bold text-2xl text-ink-950 mb-6">Contact Information</h3>
-                  
+
                   <div className="space-y-6">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 bg-champagne-200 rounded-xl flex items-center justify-center">
@@ -186,18 +186,18 @@ export default function Contact() {
                 <GlassCard className="p-6">
                   <h4 className="font-semibold text-ink-950 mb-4">Quick Resources</h4>
                   <div className="space-y-3">
-                    <a href="#" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
+                    <Link href="/security" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
                       → Download Security Datasheet
-                    </a>
-                    <a href="#" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
+                    </Link>
+                    <Link href="/security" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
                       → API Documentation
-                    </a>
-                    <a href="#" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
+                    </Link>
+                    <Link href="/security" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
                       → Integration Guide
-                    </a>
-                    <a href="#" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
+                    </Link>
+                    <Link href="/security" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
                       → Compliance Checklist
-                    </a>
+                    </Link>
                   </div>
                 </GlassCard>
               </div>
@@ -209,31 +209,29 @@ export default function Contact() {
                     <div className="flex gap-4 mb-6">
                       <button
                         onClick={() => setFormType("demo")}
-                        className={`px-4 py-2 rounded-xl font-semibold transition-colors ${
-                          formType === "demo" 
-                            ? "bg-ink-950 text-alabaster-50" 
-                            : "bg-alabaster-100 text-slate-700 hover:bg-alabaster-200"
-                        }`}
+                        className={`px-4 py-2 rounded-xl font-semibold transition-colors ${formType === "demo"
+                          ? "bg-ink-950 text-alabaster-50"
+                          : "bg-alabaster-100 text-slate-700 hover:bg-alabaster-200"
+                          }`}
                       >
                         Request Demo
                       </button>
                       <button
                         onClick={() => setFormType("contact")}
-                        className={`px-4 py-2 rounded-xl font-semibold transition-colors ${
-                          formType === "contact" 
-                            ? "bg-ink-950 text-alabaster-50" 
-                            : "bg-alabaster-100 text-slate-700 hover:bg-alabaster-200"
-                        }`}
+                        className={`px-4 py-2 rounded-xl font-semibold transition-colors ${formType === "contact"
+                          ? "bg-ink-950 text-alabaster-50"
+                          : "bg-alabaster-100 text-slate-700 hover:bg-alabaster-200"
+                          }`}
                       >
                         General Contact
                       </button>
                     </div>
-                    
+
                     <h3 className="font-display font-bold text-2xl text-ink-950 mb-2">
                       {formType === "demo" ? "Request a Personalized Demo" : "Send us a Message"}
                     </h3>
                     <p className="text-slate-700">
-                      {formType === "demo" 
+                      {formType === "demo"
                         ? "Get a tailored demonstration of FiscAI tools relevant to your use case"
                         : "We'd love to hear from you. Send us a message and we'll respond as soon as possible."
                       }
@@ -324,8 +322,8 @@ export default function Contact() {
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
                             <Label htmlFor="timeline">Implementation Timeline</Label>
-                            <Select 
-                              value={formData.timeline} 
+                            <Select
+                              value={formData.timeline}
                               onValueChange={(value) => setFormData(prev => ({ ...prev, timeline: value }))}
                             >
                               <SelectTrigger>
@@ -342,8 +340,8 @@ export default function Contact() {
                           </div>
                           <div>
                             <Label htmlFor="employees">Company Size</Label>
-                            <Select 
-                              value={formData.employees} 
+                            <Select
+                              value={formData.employees}
                               onValueChange={(value) => setFormData(prev => ({ ...prev, employees: value }))}
                             >
                               <SelectTrigger>
@@ -407,9 +405,9 @@ export default function Contact() {
                       </Label>
                     </div>
 
-                    <Button 
-                      type="submit" 
-                      className="w-full" 
+                    <Button
+                      type="submit"
+                      className="w-full"
                       disabled={submitMutation.isPending}
                     >
                       {submitMutation.isPending ? (

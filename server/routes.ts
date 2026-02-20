@@ -329,9 +329,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // 2. Chat with OmniServe (Llama 3 via Groq)
+      // Detect language from transcription first, then pass it to chat
+
       const chatResponse = await chat({
         message: transcription,
-        language: 'auto' // OmniServe handles language detection
+        language: 'auto'
       });
 
       res.json({

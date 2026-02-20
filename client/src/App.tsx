@@ -21,6 +21,7 @@ import Newsletter from "@/pages/newsletter";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfService from "@/pages/terms-of-service";
 import CookiePolicy from "@/pages/cookie-policy";
+import RefundPolicy from "@/pages/refund-policy";
 import DedicatedSupport from "@/pages/dedicated-support";
 import CustomTraining from "@/pages/custom-training";
 import OnSiteDeployment from "@/pages/on-site-deployment";
@@ -64,6 +65,7 @@ function Router() {
         <Route path="/privacy-policy" component={PrivacyPolicy} />
         <Route path="/terms-of-service" component={TermsOfService} />
         <Route path="/cookie-policy" component={CookiePolicy} />
+        <Route path="/refund-policy" component={RefundPolicy} />
         <Route path="/dedicated-support" component={DedicatedSupport} />
         <Route path="/custom-training" component={CustomTraining} />
         <Route path="/on-site-deployment" component={OnSiteDeployment} />

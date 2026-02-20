@@ -138,7 +138,7 @@ async function detectFraudWithGroq(extractedData: ExtractedData, apiKey: string)
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile', // Using a powerful model available on Groq
+        model: 'openai/gpt-oss-120b', // Using a powerful model available on Groq
         messages: [
           {
             role: 'system',

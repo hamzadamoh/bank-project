@@ -7,7 +7,7 @@ export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-champagne-100">
       <Navigation />
-      
+
       <div className="pt-32 pb-20 px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -39,7 +39,7 @@ export default function PrivacyPolicy() {
             {/* Information We Collect */}
             <section className="mb-8">
               <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">Information We Collect</h2>
-              
+
               <h3 className="font-semibold text-xl text-ink-950 mb-3">Information You Provide</h3>
               <ul className="list-disc list-inside text-slate-700 space-y-2 mb-6">
                 <li>Account registration information (name, email, company details)</li>
@@ -105,10 +105,26 @@ export default function PrivacyPolicy() {
               </p>
               <ul className="list-disc list-inside text-slate-700 space-y-2">
                 <li><strong>Service Providers:</strong> Trusted partners who assist in service delivery</li>
+                <li><strong>Payment Processors:</strong> Stripe and PayPal process payments on our behalf. They receive only the payment data necessary to complete transactions and are governed by their own privacy policies</li>
                 <li><strong>Legal Requirements:</strong> When required by law or legal process</li>
                 <li><strong>Business Transfers:</strong> In case of merger, acquisition, or asset sale</li>
                 <li><strong>Consent:</strong> When you explicitly authorize sharing</li>
               </ul>
+            </section>
+
+            {/* Payment Information */}
+            <section className="mb-8">
+              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">Payment Information</h2>
+              <p className="text-slate-700 leading-relaxed mb-4">
+                When you subscribe to a paid plan, payment processing is handled by our third-party payment processors:
+              </p>
+              <ul className="list-disc list-inside text-slate-700 space-y-2 mb-4">
+                <li><strong>Stripe:</strong> Processes credit and debit card payments. Stripe collects card numbers, expiration dates, and CVC codes directly — FiscAI never stores your full card details. See <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-ink-950 underline hover:text-slate-700">Stripe's Privacy Policy</a></li>
+                <li><strong>PayPal:</strong> Processes PayPal account payments. PayPal may collect your email, billing address, and transaction history. See <a href="https://www.paypal.com/privacy" target="_blank" rel="noopener noreferrer" className="text-ink-950 underline hover:text-slate-700">PayPal's Privacy Policy</a></li>
+              </ul>
+              <p className="text-slate-700 leading-relaxed">
+                We retain billing records (transaction amounts, dates, and subscription status) for accounting and regulatory compliance, but we do not store sensitive payment credentials on our servers.
+              </p>
             </section>
 
             {/* Data Security */}
@@ -120,8 +136,8 @@ export default function PrivacyPolicy() {
                   <div>
                     <h4 className="font-semibold text-ink-950 mb-2">Enterprise-Grade Security</h4>
                     <p className="text-slate-700 text-sm leading-relaxed">
-                      We implement industry-standard security measures including AES-256 encryption, 
-                      SOC 2 Type II compliance, regular security audits, and secure data centers. 
+                      We implement industry-standard security measures including AES-256 encryption,
+                      SOC 2 Type II compliance, regular security audits, and secure data centers.
                       All financial data is encrypted both in transit and at rest.
                     </p>
                   </div>
@@ -133,8 +149,8 @@ export default function PrivacyPolicy() {
             <section className="mb-8">
               <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">International Data Transfers</h2>
               <p className="text-slate-700 leading-relaxed">
-                As a global service provider based in Morocco, we may transfer your data internationally. 
-                We ensure adequate protection through Standard Contractual Clauses (SCCs) and other 
+                As a global service provider based in Morocco, we may transfer your data internationally.
+                We ensure adequate protection through Standard Contractual Clauses (SCCs) and other
                 appropriate safeguards recognized by international data protection authorities.
               </p>
             </section>
@@ -181,7 +197,7 @@ export default function PrivacyPolicy() {
             <section className="mb-8">
               <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">Data Retention</h2>
               <p className="text-slate-700 leading-relaxed">
-                We retain your information only as long as necessary to provide services and comply with legal obligations. 
+                We retain your information only as long as necessary to provide services and comply with legal obligations.
                 Account data is typically retained for 7 years after account closure for regulatory compliance in the financial sector.
               </p>
             </section>

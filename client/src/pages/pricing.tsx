@@ -4,7 +4,8 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Check, Star } from "lucide-react";
+import { Check, Star, Shield, CreditCard } from "lucide-react";
+import { FaCcVisa, FaCcMastercard, FaCcAmex, FaCcPaypal, FaStripe } from "react-icons/fa6";
 
 export default function Pricing() {
   const plans = [
@@ -72,7 +73,9 @@ export default function Pricing() {
       ],
       limitations: [],
       cta: "Contact Sales",
-      ctaVariant: "outline" as const
+      ctaVariant: "outline" as const,
+      stripeLink: "",
+      paypalLink: ""
     }
   ];
 
@@ -149,8 +152,8 @@ export default function Pricing() {
             {/* Pricing Cards */}
             <div className="grid lg:grid-cols-3 gap-8 mb-16">
               {plans.map((plan, index) => (
-                <GlassCard 
-                  key={index} 
+                <GlassCard
+                  key={index}
                   className={`p-8 relative ${plan.popular ? 'ring-2 ring-ink-950' : ''}`}
                 >
                   {plan.popular && (
@@ -159,7 +162,7 @@ export default function Pricing() {
                       Most Popular
                     </div>
                   )}
-                  
+
                   <div className="text-center mb-8">
                     <h3 className="font-display font-bold text-2xl text-ink-950 mb-2">{plan.name}</h3>
                     <p className="text-slate-700 mb-6">{plan.description}</p>
@@ -191,16 +194,32 @@ export default function Pricing() {
                     </div>
                   )}
 
-                  <Link 
+                  <Link
                     href="/contact"
-                    className={`w-full block text-center px-6 py-3 rounded-xl font-semibold transition-colors ${
-                      plan.ctaVariant === 'default' 
-                        ? 'bg-ink-950 text-alabaster-50 hover:bg-ink-900' 
-                        : 'bg-alabaster-50 border border-ink-950 text-ink-950 hover:bg-alabaster-100'
-                    }`}
+                    className={`w-full block text-center px-6 py-3 rounded-xl font-semibold transition-colors ${plan.ctaVariant === 'default'
+                      ? 'bg-ink-950 text-alabaster-50 hover:bg-ink-900'
+                      : 'bg-alabaster-50 border border-ink-950 text-ink-950 hover:bg-alabaster-100'
+                      }`}
                   >
                     {plan.cta}
                   </Link>
+
+                  {/* Payment Methods */}
+                  {plan.name !== 'Enterprise' && (
+                    <div className="mt-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-px flex-1 bg-alabaster-200" />
+                        <span className="text-xs text-slate-500">Pay with</span>
+                        <div className="h-px flex-1 bg-alabaster-200" />
+                      </div>
+                      <div className="flex items-center justify-center gap-3 text-slate-400">
+                        <FaCcVisa className="h-8 w-8 hover:text-[#1a1f71] transition-colors" />
+                        <FaCcMastercard className="h-8 w-8 hover:text-[#eb001b] transition-colors" />
+                        <FaCcAmex className="h-8 w-8 hover:text-[#006fcf] transition-colors" />
+                        <FaCcPaypal className="h-8 w-8 hover:text-[#003087] transition-colors" />
+                      </div>
+                    </div>
+                  )}
                 </GlassCard>
               ))}
             </div>
@@ -213,6 +232,39 @@ export default function Pricing() {
               <Badge className="bg-champagne-200 text-ink-950">
                 30-day money-back guarantee
               </Badge>
+            </div>
+
+            {/* Payment Trust Indicators */}
+            <div className="mt-12">
+              <GlassCard className="p-6">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex items-center gap-3">
+                    <Shield className="h-6 w-6 text-emerald-400" />
+                    <div>
+                      <p className="font-semibold text-ink-950 text-sm">Secure Payments</p>
+                      <p className="text-xs text-slate-600">256-bit SSL encryption</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <FaStripe className="h-10 w-10 text-[#635bff]" />
+                      <span className="text-xs text-slate-600 font-medium">Powered by Stripe</span>
+                    </div>
+                    <div className="h-6 w-px bg-alabaster-200" />
+                    <div className="flex items-center gap-2">
+                      <FaCcPaypal className="h-10 w-10 text-[#003087]" />
+                      <span className="text-xs text-slate-600 font-medium">PayPal Accepted</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CreditCard className="h-6 w-6 text-ink-950" />
+                    <div>
+                      <p className="font-semibold text-ink-950 text-sm">Flexible Billing</p>
+                      <p className="text-xs text-slate-600">Monthly or annual plans</p>
+                    </div>
+                  </div>
+                </div>
+              </GlassCard>
             </div>
           </div>
         </section>
@@ -335,7 +387,9 @@ export default function Pricing() {
                 <Link href="/contact">
                   <Button>Contact Sales</Button>
                 </Link>
-                <Button variant="outline">Schedule Demo</Button>
+                <Link href="/contact">
+                  <Button variant="outline">Schedule Demo</Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -356,9 +410,11 @@ export default function Pricing() {
                   Start Free Trial
                 </Button>
               </Link>
-              <Button variant="outline" className="border-2 border-alabaster-50 text-alabaster-50 hover:bg-alabaster-50 hover:text-ink-950 px-8 py-4 text-lg">
-                Schedule Demo
-              </Button>
+              <Link href="/contact">
+                <Button variant="outline" className="border-2 border-alabaster-50 text-alabaster-50 hover:bg-alabaster-50 hover:text-ink-950 px-8 py-4 text-lg">
+                  Schedule Demo
+                </Button>
+              </Link>
             </div>
           </div>
         </section>

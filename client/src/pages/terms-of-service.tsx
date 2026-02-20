@@ -7,7 +7,7 @@ export default function TermsOfService() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-champagne-100">
       <Navigation />
-      
+
       <div className="pt-32 pb-20 px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -32,8 +32,8 @@ export default function TermsOfService() {
             <section className="mb-8">
               <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">1. Acceptance of Terms</h2>
               <p className="text-slate-700 leading-relaxed">
-                By accessing or using FiscAI's services ("Services"), you agree to be bound by these Terms of Service ("Terms"). 
-                If you disagree with any part of these terms, you may not access the Services. These terms apply to all users 
+                By accessing or using FiscAI's services ("Services"), you agree to be bound by these Terms of Service ("Terms").
+                If you disagree with any part of these terms, you may not access the Services. These terms apply to all users
                 worldwide, with specific provisions for Moroccan and international regulatory compliance.
               </p>
             </section>
@@ -60,8 +60,8 @@ export default function TermsOfService() {
                   <div>
                     <h3 className="font-semibold text-amber-800 mb-2">Important Professional Disclaimer</h3>
                     <p className="text-amber-700 text-sm leading-relaxed">
-                      FiscAI provides AI-assisted analysis and recommendations. Our services do not constitute professional 
-                      tax, legal, or financial advice. Always consult qualified professionals for specific situations. 
+                      FiscAI provides AI-assisted analysis and recommendations. Our services do not constitute professional
+                      tax, legal, or financial advice. Always consult qualified professionals for specific situations.
                       We are not a licensed tax advisory firm or accounting practice.
                     </p>
                   </div>
@@ -135,15 +135,45 @@ export default function TermsOfService() {
             <section className="mb-8">
               <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">6. Service Availability</h2>
               <p className="text-slate-700 leading-relaxed">
-                We strive for high availability but do not guarantee uninterrupted service. Planned maintenance, 
-                updates, and unforeseen technical issues may cause temporary service interruptions. We provide 
+                We strive for high availability but do not guarantee uninterrupted service. Planned maintenance,
+                updates, and unforeseen technical issues may cause temporary service interruptions. We provide
                 99.9% uptime SLA for Enterprise customers with appropriate service credits for extended outages.
+              </p>
+            </section>
+
+            {/* Billing & Payments */}
+            <section className="mb-8">
+              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">7. Billing & Payments</h2>
+              <p className="text-slate-700 leading-relaxed mb-4">
+                Paid subscriptions are billed in advance on a monthly or annual basis. By subscribing, you agree to the following:
+              </p>
+              <ul className="list-disc list-inside text-slate-700 space-y-2 mb-4">
+                <li><strong>Payment Methods:</strong> We accept credit/debit cards (via Stripe) and PayPal</li>
+                <li><strong>Auto-Renewal:</strong> Subscriptions automatically renew at the end of each billing period unless cancelled</li>
+                <li><strong>Price Changes:</strong> We will provide at least 30 days' notice before any price changes take effect</li>
+                <li><strong>Failed Payments:</strong> If payment fails, we may attempt to charge again or suspend access after a grace period</li>
+                <li><strong>Taxes:</strong> Prices are exclusive of applicable taxes, which will be added at checkout</li>
+              </ul>
+              <p className="text-slate-700 leading-relaxed">
+                All payments are processed securely by our third-party payment processors (Stripe and PayPal).
+                FiscAI does not store your complete payment credentials.
+              </p>
+            </section>
+
+            {/* Refunds & Cancellations */}
+            <section className="mb-8">
+              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">8. Refunds & Cancellations</h2>
+              <p className="text-slate-700 leading-relaxed mb-4">
+                All new subscriptions are covered by a 30-day money-back guarantee. You may cancel your subscription
+                at any time; access continues until the end of the current billing period. For full details on
+                refund eligibility, prorated refunds for annual plans, and the refund request process, please refer
+                to our <a href="/refund-policy" className="text-ink-950 underline hover:text-slate-700">Refund Policy</a>.
               </p>
             </section>
 
             {/* Limitation of Liability */}
             <section className="mb-8">
-              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">7. Limitation of Liability</h2>
+              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">9. Limitation of Liability</h2>
               <p className="text-slate-700 leading-relaxed mb-4">
                 To the maximum extent permitted by law, FiscAI's liability is limited as follows:
               </p>
@@ -157,27 +187,27 @@ export default function TermsOfService() {
 
             {/* Governing Law */}
             <section className="mb-8">
-              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">8. Governing Law</h2>
+              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">10. Governing Law</h2>
               <p className="text-slate-700 leading-relaxed">
-                These Terms are governed by the laws of the Kingdom of Morocco. For international customers, 
-                disputes will be resolved through binding arbitration in accordance with ICC rules, with 
+                These Terms are governed by the laws of the Kingdom of Morocco. For international customers,
+                disputes will be resolved through binding arbitration in accordance with ICC rules, with
                 proceedings conducted in English in Casablanca, Morocco.
               </p>
             </section>
 
             {/* Changes to Terms */}
             <section className="mb-8">
-              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">9. Changes to Terms</h2>
+              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">11. Changes to Terms</h2>
               <p className="text-slate-700 leading-relaxed">
-                We may modify these Terms at any time. Material changes will be communicated via email and 
-                posted on our website 30 days before taking effect. Continued use of the Services after 
+                We may modify these Terms at any time. Material changes will be communicated via email and
+                posted on our website 30 days before taking effect. Continued use of the Services after
                 changes constitutes acceptance of the modified Terms.
               </p>
             </section>
 
             {/* Contact Information */}
             <section className="mb-8">
-              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">10. Contact Information</h2>
+              <h2 className="font-display font-bold text-2xl text-ink-950 mb-4">12. Contact Information</h2>
               <div className="bg-champagne-200/20 p-6 rounded-2xl">
                 <div className="flex items-start gap-3">
                   <FileText className="h-6 w-6 text-ink-950 mt-1" />

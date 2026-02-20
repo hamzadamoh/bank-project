@@ -5,9 +5,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, AlertTriangle, CheckCircle, X } from "lucide-react";
 
 export default function FactoringGuardian() {
+  const { toast } = useToast();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -26,7 +28,7 @@ export default function FactoringGuardian() {
         alert('Please upload a PDF, JPG, or PNG file');
         return;
       }
-      
+
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
         alert('File size must be less than 10MB');
@@ -166,11 +168,11 @@ export default function FactoringGuardian() {
             <GlassCard className="max-w-4xl mx-auto p-8">
               <div className="text-center mb-8">
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">Document Analysis Demo</h3>
-                
+
                 {!isAnalyzing && !analysisComplete && (
                   <div>
                     {!selectedFile ? (
-                      <div 
+                      <div
                         className="border-2 border-dashed border-champagne-200 rounded-2xl p-12 hover:border-champagne-300 transition-colors cursor-pointer"
                         onClick={handleUploadClick}
                       >
@@ -282,53 +284,49 @@ export default function FactoringGuardian() {
                       </div>
                       <div className="space-y-3">
                         {analysisResult.anomalies.map((anomaly: any, index: number) => (
-                        <div key={index} className={`border-l-4 pl-4 ${
-                          anomaly.severity === 'HIGH' ? 'border-rose-400' : 'border-amber-400'
-                        }`}>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium text-ink-950">{anomaly.type.replace('_', ' ')}</span>
-                            <Badge className={`text-xs ${
-                              anomaly.severity === 'HIGH' ? 'bg-rose-400' : 'bg-amber-400'
-                            } text-ink-950`}>
-                              {anomaly.severity}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-slate-700">{anomaly.message}</p>
-                          {anomaly.expected && (
-                            <div className="text-xs text-slate-600 mt-1">
-                              <div>Expected: {anomaly.expected}</div>
-                              <div>Found: {anomaly.found}</div>
+                          <div key={index} className={`border-l-4 pl-4 ${anomaly.severity === 'HIGH' ? 'border-rose-400' : 'border-amber-400'
+                            }`}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium text-ink-950">{anomaly.type.replace('_', ' ')}</span>
+                              <Badge className={`text-xs ${anomaly.severity === 'HIGH' ? 'bg-rose-400' : 'bg-amber-400'
+                                } text-ink-950`}>
+                                {anomaly.severity}
+                              </Badge>
                             </div>
-                          )}
-                        </div>
+                            <p className="text-sm text-slate-700">{anomaly.message}</p>
+                            {anomaly.expected && (
+                              <div className="text-xs text-slate-600 mt-1">
+                                <div>Expected: {anomaly.expected}</div>
+                                <div>Found: {anomaly.found}</div>
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
                     </div>
                   )}
 
                   {/* Decision */}
-                  <div className={`rounded-xl p-6 ${
-                    analysisResult.decision === 'ALERT' ? 'bg-amber-50' : analysisResult.decision === 'REJECTED' ? 'bg-rose-50' : 'bg-emerald-50'
-                  }`}>
+                  <div className={`rounded-xl p-6 ${analysisResult.decision === 'ALERT' ? 'bg-amber-50' : analysisResult.decision === 'REJECTED' ? 'bg-rose-50' : 'bg-emerald-50'
+                    }`}>
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-semibold text-ink-950">Processing Decision</h4>
-                      <Badge className={`${
-                        analysisResult.decision === 'ALERT' ? 'bg-amber-400' : analysisResult.decision === 'REJECTED' ? 'bg-rose-400' : 'bg-emerald-400'
-                      } text-ink-950`}>
+                      <Badge className={`${analysisResult.decision === 'ALERT' ? 'bg-amber-400' : analysisResult.decision === 'REJECTED' ? 'bg-rose-400' : 'bg-emerald-400'
+                        } text-ink-950`}>
                         {analysisResult.decision}
                       </Badge>
                     </div>
                     <p className="text-slate-700 mb-4">
-                      {analysisResult.decision === 'VALIDATED' 
+                      {analysisResult.decision === 'VALIDATED'
                         ? 'Document validated successfully. No anomalies detected.'
                         : analysisResult.decision === 'ALERT'
-                        ? 'Review recommended due to detected anomalies.'
-                        : 'Document rejected due to critical anomalies.'}
+                          ? 'Review recommended due to detected anomalies.'
+                          : 'Document rejected due to critical anomalies.'}
                     </p>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">Approve with Review</Button>
-                      <Button variant="outline" size="sm">Request Clarification</Button>
-                      <Button variant="outline" size="sm">Reject</Button>
+                      <Button variant="outline" size="sm" onClick={() => toast({ title: "Approved with Review", description: "Document has been approved and flagged for manual review." })}>Approve with Review</Button>
+                      <Button variant="outline" size="sm" onClick={() => toast({ title: "Clarification Requested", description: "A clarification request has been sent to the supplier." })}>Request Clarification</Button>
+                      <Button variant="outline" size="sm" onClick={() => toast({ title: "Document Rejected", description: "The document has been rejected due to detected anomalies.", variant: "destructive" })}>Reject</Button>
                     </div>
                   </div>
 
@@ -343,7 +341,16 @@ export default function FactoringGuardian() {
                     }}>
                       Analyze Another Document
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={() => {
+                      const blob = new Blob([JSON.stringify(analysisResult, null, 2)], { type: 'application/json' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `analysis-report-${new Date().toISOString().slice(0, 10)}.json`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                      toast({ title: "Report Exported", description: "Analysis report has been downloaded." });
+                    }}>
                       <FileText className="h-4 w-4 mr-2" />
                       Export Report
                     </Button>

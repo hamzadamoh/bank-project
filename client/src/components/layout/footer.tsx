@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { FaLinkedinIn, FaXTwitter, FaGithub } from "react-icons/fa6";
 
 export default function Footer() {
   return (
@@ -11,12 +12,18 @@ export default function Footer() {
               Enterprise AI suite for smarter finance and faster decisions. Seven specialized tools built for financial institutions.
             </p>
             <div className="flex gap-4">
-              <div className="w-10 h-10 bg-champagne-200 rounded-xl"></div>
-              <div className="w-10 h-10 bg-champagne-200 rounded-xl"></div>
-              <div className="w-10 h-10 bg-champagne-200 rounded-xl"></div>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-champagne-200 rounded-xl flex items-center justify-center hover:bg-champagne-300 transition-colors">
+                <FaLinkedinIn className="h-5 w-5 text-ink-950" />
+              </a>
+              <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-champagne-200 rounded-xl flex items-center justify-center hover:bg-champagne-300 transition-colors">
+                <FaXTwitter className="h-5 w-5 text-ink-950" />
+              </a>
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-champagne-200 rounded-xl flex items-center justify-center hover:bg-champagne-300 transition-colors">
+                <FaGithub className="h-5 w-5 text-ink-950" />
+              </a>
             </div>
           </div>
-          
+
           <div>
             <h3 className="font-semibold text-ink-950 mb-4">Products</h3>
             <ul className="space-y-2 text-sm text-slate-700">
@@ -29,7 +36,7 @@ export default function Footer() {
               <li><Link href="/products/satisfai" className="hover:text-ink-950 transition-colors">SatisfAI</Link></li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="font-semibold text-ink-950 mb-4">Solutions</h3>
             <ul className="space-y-2 text-sm text-slate-700">
@@ -39,7 +46,7 @@ export default function Footer() {
               <li><Link href="/solutions#smb" className="hover:text-ink-950 transition-colors">SMB Accounting</Link></li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="font-semibold text-ink-950 mb-4">Company</h3>
             <ul className="space-y-2 text-sm text-slate-700">
@@ -51,7 +58,7 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        
+
         <div className="border-t border-alabaster-200 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-sm text-slate-600 mb-4 md:mb-0">
             © 2024 FiscAI. All rights reserved.
@@ -60,6 +67,7 @@ export default function Footer() {
             <Link href="/privacy-policy" className="hover:text-ink-950 transition-colors">Privacy Policy</Link>
             <Link href="/terms-of-service" className="hover:text-ink-950 transition-colors">Terms of Service</Link>
             <Link href="/cookie-policy" className="hover:text-ink-950 transition-colors">Cookie Policy</Link>
+            <Link href="/refund-policy" className="hover:text-ink-950 transition-colors">Refund Policy</Link>
           </div>
         </div>
       </div>
