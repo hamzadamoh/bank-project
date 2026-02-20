@@ -184,7 +184,7 @@ export default function Solutions() {
             <section
               key={solution.id}
               id={solution.id}
-              className={`py-24 px-6 lg:px-8 ${index % 2 === 0 ? 'bg-white' : 'bg-alabaster-50'}`}
+              className={`py-24 px-6 lg:px-8 scroll-mt-20 ${index % 2 === 0 ? 'bg-white' : 'bg-alabaster-50'}`}
             >
               <div className="max-w-7xl mx-auto">
                 <div className="grid lg:grid-cols-2 gap-16 items-center">
