@@ -121,7 +121,7 @@ export default function Home() {
                 <p className="text-xl text-slate-700 mb-8">
                   Built with bank-grade security and compliance from day one. Your data never leaves your infrastructure.
                 </p>
-                
+
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
                     <div className="w-6 h-6 bg-emerald-400 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
@@ -132,7 +132,7 @@ export default function Home() {
                       <p className="text-slate-700 text-sm">All AI models run within your VPC. Zero data egress to external services.</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-4">
                     <div className="w-6 h-6 bg-emerald-400 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                       <div className="w-3 h-3 bg-white rounded-full"></div>
@@ -142,7 +142,7 @@ export default function Home() {
                       <p className="text-slate-700 text-sm">Per-tenant encryption keys and data residency selection (EU/MA/US).</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-4">
                     <div className="w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                       <div className="w-3 h-3 bg-white rounded-full"></div>
@@ -154,10 +154,10 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="glass-card rounded-3xl p-8 bg-white/60 backdrop-blur-md border border-champagne-200/50">
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-6">Security Features</h3>
-                
+
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-white rounded-xl p-4 text-center">
                     <div className="font-bold text-2xl text-emerald-400 mb-1">AES-256</div>
@@ -176,7 +176,7 @@ export default function Home() {
                     <div className="text-xs text-slate-600">Access Control</div>
                   </div>
                 </div>
-                
+
                 <div className="bg-champagne-200 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
@@ -202,7 +202,7 @@ export default function Home() {
               Join leading financial institutions already using FiscAI to make smarter decisions faster.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact" className="bg-alabaster-50 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-100 transition-all duration-200 transform hover:scale-105">
+              <Link href="/checkout?plan=starter" className="bg-alabaster-50 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-100 transition-all duration-200 transform hover:scale-105">
                 Start Free Trial
               </Link>
               <Link href="/contact" className="border-2 border-alabaster-50 text-alabaster-50 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-50 hover:text-ink-950 transition-all duration-200">

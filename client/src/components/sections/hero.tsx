@@ -13,11 +13,11 @@ export default function Hero() {
             Enterprise AI suite delivering seven specialized tools for tax advisory, fraud detection, and financial intelligence. Trusted by banks, fintechs, and accounting firms worldwide.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/contact" className="bg-ink-950 text-alabaster-50 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-ink-900 transition-all duration-200 transform hover:scale-105">
+            <Link href="/checkout?plan=starter" className="bg-ink-950 text-alabaster-50 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-ink-900 transition-all duration-200 transform hover:scale-105">
               Start Free Trial
             </Link>
             <Link href="/contact" className="gradient-border bg-alabaster-50 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-100 transition-all duration-200">
-              Watch Demo
+              Schedule Demo
             </Link>
           </div>
         </div>
