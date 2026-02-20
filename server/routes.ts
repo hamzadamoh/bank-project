@@ -7,7 +7,8 @@ import {
   insertTaxQuerySchema,
   insertSqlQuerySchema,
   insertDocumentAnalysisSchema,
-  insertWaitlistSchema
+  insertWaitlistSchema,
+  insertOrderSchema
 } from "../shared/schema.js";
 import { z } from "zod";
 // Import all services statically to ensure they're bundled
@@ -407,7 +408,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   });
-
   // SatisfAI satisfaction analysis endpoint
   app.post("/api/satisfaction-analysis", async (req, res) => {
     try {
@@ -436,6 +436,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: error instanceof Error ? error.message : "Internal server error",
         error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
       });
+    }
+  });
+
+  // Orders endpoints
+  app.get("/api/orders", async (req, res) => {
+    try {
+      const orders = await storage.getAllOrders();
+      res.json({ success: true, data: orders });
+    } catch (error) {
+      console.error("Get orders error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error"
+      });
+    }
+  });
+
+  app.post("/api/orders", async (req, res) => {
+    try {
+      const validatedData = insertOrderSchema.parse(req.body);
+      const order = await storage.createOrder(validatedData);
+      res.json({ success: true, data: order });
+    } catch (error) {
+      console.error("Create order error:", error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({
+          success: false,
+          message: "Invalid order data",
+          errors: error.errors
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "Internal server error"
+        });
+      }
     }
   });
 

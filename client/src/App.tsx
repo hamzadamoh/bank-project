@@ -30,6 +30,11 @@ import OnSiteDeployment from "@/pages/on-site-deployment";
 import About from "@/pages/about";
 import Careers from "@/pages/careers";
 import Waitlist from "@/pages/waitlist";
+import ROICalculator from "@/pages/roi-calculator";
+import IndustryAssessment from "@/pages/industry-assessment";
+import Apply from "@/pages/apply";
+import RequestAccess from "@/pages/request-access";
+import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
 
 // Component to handle scroll to top on route change
@@ -76,6 +81,11 @@ function Router() {
         <Route path="/about" component={About} />
         <Route path="/careers" component={Careers} />
         <Route path="/waitlist" component={Waitlist} />
+        <Route path="/roi-calculator" component={ROICalculator} />
+        <Route path="/industry-assessment" component={IndustryAssessment} />
+        <Route path="/apply" component={Apply} />
+        <Route path="/request-access" component={RequestAccess} />
+        <Route path="/dashboard" component={Dashboard} />
         <Route component={NotFound} />
       </Switch>
     </>

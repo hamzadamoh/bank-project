@@ -19,7 +19,7 @@ export default function Careers() {
       title: "Tax Domain Expert",
       department: "Product",
       location: "Remote MENA",
-      type: "Full-time", 
+      type: "Full-time",
       description: "Shape our tax advisory AI products with deep knowledge of Moroccan and international tax law.",
       requirements: ["CPA or tax law degree", "10+ years tax consulting", "MENA tax expertise", "Technology-forward mindset"],
     },
@@ -33,7 +33,7 @@ export default function Careers() {
     },
     {
       title: "Frontend Engineer",
-      department: "Engineering", 
+      department: "Engineering",
       location: "Remote Europe",
       type: "Full-time",
       description: "Build beautiful, intuitive interfaces for complex AI-powered financial tools.",
@@ -60,7 +60,7 @@ export default function Careers() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-champagne-100">
       <Navigation />
-      
+
       <div className="pt-32 pb-20 px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -73,7 +73,7 @@ export default function Careers() {
               Shape the Future of Financial AI
             </h1>
             <p className="text-xl text-slate-700 max-w-3xl mx-auto leading-relaxed">
-              Join a diverse, global team building AI solutions that serve Morocco and the world. 
+              Join a diverse, global team building AI solutions that serve Morocco and the world.
               Work on cutting-edge technology while making a real impact on financial services.
             </p>
           </div>
@@ -96,7 +96,7 @@ export default function Careers() {
                 </div>
                 <h3 className="font-display font-bold text-xl text-ink-950 mb-4">Cutting-Edge Technology</h3>
                 <p className="text-slate-700 leading-relaxed">
-                  Work with the latest AI technologies and contribute to research that advances 
+                  Work with the latest AI technologies and contribute to research that advances
                   the entire field of financial AI and natural language processing.
                 </p>
               </GlassCard>
@@ -107,7 +107,7 @@ export default function Careers() {
                 </div>
                 <h3 className="font-display font-bold text-xl text-ink-950 mb-4">Global Impact</h3>
                 <p className="text-slate-700 leading-relaxed">
-                  Your work directly impacts financial institutions across Morocco, MENA, and beyond. 
+                  Your work directly impacts financial institutions across Morocco, MENA, and beyond.
                   Help democratize access to sophisticated financial AI tools worldwide.
                 </p>
               </GlassCard>
@@ -118,7 +118,7 @@ export default function Careers() {
                 </div>
                 <h3 className="font-display font-bold text-xl text-ink-950 mb-4">Diverse Team</h3>
                 <p className="text-slate-700 leading-relaxed">
-                  Join a multicultural team spanning continents and disciplines. Learn from 
+                  Join a multicultural team spanning continents and disciplines. Learn from
                   experts in AI, finance, linguistics, and business across different cultures.
                 </p>
               </GlassCard>
@@ -213,7 +213,7 @@ export default function Careers() {
                           {position.department}
                         </span>
                       </div>
-                      
+
                       <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 mb-4">
                         <div className="flex items-center gap-1">
                           <MapPin className="h-4 w-4" />
@@ -224,11 +224,11 @@ export default function Careers() {
                           {position.type}
                         </div>
                       </div>
-                      
+
                       <p className="text-slate-700 mb-4 leading-relaxed">
                         {position.description}
                       </p>
-                      
+
                       <div>
                         <h4 className="font-semibold text-ink-950 mb-2">Key Requirements:</h4>
                         <ul className="text-sm text-slate-700">
@@ -241,7 +241,7 @@ export default function Careers() {
                         </ul>
                       </div>
                     </div>
-                    
+
                     <div className="lg:w-48 flex-shrink-0">
                       <Button className="w-full bg-ink-950 text-alabaster-50 hover:bg-ink-900">
                         Apply Now
@@ -269,11 +269,11 @@ export default function Careers() {
               <GlassCard className="p-8">
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">🌍 Global Mindset</h3>
                 <p className="text-slate-700 leading-relaxed mb-4">
-                  We think globally while acting locally. Our diverse team brings perspectives from across 
+                  We think globally while acting locally. Our diverse team brings perspectives from across
                   Morocco, MENA, Europe, and beyond to create solutions that work everywhere.
                 </p>
                 <p className="text-slate-700 leading-relaxed">
-                  Whether you're in Casablanca, Paris, or working remotely from anywhere, you're 
+                  Whether you're in Casablanca, Paris, or working remotely from anywhere, you're
                   part of a connected global team building for the world.
                 </p>
               </GlassCard>
@@ -281,11 +281,11 @@ export default function Careers() {
               <GlassCard className="p-8">
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">🚀 Innovation First</h3>
                 <p className="text-slate-700 leading-relaxed mb-4">
-                  We encourage experimentation, learning from failures, and pushing boundaries. 
+                  We encourage experimentation, learning from failures, and pushing boundaries.
                   Every team member is empowered to suggest improvements and try new approaches.
                 </p>
                 <p className="text-slate-700 leading-relaxed">
-                  From 20% time for personal projects to hackathons and research collaborations, 
+                  From 20% time for personal projects to hackathons and research collaborations,
                   innovation is woven into everything we do.
                 </p>
               </GlassCard>
@@ -293,11 +293,11 @@ export default function Careers() {
               <GlassCard className="p-8">
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">🤝 Collaboration</h3>
                 <p className="text-slate-700 leading-relaxed mb-4">
-                  We believe the best solutions come from diverse perspectives working together. 
+                  We believe the best solutions come from diverse perspectives working together.
                   Engineers collaborate with domain experts, designers work with product managers.
                 </p>
                 <p className="text-slate-700 leading-relaxed">
-                  Our flat organizational structure means everyone's voice is heard and 
+                  Our flat organizational structure means everyone's voice is heard and
                   good ideas can come from anywhere.
                 </p>
               </GlassCard>
@@ -305,11 +305,11 @@ export default function Careers() {
               <GlassCard className="p-8">
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">💡 Continuous Learning</h3>
                 <p className="text-slate-700 leading-relaxed mb-4">
-                  The AI field evolves rapidly, and so do we. We invest heavily in our team's 
+                  The AI field evolves rapidly, and so do we. We invest heavily in our team's
                   continuous learning through training, conferences, and knowledge sharing.
                 </p>
                 <p className="text-slate-700 leading-relaxed">
-                  Regular tech talks, paper reading sessions, and skill-sharing workshops 
+                  Regular tech talks, paper reading sessions, and skill-sharing workshops
                   keep everyone at the cutting edge of their field.
                 </p>
               </GlassCard>
@@ -376,24 +376,24 @@ export default function Careers() {
               Don't See Your Role?
             </h2>
             <p className="text-xl text-slate-700 mb-8 max-w-2xl mx-auto">
-              We're always looking for exceptional talent. If you're passionate about AI, finance, 
+              We're always looking for exceptional talent. If you're passionate about AI, finance,
               or building great products, we'd love to hear from you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact" className="bg-ink-950 text-alabaster-50 hover:bg-ink-900 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center transition-colors">
+              <Link href="/apply" className="bg-ink-950 text-alabaster-50 hover:bg-ink-900 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center transition-colors">
                 Send Us Your Resume
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-              <a 
-                href="https://www.linkedin.com/company/fiscai" 
-                target="_blank" 
+              <a
+                href="https://www.linkedin.com/company/fiscai"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="border border-ink-950 bg-alabaster-50 text-ink-950 hover:bg-alabaster-100 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center transition-colors"
               >
                 Follow Us on LinkedIn
               </a>
             </div>
-            
+
             <div className="mt-8 text-center text-sm text-slate-600">
               <p>FiscAI is an equal opportunity employer committed to diversity and inclusion</p>
               <p>We welcome applications from all qualified candidates regardless of background</p>

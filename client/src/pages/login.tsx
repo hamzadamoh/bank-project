@@ -78,8 +78,8 @@ export default function Login() {
                         <button
                             onClick={() => setRole("client")}
                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all ${role === "client"
-                                    ? "bg-white shadow-sm text-ink-950"
-                                    : "text-slate-500 hover:text-ink-950"
+                                ? "bg-white shadow-sm text-ink-950"
+                                : "text-slate-500 hover:text-ink-950"
                                 }`}
                         >
                             <User className="h-4 w-4" />
@@ -88,8 +88,8 @@ export default function Login() {
                         <button
                             onClick={() => setRole("admin")}
                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all ${role === "admin"
-                                    ? "bg-white shadow-sm text-ink-950"
-                                    : "text-slate-500 hover:text-ink-950"
+                                ? "bg-white shadow-sm text-ink-950"
+                                : "text-slate-500 hover:text-ink-950"
                                 }`}
                         >
                             <Settings className="h-4 w-4" />
@@ -249,7 +249,7 @@ export default function Login() {
                         {/* Sign Up Link */}
                         <p className="text-center text-sm text-slate-600 mt-6">
                             Don't have an account?{" "}
-                            <Link href="/contact" className="text-ink-950 font-semibold hover:underline">
+                            <Link href="/request-access" className="text-ink-950 font-semibold hover:underline">
                                 Request Access
                             </Link>
                         </p>

@@ -1,5 +1,5 @@
-import { 
-  type User, 
+import {
+  type User,
   type InsertUser,
   type DemoRequest,
   type InsertDemoRequest,
@@ -12,7 +12,9 @@ import {
   type DocumentAnalysis,
   type InsertDocumentAnalysis,
   type Waitlist,
-  type InsertWaitlist
+  type InsertWaitlist,
+  type Order,
+  type InsertOrder
 } from "../shared/schema.js";
 import { randomUUID } from "crypto";
 
@@ -20,37 +22,42 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   // Demo requests
   createDemoRequest(demoRequest: InsertDemoRequest): Promise<DemoRequest>;
   getAllDemoRequests(): Promise<DemoRequest[]>;
   getDemoRequest(id: string): Promise<DemoRequest | undefined>;
-  
+
   // Contact submissions
   createContactSubmission(contact: InsertContactSubmission): Promise<ContactSubmission>;
   getAllContactSubmissions(): Promise<ContactSubmission[]>;
   getContactSubmission(id: string): Promise<ContactSubmission | undefined>;
-  
+
   // Tax queries
   createTaxQuery(taxQuery: InsertTaxQuery): Promise<TaxQuery>;
   getAllTaxQueries(): Promise<TaxQuery[]>;
   getTaxQuery(id: string): Promise<TaxQuery | undefined>;
-  
+
   // SQL queries
   createSqlQuery(sqlQuery: InsertSqlQuery): Promise<SqlQuery>;
   getAllSqlQueries(): Promise<SqlQuery[]>;
   getSqlQuery(id: string): Promise<SqlQuery | undefined>;
-  
+
   // Document analysis
   createDocumentAnalysis(analysis: InsertDocumentAnalysis): Promise<DocumentAnalysis>;
   getAllDocumentAnalysis(): Promise<DocumentAnalysis[]>;
   getDocumentAnalysis(id: string): Promise<DocumentAnalysis | undefined>;
-  
+
   // Waitlist
   createWaitlistEntry(waitlist: InsertWaitlist): Promise<Waitlist>;
   getAllWaitlistEntries(): Promise<Waitlist[]>;
   getWaitlistEntry(id: string): Promise<Waitlist | undefined>;
   getWaitlistEntryByEmail(email: string): Promise<Waitlist | undefined>;
+
+  // Orders
+  createOrder(order: InsertOrder): Promise<Order>;
+  getAllOrders(): Promise<Order[]>;
+  getOrder(id: string): Promise<Order | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -61,6 +68,7 @@ export class MemStorage implements IStorage {
   private sqlQueries: Map<string, SqlQuery>;
   private documentAnalysis: Map<string, DocumentAnalysis>;
   private waitlist: Map<string, Waitlist>;
+  private orders: Map<string, Order>;
 
   constructor() {
     this.users = new Map();
@@ -70,6 +78,7 @@ export class MemStorage implements IStorage {
     this.sqlQueries = new Map();
     this.documentAnalysis = new Map();
     this.waitlist = new Map();
+    this.orders = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -92,7 +101,7 @@ export class MemStorage implements IStorage {
   // Demo requests
   async createDemoRequest(insertDemoRequest: InsertDemoRequest): Promise<DemoRequest> {
     const id = randomUUID();
-    const demoRequest: DemoRequest = { 
+    const demoRequest: DemoRequest = {
       ...insertDemoRequest,
       message: insertDemoRequest.message ?? null,
       id,
@@ -229,6 +238,27 @@ export class MemStorage implements IStorage {
     return Array.from(this.waitlist.values()).find(
       (entry) => entry.email.toLowerCase() === email.toLowerCase()
     );
+  }
+
+  // Orders
+  async createOrder(insertOrder: InsertOrder): Promise<Order> {
+    const id = randomUUID();
+    const order: Order = {
+      ...insertOrder,
+      id,
+      createdAt: new Date()
+    };
+    this.orders.set(id, order);
+    return order;
+  }
+
+  async getAllOrders(): Promise<Order[]> {
+    return Array.from(this.orders.values())
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async getOrder(id: string): Promise<Order | undefined> {
+    return this.orders.get(id);
   }
 }
 

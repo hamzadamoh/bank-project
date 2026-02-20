@@ -279,7 +279,7 @@ export default function Solutions() {
               Join industry leaders who've already deployed FiscAI solutions for measurable business impact.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact" className="bg-alabaster-50 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-100 transition-all duration-200 transform hover:scale-105">
+              <Link href="/industry-assessment" className="bg-alabaster-50 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-100 transition-all duration-200 transform hover:scale-105">
                 Get Industry Assessment
               </Link>
               <Link href="/pricing" className="border-2 border-alabaster-50 text-alabaster-50 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-alabaster-50 hover:text-ink-950 transition-all duration-200">

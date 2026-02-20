@@ -353,7 +353,7 @@ export default function Pricing() {
                     </div>
                   </div>
                   <div className="mt-6 text-center">
-                    <Link href="/contact">
+                    <Link href="/roi-calculator">
                       <Button>Calculate Your ROI</Button>
                     </Link>
                   </div>

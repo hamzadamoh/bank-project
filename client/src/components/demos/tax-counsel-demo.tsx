@@ -1,20 +1,28 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function TaxCounselDemo() {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showResponse, setShowResponse] = useState(true);
+  const [response, setResponse] = useState<any>(null);
 
   const handleQuery = async () => {
     setIsProcessing(true);
-    setShowResponse(false);
+    setResponse(null);
 
-    // Simulate AI processing
-    setTimeout(() => {
+    try {
+      const res = await apiRequest("POST", "/api/tax-queries", {
+        query: "What are the VAT implications for a Moroccan company providing SaaS services to EU clients?",
+        jurisdiction: "MA-EU"
+      });
+      const data = await res.json();
+      setResponse(data);
+    } catch (error) {
+      console.error("Tax query failed:", error);
+    } finally {
       setIsProcessing(false);
-      setShowResponse(true);
-    }, 2000);
+    }
   };
 
   return (
@@ -40,21 +48,16 @@ export default function TaxCounselDemo() {
         </div>
       )}
 
-      {showResponse && !isProcessing && (
+      {response && !isProcessing && (
         <div className="border-l-4 border-champagne-200 pl-4">
           <h4 className="font-semibold text-ink-950 mb-2">Tax Analysis</h4>
-          <p className="text-sm text-slate-700 mb-3">
-            For Moroccan SaaS providers serving EU clients, the following VAT treatment applies:
+          <p className="text-sm text-slate-700 mb-3 whitespace-pre-line">
+            {response.response.analysis}
           </p>
-          <ul className="text-sm text-slate-700 space-y-1 mb-3">
-            <li>• <strong>Morocco VAT:</strong> 20% applies to domestic supplies</li>
-            <li>• <strong>EU VAT:</strong> Reverse charge mechanism for B2B clients</li>
-            <li>• <strong>Threshold:</strong> $10,000 annual EU sales trigger OSS registration</li>
-          </ul>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary" className="bg-champagne-200 text-ink-950">Art. 87 CGI</Badge>
-            <Badge variant="secondary" className="bg-champagne-200 text-ink-950">EU Dir. 2006/112</Badge>
-            <Badge variant="secondary" className="bg-champagne-200 text-ink-950">Note 728/2023</Badge>
+            {response.response.citations.map((cite: string, i: number) => (
+              <Badge key={i} variant="secondary" className="bg-champagne-200 text-ink-950">{cite}</Badge>
+            ))}
           </div>
         </div>
       )}
