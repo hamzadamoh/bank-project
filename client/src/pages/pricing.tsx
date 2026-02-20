@@ -34,7 +34,7 @@ export default function Pricing() {
     {
       name: "Professional",
       description: "For growing teams that need advanced AI capabilities",
-      price: "€2,500",
+      price: "$2,500",
       period: "per month",
       popular: true,
       features: [
@@ -83,25 +83,25 @@ export default function Pricing() {
     {
       name: "Additional Jurisdictions",
       description: "Extend tax counsel to additional countries and regions",
-      price: "€500",
+      price: "$500",
       period: "per jurisdiction/month"
     },
     {
       name: "Premium Support",
       description: "24/7 phone and chat support with 1-hour response SLA",
-      price: "€1,200",
+      price: "$1,200",
       period: "per month"
     },
     {
       name: "Professional Services",
       description: "Implementation, training, and custom workflow development",
-      price: "€2,000",
+      price: "$2,000",
       period: "per day"
     },
     {
       name: "Advanced Analytics",
       description: "Custom dashboards, reporting, and business intelligence",
-      price: "€800",
+      price: "$800",
       period: "per month"
     }
   ];
@@ -125,7 +125,7 @@ export default function Pricing() {
     },
     {
       question: "What happens if I exceed my query limit?",
-      answer: "You'll be notified when approaching limits. Overage charges apply at €0.05 per additional query, or you can upgrade to a higher plan."
+      answer: "You'll be notified when approaching limits. Overage charges apply at $0.05 per additional query, or you can upgrade to a higher plan."
     },
     {
       question: "Do you offer discounts for non-profits or education?",

@@ -28,7 +28,7 @@ export default function Solutions() {
         client: "Al Barid Bank",
         challenge: "Manual invoice processing led to 15% fraud losses and 3-day processing delays",
         solution: "Deployed Factoring Guardian for automated document analysis and anomaly detection",
-        results: "99.2% fraud detection accuracy, 90% processing time reduction, €2M annual savings"
+        results: "99.2% fraud detection accuracy, 90% processing time reduction, $2M annual savings"
       }
     },
     {
@@ -181,8 +181,8 @@ export default function Solutions() {
         {solutions.map((solution, index) => {
           const IconComponent = solution.icon;
           return (
-            <section 
-              key={solution.id} 
+            <section
+              key={solution.id}
               id={solution.id}
               className={`py-24 px-6 lg:px-8 ${index % 2 === 0 ? 'bg-white' : 'bg-alabaster-50'}`}
             >

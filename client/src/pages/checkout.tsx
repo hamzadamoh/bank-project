@@ -27,7 +27,7 @@ const plans: Record<string, { name: string; price: string; period: string; featu
     },
     professional: {
         name: "Professional",
-        price: "€2,500",
+        price: "$2,500",
         period: "per month",
         features: [
             "All 7 AI tools included",
@@ -67,7 +67,7 @@ export default function Checkout() {
     });
 
     const annualPrice = plan.price !== "Free"
-        ? `€${(2500 * 12 * 0.8).toLocaleString()}`
+        ? `$${(2500 * 12 * 0.8).toLocaleString()}`
         : "Free";
 
     const displayPrice = billingCycle === "annual" && plan.price !== "Free"

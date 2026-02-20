@@ -6,10 +6,10 @@ export default function FactoringGuardianDemo() {
       title: "Document Analysis",
       status: "validated",
       statusColor: "bg-emerald-400",
-      details: "Invoice #INV-2024-001 • €125,450"
+      details: "Invoice #INV-2024-001 • $125,450"
     },
     {
-      title: "Anomaly Check", 
+      title: "Anomaly Check",
       status: "alert",
       statusColor: "bg-amber-400",
       details: "IBAN mismatch detected"
@@ -17,7 +17,7 @@ export default function FactoringGuardianDemo() {
     {
       title: "PO Matching",
       status: "matched",
-      statusColor: "bg-emerald-400", 
+      statusColor: "bg-emerald-400",
       details: "98.5% line item accuracy"
     }
   ];

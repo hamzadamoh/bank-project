@@ -3,7 +3,7 @@
 
 export const mockTaxResponses = {
   morocco_vat_saas: {
-    shortAnswer: "Moroccan SaaS companies serving EU clients must apply 20% VAT domestically and trigger EU OSS registration above €10,000 annual sales.",
+    shortAnswer: "Moroccan SaaS companies serving EU clients must apply 20% VAT domestically and trigger EU OSS registration above $10,000 annual sales.",
     explanation: "For Moroccan SaaS providers serving EU clients, the VAT treatment involves both domestic Moroccan obligations and potential EU compliance requirements.",
     details: [
       {
@@ -11,17 +11,17 @@ export const mockTaxResponses = {
         content: "Under Article 87 of the General Tax Code (CGI), SaaS services are subject to 20% VAT when provided from Morocco, regardless of client location."
       },
       {
-        title: "EU VAT Obligations", 
+        title: "EU VAT Obligations",
         content: "For B2B clients in the EU, the reverse charge mechanism applies under EU Directive 2006/112/EC. EU businesses account for VAT in their member state."
       },
       {
         title: "OSS Registration Threshold",
-        content: "Once annual EU B2C sales exceed €10,000, registration for the One-Stop Shop (OSS) system becomes mandatory per Note 728/2023."
+        content: "Once annual EU B2C sales exceed $10,000, registration for the One-Stop Shop (OSS) system becomes mandatory per Note 728/2023."
       }
     ],
     checklist: [
       "Register for Moroccan VAT if not already done",
-      "Implement reverse charge invoicing for EU B2B clients", 
+      "Implement reverse charge invoicing for EU B2B clients",
       "Monitor annual EU B2C sales threshold",
       "Consider OSS registration preparation",
       "Maintain proper documentation for cross-border services"
@@ -62,7 +62,7 @@ LIMIT 100;`,
     input: "SELECT customer_id, COUNT(*) FROM transactions WHERE amount > 1000 GROUP BY customer_id HAVING COUNT(*) > 5;",
     output: "This query identifies high-value customers by finding customer IDs that have made more than 5 transactions with individual amounts exceeding $1,000. It groups all transactions by customer_id, counts the number of transactions per customer, and then filters to only show customers who meet both criteria (>5 transactions AND each transaction >$1,000). The result shows customer IDs and their qualifying transaction counts.",
     performance: {
-      executionTime: "~1.8s", 
+      executionTime: "~1.8s",
       rowsScanned: 28450,
       optimization: "Consider adding index on (customer_id, amount) for better performance"
     }
@@ -79,14 +79,14 @@ export const mockFactoringAnalysis = {
   extractedData: {
     supplier: {
       name: "ABC Construction SARL",
-      taxId: "123456789", 
+      taxId: "123456789",
       address: "123 Rue Mohammed V, Casablanca",
       iban: "MA64011090000001234567890"
     },
     invoice: {
       number: "INV-2024-001",
       date: "2024-01-15",
-      dueDate: "2024-02-15", 
+      dueDate: "2024-02-15",
       currency: "MAD",
       totalHT: 104542.00,
       totalTVA: 20908.40,
@@ -107,7 +107,7 @@ export const mockFactoringAnalysis = {
     },
     {
       type: "AMOUNT_VARIANCE",
-      severity: "MEDIUM", 
+      severity: "MEDIUM",
       message: "Line total variance exceeds threshold",
       variance: "0.02%"
     }
@@ -131,7 +131,7 @@ export const mockCompanyData = {
   trustPartners: [
     "Bank Al-Maghrib",
     "BMCE Group",
-    "Attijariwafa", 
+    "Attijariwafa",
     "CFG Bank",
     "Société Générale",
     "Credit Agricole"
@@ -144,14 +144,14 @@ export const mockCompanyData = {
       rating: 5
     },
     {
-      quote: "Factoring Guardian caught fraudulent invoices our manual process missed. ROI was immediate.", 
+      quote: "Factoring Guardian caught fraudulent invoices our manual process missed. ROI was immediate.",
       author: "Ahmed Tazi",
       role: "Risk Director, Al Barid Bank",
       rating: 5
     },
     {
       quote: "Query Architect democratized data access across our organization. Non-technical teams now run complex analyses.",
-      author: "Marie Dubois", 
+      author: "Marie Dubois",
       role: "CFO, Société Générale Maroc",
       rating: 5
     }

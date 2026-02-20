@@ -9,7 +9,7 @@ export default function TaxCounselDemo() {
   const handleQuery = async () => {
     setIsProcessing(true);
     setShowResponse(false);
-    
+
     // Simulate AI processing
     setTimeout(() => {
       setIsProcessing(false);
@@ -28,7 +28,7 @@ export default function TaxCounselDemo() {
           "What are the VAT implications for a Moroccan company providing SaaS services to EU clients?"
         </div>
       </div>
-      
+
       {isProcessing && (
         <div className="text-center mb-4">
           <div className="inline-flex items-center bg-champagne-200 rounded-full px-4 py-2">
@@ -39,7 +39,7 @@ export default function TaxCounselDemo() {
           </div>
         </div>
       )}
-      
+
       {showResponse && !isProcessing && (
         <div className="border-l-4 border-champagne-200 pl-4">
           <h4 className="font-semibold text-ink-950 mb-2">Tax Analysis</h4>
@@ -49,7 +49,7 @@ export default function TaxCounselDemo() {
           <ul className="text-sm text-slate-700 space-y-1 mb-3">
             <li>• <strong>Morocco VAT:</strong> 20% applies to domestic supplies</li>
             <li>• <strong>EU VAT:</strong> Reverse charge mechanism for B2B clients</li>
-            <li>• <strong>Threshold:</strong> €10,000 annual EU sales trigger OSS registration</li>
+            <li>• <strong>Threshold:</strong> $10,000 annual EU sales trigger OSS registration</li>
           </ul>
           <div className="flex flex-wrap gap-2">
             <Badge variant="secondary" className="bg-champagne-200 text-ink-950">Art. 87 CGI</Badge>
@@ -58,19 +58,19 @@ export default function TaxCounselDemo() {
           </div>
         </div>
       )}
-      
+
       {!isProcessing && (
         <div className="mt-4 flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleQuery}
             className="text-xs"
           >
             New Query
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
             className="text-xs"
           >
