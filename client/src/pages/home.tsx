@@ -1,7 +1,6 @@
 import Navigation from "@/components/layout/navigation";
 import Footer from "@/components/layout/footer";
 import Hero from "@/components/sections/hero";
-import TrustIndicators from "@/components/sections/trust-indicators";
 import ProductsShowcase from "@/components/sections/products-showcase";
 import Testimonials from "@/components/sections/testimonials";
 import { useEffect } from "react";
@@ -37,7 +36,6 @@ export default function Home() {
       <Navigation />
       <main>
         <Hero />
-        <TrustIndicators />
         <ProductsShowcase />
         <section id="solutions" className="py-24 px-6 lg:px-8 bg-white">
           <div className="max-w-7xl mx-auto">
