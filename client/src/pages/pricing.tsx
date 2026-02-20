@@ -295,7 +295,7 @@ export default function Pricing() {
                       <span className="font-display font-bold text-2xl text-ink-950">{addon.price}</span>
                       <span className="text-slate-600 text-sm ml-2">{addon.period}</span>
                     </div>
-                    <Link href="/contact">
+                    <Link href={`/checkout?plan=professional&addon=${encodeURIComponent(addon.name)}&addonPrice=${encodeURIComponent(addon.price)}&addonPeriod=${encodeURIComponent(addon.period)}`}>
                       <Button variant="outline" size="sm">
                         Add to Plan
                       </Button>

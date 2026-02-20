@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
-import { CreditCard, Shield, Lock, Check, ArrowLeft } from "lucide-react";
+import { CreditCard, Shield, Lock, Check, ArrowLeft, Plus } from "lucide-react";
 import { FaCcVisa, FaCcMastercard, FaCcAmex, FaCcPaypal, FaStripe } from "react-icons/fa6";
 
 type PaymentMethod = "stripe" | "paypal";
@@ -47,6 +47,11 @@ export default function Checkout() {
     const params = new URLSearchParams(window.location.search);
     const planKey = params.get("plan") || "professional";
     const plan = plans[planKey] || plans.professional;
+
+    // Parse add-on from URL
+    const addonName = params.get("addon");
+    const addonPrice = params.get("addonPrice");
+    const addonPeriod = params.get("addonPeriod");
 
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("stripe");
     const [isProcessing, setIsProcessing] = useState(false);
@@ -143,8 +148,8 @@ export default function Checkout() {
                                     <button
                                         onClick={() => setPaymentMethod("stripe")}
                                         className={`flex-1 flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${paymentMethod === "stripe"
-                                                ? "border-ink-950 bg-ink-950/5"
-                                                : "border-alabaster-200 hover:border-alabaster-300"
+                                            ? "border-ink-950 bg-ink-950/5"
+                                            : "border-alabaster-200 hover:border-alabaster-300"
                                             }`}
                                     >
                                         <FaStripe className="h-8 w-8 text-[#635bff]" />
@@ -157,8 +162,8 @@ export default function Checkout() {
                                     <button
                                         onClick={() => setPaymentMethod("paypal")}
                                         className={`flex-1 flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${paymentMethod === "paypal"
-                                                ? "border-ink-950 bg-ink-950/5"
-                                                : "border-alabaster-200 hover:border-alabaster-300"
+                                            ? "border-ink-950 bg-ink-950/5"
+                                            : "border-alabaster-200 hover:border-alabaster-300"
                                             }`}
                                     >
                                         <FaCcPaypal className="h-8 w-8 text-[#003087]" />
@@ -373,14 +378,33 @@ export default function Checkout() {
                                         </div>
                                     </div>
 
+                                    {/* Add-on */}
+                                    {addonName && (
+                                        <div className="bg-champagne-200/20 rounded-xl p-4">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Plus className="h-4 w-4 text-ink-950" />
+                                                <span className="text-xs font-semibold text-ink-950 uppercase tracking-wide">Add-on</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="font-semibold text-ink-950 text-sm">{addonName}</p>
+                                                    {addonPeriod && <p className="text-xs text-slate-600">{addonPeriod}</p>}
+                                                </div>
+                                                {addonPrice && (
+                                                    <p className="font-display font-bold text-lg text-ink-950">{addonPrice}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Billing Cycle Toggle */}
                                     {plan.price !== "Free" && (
                                         <div className="bg-alabaster-100 rounded-xl p-1 flex">
                                             <button
                                                 onClick={() => setBillingCycle("monthly")}
                                                 className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${billingCycle === "monthly"
-                                                        ? "bg-white shadow-sm text-ink-950"
-                                                        : "text-slate-600 hover:text-ink-950"
+                                                    ? "bg-white shadow-sm text-ink-950"
+                                                    : "text-slate-600 hover:text-ink-950"
                                                     }`}
                                             >
                                                 Monthly
@@ -388,8 +412,8 @@ export default function Checkout() {
                                             <button
                                                 onClick={() => setBillingCycle("annual")}
                                                 className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${billingCycle === "annual"
-                                                        ? "bg-white shadow-sm text-ink-950"
-                                                        : "text-slate-600 hover:text-ink-950"
+                                                    ? "bg-white shadow-sm text-ink-950"
+                                                    : "text-slate-600 hover:text-ink-950"
                                                     }`}
                                             >
                                                 Annual
