@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Send, Globe, Bot, Mic } from "lucide-react";
-import VoiceChatbot from "@/components/voice-chatbot";
+import { VoiceChatbot } from "@/components/voice-chatbot";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -164,8 +164,8 @@ export default function OmniServe() {
                       >
                         <div
                           className={`max-w-[80%] rounded-xl p-4 ${msg.role === 'user'
-                              ? 'bg-ink-950 text-alabaster-50'
-                              : 'bg-alabaster-100 text-ink-950'
+                            ? 'bg-ink-950 text-alabaster-50'
+                            : 'bg-alabaster-100 text-ink-950'
                             }`}
                         >
                           <p className="text-sm whitespace-pre-wrap">{msg.content}</p>

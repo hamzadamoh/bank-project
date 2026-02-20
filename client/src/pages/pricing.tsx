@@ -195,7 +195,7 @@ export default function Pricing() {
                   )}
 
                   <Link
-                    href="/contact"
+                    href={plan.name === 'Enterprise' ? '/contact' : `/checkout?plan=${plan.name.toLowerCase()}`}
                     className={`w-full block text-center px-6 py-3 rounded-xl font-semibold transition-colors ${plan.ctaVariant === 'default'
                       ? 'bg-ink-950 text-alabaster-50 hover:bg-ink-900'
                       : 'bg-alabaster-50 border border-ink-950 text-ink-950 hover:bg-alabaster-100'
@@ -405,7 +405,7 @@ export default function Pricing() {
               Join thousands of finance professionals already using FiscAI to work smarter, not harder.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact">
+              <Link href="/checkout?plan=starter">
                 <Button className="bg-alabaster-50 text-ink-950 hover:bg-alabaster-100 px-8 py-4 text-lg">
                   Start Free Trial
                 </Button>
