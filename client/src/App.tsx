@@ -23,6 +23,7 @@ import TermsOfService from "@/pages/terms-of-service";
 import CookiePolicy from "@/pages/cookie-policy";
 import RefundPolicy from "@/pages/refund-policy";
 import Checkout from "@/pages/checkout";
+import Login from "@/pages/login";
 import DedicatedSupport from "@/pages/dedicated-support";
 import CustomTraining from "@/pages/custom-training";
 import OnSiteDeployment from "@/pages/on-site-deployment";
@@ -68,6 +69,7 @@ function Router() {
         <Route path="/cookie-policy" component={CookiePolicy} />
         <Route path="/refund-policy" component={RefundPolicy} />
         <Route path="/checkout" component={Checkout} />
+        <Route path="/login" component={Login} />
         <Route path="/dedicated-support" component={DedicatedSupport} />
         <Route path="/custom-training" component={CustomTraining} />
         <Route path="/on-site-deployment" component={OnSiteDeployment} />

@@ -20,13 +20,12 @@ export default function Navigation() {
     { href: "/#products", label: "Products" },
     { href: "/solutions", label: "Solutions" },
     { href: "/security", label: "Security" },
-    { href:"/pricing", label: "Pricing" },
+    { href: "/pricing", label: "Pricing" },
   ];
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      isScrolled ? 'glass-card bg-white/80' : 'bg-transparent'
-    }`}>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'glass-card bg-white/80' : 'bg-transparent'
+      }`}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
@@ -54,10 +53,10 @@ export default function Navigation() {
                     }
                   }
                 };
-                
+
                 return (
-                  <Link 
-                    key={link.href} 
+                  <Link
+                    key={link.href}
                     href={link.href}
                     onClick={handleClick}
                     className="text-slate-700 hover:text-ink-950 transition-colors duration-200 cursor-pointer"
@@ -68,11 +67,16 @@ export default function Navigation() {
               })}
             </div>
           </div>
-          
+
           <div className="hidden md:flex items-center space-x-4">
             <Link href="/newsletter">
               <button className="text-sm font-medium text-slate-700 hover:text-ink-950 transition-colors duration-200">
                 Newsletter
+              </button>
+            </Link>
+            <Link href="/login">
+              <button className="text-sm font-medium text-slate-700 hover:text-ink-950 transition-colors duration-200">
+                Sign In
               </button>
             </Link>
             <Link href="/contact">
@@ -113,10 +117,10 @@ export default function Navigation() {
                     }
                   }
                 };
-                
+
                 return (
-                  <Link 
-                    key={link.href} 
+                  <Link
+                    key={link.href}
                     href={link.href}
                     onClick={handleClick}
                     className="block px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors cursor-pointer"
@@ -126,14 +130,21 @@ export default function Navigation() {
                 );
               })}
               <div className="border-t border-alabaster-200 pt-4">
-                <Link 
+                <Link
                   href="/newsletter"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block w-full text-left px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors"
                 >
                   Newsletter
                 </Link>
-                <Link 
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block w-full text-left px-3 py-2 text-slate-700 hover:text-ink-950 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
                   href="/contact"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block w-full mt-2 bg-ink-950 text-alabaster-50 px-3 py-2 rounded-xl text-sm font-medium hover:bg-ink-900 transition-colors"
