@@ -50,6 +50,7 @@ export default function Login() {
 
         // Redirect to dashboard after brief delay
         setTimeout(() => {
+            localStorage.setItem("fiscai_user_role", role);
             setLocation("/dashboard");
         }, 1000);
     };
