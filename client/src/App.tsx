@@ -33,7 +33,8 @@ import Waitlist from "@/pages/waitlist";
 import ROICalculator from "@/pages/roi-calculator";
 import IndustryAssessment from "@/pages/industry-assessment";
 import Apply from "@/pages/apply";
-import RequestAccess from "@/pages/request-access";
+import RequestAccess from "./pages/request-access";
+import TrustCenter from "./pages/trust-center";
 import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
 
@@ -85,6 +86,7 @@ function Router() {
         <Route path="/industry-assessment" component={IndustryAssessment} />
         <Route path="/apply" component={Apply} />
         <Route path="/request-access" component={RequestAccess} />
+        <Route path="/trust-center" component={TrustCenter} />
         <Route path="/dashboard" component={Dashboard} />
         <Route component={NotFound} />
       </Switch>

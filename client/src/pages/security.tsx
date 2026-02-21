@@ -2,9 +2,20 @@ import Navigation from "@/components/layout/navigation";
 import Footer from "@/components/layout/footer";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Lock, Database, FileText, Users, Globe, CheckCircle, Clock } from "lucide-react";
+import { Shield, Lock, Database, FileText, Users, Globe, CheckCircle, Clock, Download } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 export default function Security() {
+  const { toast } = useToast();
+
+  const handleDownload = () => {
+    toast({
+      title: "Download Started",
+      description: "FiscAI Security Datasheet v2.4 (PDF) is being generated...",
+    });
+  };
+
   const securityFeatures = [
     {
       icon: Lock,
@@ -59,7 +70,7 @@ export default function Security() {
     },
     {
       standard: "ISO 27001",
-      status: "In Progress", 
+      status: "In Progress",
       description: "Information security management system certification",
       color: "bg-amber-400"
     },
@@ -179,14 +190,14 @@ export default function Security() {
                         We collect only the data necessary for service delivery and automatically purge information according to retention policies.
                       </p>
                     </div>
-                    
+
                     <div>
                       <h4 className="font-semibold text-ink-950 mb-2">Consent Management</h4>
                       <p className="text-sm text-slate-700">
                         Granular consent controls allow users to specify exactly how their data can be used, with easy withdrawal mechanisms.
                       </p>
                     </div>
-                    
+
                     <div>
                       <h4 className="font-semibold text-ink-950 mb-2">Right to Erasure</h4>
                       <p className="text-sm text-slate-700">
@@ -265,7 +276,7 @@ export default function Security() {
                     </p>
                     <Badge className="bg-emerald-400 text-ink-950">Available Now</Badge>
                   </div>
-                  
+
                   <div className="border border-champagne-200 rounded-xl p-6">
                     <h4 className="font-semibold text-ink-950 mb-2">Private Cloud</h4>
                     <p className="text-sm text-slate-700 mb-3">
@@ -273,7 +284,7 @@ export default function Security() {
                     </p>
                     <Badge className="bg-emerald-400 text-ink-950">Available Now</Badge>
                   </div>
-                  
+
                   <div className="border border-champagne-200 rounded-xl p-6">
                     <h4 className="font-semibold text-ink-950 mb-2">On-Premises</h4>
                     <p className="text-sm text-slate-700 mb-3">
@@ -294,14 +305,14 @@ export default function Security() {
                         Security operations center with real-time threat detection and incident response capabilities.
                       </p>
                     </div>
-                    
+
                     <div>
                       <h4 className="font-semibold text-ink-950 mb-2">Vulnerability Management</h4>
                       <p className="text-sm text-slate-700">
                         Continuous security scanning, patch management, and penetration testing by certified experts.
                       </p>
                     </div>
-                    
+
                     <div>
                       <h4 className="font-semibold text-ink-950 mb-2">Compliance Reporting</h4>
                       <p className="text-sm text-slate-700">
@@ -335,10 +346,16 @@ export default function Security() {
               Access detailed security documentation, compliance reports, and technical specifications in our Trust Center.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-ink-950 text-alabaster-50 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-ink-900 transition-all duration-200">
-                Visit Trust Center
-              </button>
-              <button className="border-2 border-ink-950 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-ink-950 hover:text-alabaster-50 transition-all duration-200">
+              <Link href="/trust-center">
+                <button className="w-full sm:w-auto bg-ink-950 text-alabaster-50 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-ink-900 transition-all duration-200">
+                  Visit Trust Center
+                </button>
+              </Link>
+              <button
+                onClick={handleDownload}
+                className="border-2 border-ink-950 text-ink-950 px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-ink-950 hover:text-alabaster-50 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Download className="h-5 w-5" />
                 Download Security Datasheet
               </button>
             </div>
