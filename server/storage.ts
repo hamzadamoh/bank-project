@@ -16,7 +16,11 @@ import {
   type Order,
   type InsertOrder,
   type AuditLog,
-  type InsertAuditLog
+  type InsertAuditLog,
+  type KycRecord,
+  type InsertKycRecord,
+  type CreditAssessment,
+  type InsertCreditAssessment
 } from "../shared/schema.js";
 import { randomUUID } from "crypto";
 
@@ -64,6 +68,16 @@ export interface IStorage {
   createOrder(order: InsertOrder): Promise<Order>;
   getOrdersByTenant(tenantId: string): Promise<Order[]>;
   getOrder(id: string): Promise<Order | undefined>;
+
+  // KYC (Tenant isolated)
+  createKycRecord(record: InsertKycRecord): Promise<KycRecord>;
+  getKycRecordsByTenant(tenantId: string): Promise<KycRecord[]>;
+  getKycRecord(id: string): Promise<KycRecord | undefined>;
+
+  // Credit Assessments (Tenant isolated)
+  createCreditAssessment(assessment: InsertCreditAssessment): Promise<CreditAssessment>;
+  getCreditAssessmentsByTenant(tenantId: string): Promise<CreditAssessment[]>;
+  getCreditAssessment(id: string): Promise<CreditAssessment | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -76,6 +90,8 @@ export class MemStorage implements IStorage {
   private waitlist: Map<string, Waitlist>;
   private orders: Map<string, Order>;
   private auditLogs: Map<string, AuditLog>;
+  private kycRecords: Map<string, KycRecord>;
+  private creditAssessments: Map<string, CreditAssessment>;
 
   constructor() {
     this.users = new Map();
@@ -87,6 +103,8 @@ export class MemStorage implements IStorage {
     this.waitlist = new Map();
     this.orders = new Map();
     this.auditLogs = new Map();
+    this.kycRecords = new Map();
+    this.creditAssessments = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -101,7 +119,7 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id };
+    const user: User = { ...insertUser, id, tenantId: insertUser.tenantId || "tenant_default" };
     this.users.set(id, user);
     return user;
   }
@@ -109,7 +127,13 @@ export class MemStorage implements IStorage {
   // Audit Logs
   async createAuditLog(insertLog: InsertAuditLog): Promise<AuditLog> {
     const id = randomUUID();
-    const log: AuditLog = { ...insertLog, id, createdAt: new Date() };
+    const log: AuditLog = {
+      ...insertLog,
+      id,
+      userId: insertLog.userId ?? null,
+      ipAddress: insertLog.ipAddress ?? null,
+      createdAt: new Date()
+    };
     this.auditLogs.set(id, log);
     return log;
   }
@@ -170,6 +194,7 @@ export class MemStorage implements IStorage {
     const taxQuery: TaxQuery = {
       ...insertTaxQuery,
       id,
+      tenantId: insertTaxQuery.tenantId ?? "tenant_default",
       createdAt: new Date()
     };
     this.taxQueries.set(id, taxQuery);
@@ -193,6 +218,7 @@ export class MemStorage implements IStorage {
       ...insertSqlQuery,
       metadata: insertSqlQuery.metadata ?? null,
       id,
+      tenantId: insertSqlQuery.tenantId ?? "tenant_default",
       createdAt: new Date()
     };
     this.sqlQueries.set(id, sqlQuery);
@@ -215,6 +241,7 @@ export class MemStorage implements IStorage {
     const analysis: DocumentAnalysis = {
       ...insertAnalysis,
       id,
+      tenantId: insertAnalysis.tenantId ?? "tenant_default",
       createdAt: new Date()
     };
     this.documentAnalysis.set(id, analysis);
@@ -268,6 +295,7 @@ export class MemStorage implements IStorage {
     const order: Order = {
       ...insertOrder,
       id,
+      tenantId: insertOrder.tenantId ?? "tenant_default",
       createdAt: new Date()
     };
     this.orders.set(id, order);
@@ -282,6 +310,52 @@ export class MemStorage implements IStorage {
 
   async getOrder(id: string): Promise<Order | undefined> {
     return this.orders.get(id);
+  }
+
+  // KYC
+  async createKycRecord(insertRecord: InsertKycRecord): Promise<KycRecord> {
+    const id = randomUUID();
+    const record: KycRecord = {
+      ...insertRecord,
+      notes: insertRecord.notes ?? null,
+      id,
+      createdAt: new Date()
+    };
+    this.kycRecords.set(id, record);
+    return record;
+  }
+
+  async getKycRecordsByTenant(tenantId: string): Promise<KycRecord[]> {
+    return Array.from(this.kycRecords.values())
+      .filter(r => r.tenantId === tenantId)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async getKycRecord(id: string): Promise<KycRecord | undefined> {
+    return this.kycRecords.get(id);
+  }
+
+  // Credit Assessments
+  async createCreditAssessment(insertAssessment: InsertCreditAssessment): Promise<CreditAssessment> {
+    const id = randomUUID();
+    const assessment: CreditAssessment = {
+      ...insertAssessment,
+      metadata: insertAssessment.metadata ?? null,
+      id,
+      createdAt: new Date()
+    };
+    this.creditAssessments.set(id, assessment);
+    return assessment;
+  }
+
+  async getCreditAssessmentsByTenant(tenantId: string): Promise<CreditAssessment[]> {
+    return Array.from(this.creditAssessments.values())
+      .filter(a => a.tenantId === tenantId)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async getCreditAssessment(id: string): Promise<CreditAssessment | undefined> {
+    return this.creditAssessments.get(id);
   }
 }
 

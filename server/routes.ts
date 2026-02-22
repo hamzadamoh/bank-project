@@ -21,6 +21,7 @@ import { analyzeWellbeing } from "./services/rhalia.js";
 import { analyzeSatisfaction } from "./services/satisfai.js";
 import multer from "multer";
 import { securityService } from "./services/security.js";
+import { financialAssessor } from "./services/financial-assessor.js";
 
 // Configure multer for memory storage
 const upload = multer({ storage: multer.memoryStorage() });
@@ -292,7 +293,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { responses, context } = req.body;
       const tenantId = (req as any).tenantId;
 
-      const analysis = await analyzeSatisfaction({ responses, context });
+      const analysis = await analyzeSatisfaction({ responses });
 
       // Audit Logging
       await securityService.logAction({
@@ -307,6 +308,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ success: true, analysis });
     } catch (error) {
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  // KYC Submission endpoint
+  app.post("/api/kyc/submit", upload.single('document'), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ success: false, message: "No document provided" });
+      const { documentType } = req.body;
+      const tenantId = (req as any).tenantId;
+      const userId = (req as any).userId;
+
+      const kycResult = await financialAssessor.processKyc({
+        documentType: documentType || 'ID_CARD',
+        imageBuffer: req.file.buffer,
+        mimeType: req.file.mimetype
+      });
+
+      // Audit Logging
+      await securityService.logAction({
+        tenantId,
+        userId,
+        action: 'SUBMIT',
+        resource: 'KYC',
+        details: `KYC submission processed for: ${documentType || 'ID_CARD'}`,
+        severity: kycResult.status === 'REJECTED' ? 'WARNING' : 'INFO',
+        ipAddress: req.ip
+      });
+
+      const record = await storage.createKycRecord({
+        tenantId,
+        userId,
+        status: kycResult.status,
+        documentType: documentType || 'ID_CARD',
+        extractedInfo: kycResult.extractedInfo,
+        notes: kycResult.notes
+      });
+
+      res.json({ success: true, record });
+    } catch (error) {
+      console.error("KYC endpoint error:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  // Credit Risk Assessment endpoint
+  app.post("/api/credit-risk/assess", async (req, res) => {
+    try {
+      const { financialData, context } = req.body;
+      const tenantId = (req as any).tenantId;
+      const userId = (req as any).userId;
+
+      if (!financialData) return res.status(400).json({ success: false, message: "Financial data is required" });
+
+      const assessmentResult = await financialAssessor.assessCreditRisk({ financialData, context });
+
+      // Audit Logging
+      await securityService.logAction({
+        tenantId,
+        userId,
+        action: 'QUERY',
+        resource: 'CREDIT_ASSESSMENT',
+        details: `Credit risk assessment completed. Risk: ${assessmentResult.riskLevel}`,
+        severity: assessmentResult.riskLevel === 'CRITICAL' ? 'CRITICAL' : assessmentResult.riskLevel === 'HIGH' ? 'WARNING' : 'INFO',
+        ipAddress: req.ip
+      });
+
+      const assessment = await storage.createCreditAssessment({
+        tenantId,
+        userId,
+        score: assessmentResult.score,
+        riskLevel: assessmentResult.riskLevel,
+        recommendation: assessmentResult.recommendation,
+        metadata: assessmentResult.metadata
+      });
+
+      res.json({ success: true, assessment });
+    } catch (error) {
+      console.error("Credit assessment endpoint error:", error);
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   });

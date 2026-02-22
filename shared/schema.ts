@@ -93,6 +93,28 @@ export const orders = pgTable("orders", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const kycRecords = pgTable("kyc_records", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: text("tenant_id").notNull(),
+  userId: text("user_id").notNull(),
+  status: text("status").notNull(), // 'PENDING', 'APPROVED', 'REJECTED'
+  documentType: text("document_type").notNull(),
+  extractedInfo: jsonb("extracted_info").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const creditAssessments = pgTable("credit_assessments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: text("tenant_id").notNull(),
+  userId: text("user_id").notNull(),
+  score: text("score").notNull(),
+  riskLevel: text("risk_level").notNull(), // 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'
+  recommendation: text("recommendation").notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Zod schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -140,6 +162,16 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   createdAt: true,
 });
 
+export const insertKycRecordSchema = createInsertSchema(kycRecords).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCreditAssessmentSchema = createInsertSchema(creditAssessments).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -167,3 +199,9 @@ export type Waitlist = typeof waitlist.$inferSelect;
 
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type Order = typeof orders.$inferSelect;
+
+export type InsertKycRecord = z.infer<typeof insertKycRecordSchema>;
+export type KycRecord = typeof kycRecords.$inferSelect;
+
+export type InsertCreditAssessment = z.infer<typeof insertCreditAssessmentSchema>;
+export type CreditAssessment = typeof creditAssessments.$inferSelect;
