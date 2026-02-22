@@ -19,7 +19,11 @@ import {
     User,
     Check,
     Info,
-    Key
+    Key,
+    Activity,
+    PieChart,
+    Server,
+    ShieldCheck
 } from "lucide-react";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
@@ -68,6 +72,149 @@ const AIInsightsPanel = ({ userRole }: { userRole: string }) => {
                 ))}
             </div>
         </GlassCard>
+    );
+};
+
+const AuditLogTab = () => {
+    const logs = [
+        { event: "Admin Login", user: "Admin User", ip: "192.168.1.1", time: "Now", status: "Success" },
+        { event: "API Key Generated", user: "Client User", ip: "45.12.89.22", time: "12m ago", status: "Success" },
+        { event: "Sensitive Data Export", user: "John Doe", ip: "10.0.0.4", time: "1h ago", status: "Warning" },
+        { event: "Role Changed: 'Client' -> 'Admin'", user: "Admin User", ip: "192.168.1.1", time: "3h ago", status: "Critical" },
+        { event: "DPA Request Submitted", user: "Sarah Smith", ip: "172.16.0.5", time: "5h ago", status: "Success" },
+    ];
+
+    return (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+            <GlassCard className="overflow-hidden">
+                <div className="p-8 border-b border-alabaster-100 flex items-center justify-between">
+                    <div>
+                        <h2 className="text-2xl font-bold text-ink-950">System Audit Logs</h2>
+                        <p className="text-slate-500 text-sm">Real-time security and governance event trail.</p>
+                    </div>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-alabaster-50 text-xs font-bold uppercase tracking-wider text-slate-500">
+                            <tr>
+                                <th className="px-8 py-4">Event</th>
+                                <th className="px-8 py-4">Initiator</th>
+                                <th className="px-8 py-4">IP Address</th>
+                                <th className="px-8 py-4">Time</th>
+                                <th className="px-8 py-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-alabaster-100">
+                            {logs.map((log, i) => (
+                                <tr key={i} className="hover:bg-alabaster-50 transition-colors">
+                                    <td className="px-8 py-4 text-sm font-bold text-ink-950">{log.event}</td>
+                                    <td className="px-8 py-4 text-sm text-slate-600">{log.user}</td>
+                                    <td className="px-8 py-4 text-xs font-mono text-slate-400">{log.ip}</td>
+                                    <td className="px-8 py-4 text-xs text-slate-500">{log.time}</td>
+                                    <td className="px-8 py-4">
+                                        <Badge className={`${log.status === 'Critical' ? 'bg-red-50 text-red-600' :
+                                            log.status === 'Warning' ? 'bg-amber-50 text-amber-600' :
+                                                'bg-emerald-50 text-emerald-600'
+                                            }`}>
+                                            {log.status}
+                                        </Badge>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </GlassCard>
+        </motion.div>
+    );
+};
+
+const UsageAnalyticsTab = () => {
+    return (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+            <div className="grid md:grid-cols-2 gap-8">
+                <GlassCard className="p-8">
+                    <h3 className="text-lg font-bold text-ink-950 mb-6 flex items-center gap-2">
+                        <Zap className="h-5 w-5 text-amber-500" />
+                        AI Token Distribution
+                    </h3>
+                    <div className="space-y-4">
+                        {[
+                            { label: "Tax Counsel", value: 65, color: "bg-emerald-400" },
+                            { label: "Query Architect", value: 20, color: "bg-blue-400" },
+                            { label: "OmniServe", value: 15, color: "bg-slate-400" },
+                        ].map((item, i) => (
+                            <div key={i}>
+                                <div className="flex justify-between text-xs font-bold mb-2">
+                                    <span>{item.label}</span>
+                                    <span>{item.value}%</span>
+                                </div>
+                                <div className="w-full bg-alabaster-100 h-2 rounded-full">
+                                    <div className={`${item.color} h-2 rounded-full`} style={{ width: `${item.value}%` }}></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </GlassCard>
+                <GlassCard className="p-8">
+                    <h3 className="text-lg font-bold text-ink-950 mb-6 flex items-center gap-2">
+                        <ShoppingBag className="h-5 w-5 text-emerald-500" />
+                        Spend Analytics (Monthly)
+                    </h3>
+                    <div className="flex items-end justify-between h-32 gap-2">
+                        {[30, 45, 25, 60, 80, 55, 90].map((h, i) => (
+                            <div key={i} className="flex-1 bg-ink-950/10 rounded-t-lg relative group">
+                                <motion.div
+                                    initial={{ height: 0 }}
+                                    animate={{ height: `${h}%` }}
+                                    className="absolute bottom-0 left-0 right-0 bg-emerald-400 rounded-t-lg group-hover:bg-emerald-500 transition-colors"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-between mt-4 text-[10px] text-slate-400 font-bold">
+                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                    </div>
+                </GlassCard>
+            </div>
+            <GlassCard className="p-8 bg-ink-950 text-alabaster-50 overflow-hidden relative">
+                <div className="relative z-10">
+                    <h3 className="text-xl font-bold mb-2">Resource Efficiency Score</h3>
+                    <p className="text-alabaster-400 text-sm mb-6">Your current AI usage is 14% more efficient than the industry average.</p>
+                    <div className="text-4xl font-bold text-emerald-400">92/100</div>
+                </div>
+                <TrendingUp className="absolute -bottom-4 -right-4 w-32 h-32 text-emerald-400 opacity-10" />
+            </GlassCard>
+        </motion.div>
+    );
+};
+
+const SystemHealth = () => {
+    return (
+        <div className="p-4 mt-auto border-t border-ink-900 bg-ink-950/50">
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Server className="h-3 w-3" />
+                Infrastructure Status
+            </h4>
+            <div className="space-y-3">
+                {[
+                    { label: "Global API", status: "Healthy" },
+                    { label: "AI Models", status: "Healthy" },
+                    { label: "Database", status: "Optimal" },
+                ].map((s, i) => (
+                    <div key={i} className="flex items-center justify-between text-[10px]">
+                        <span className="text-alabaster-200">{s.label}</span>
+                        <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
+                            <span className="text-emerald-400 font-bold uppercase">{s.status}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <div className="mt-4 pt-4 border-t border-ink-900">
+                <p className="text-[10px] text-slate-500">Last health check: <span className="text-alabaster-50 font-medium ml-1">Just now</span></p>
+            </div>
+        </div>
     );
 };
 
@@ -175,6 +322,23 @@ export default function Dashboard() {
                         <ShoppingBag className="w-5 h-5" />
                         Orders
                     </button>
+                    {userRole === "admin" ? (
+                        <button
+                            onClick={() => setActiveTab("activity")}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'activity' ? 'bg-emerald-400 text-ink-950 font-semibold' : 'hover:bg-ink-900 text-alabaster-200'}`}
+                        >
+                            <Activity className="w-5 h-5" />
+                            Audit Logs
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => setActiveTab("analytics")}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'analytics' ? 'bg-emerald-400 text-ink-950 font-semibold' : 'hover:bg-ink-900 text-alabaster-200'}`}
+                        >
+                            <PieChart className="w-5 h-5" />
+                            Analytics
+                        </button>
+                    )}
                     {userRole === "admin" && (
                         <button
                             onClick={() => setActiveTab("users")}
@@ -213,6 +377,8 @@ export default function Dashboard() {
                         <p className="text-[10px] opacity-60">75% of compute used</p>
                     </div>
                 </div>
+
+                <SystemHealth />
             </aside>
 
             {/* Main Content */}
@@ -489,6 +655,14 @@ export default function Dashboard() {
                             </motion.div>
                         )}
 
+                        {activeTab === "activity" && userRole === "admin" && (
+                            <AuditLogTab />
+                        )}
+
+                        {activeTab === "analytics" && userRole === "client" && (
+                            <UsageAnalyticsTab />
+                        )}
+
                         {activeTab === "users" && userRole === "admin" && (
                             <motion.div
                                 key="users"
@@ -641,6 +815,30 @@ export default function Dashboard() {
                                                 </div>
                                             </div>
                                             <Button className="w-full bg-ink-950 text-alabaster-50 py-6">Generate New API Key</Button>
+                                        </GlassCard>
+                                    </div>
+
+                                    <div className="md:col-span-1">
+                                        <h3 className="font-bold text-ink-950 mb-2">Resource Alerts</h3>
+                                        <p className="text-sm text-slate-500">Configure notifications for AI token thresholds and spend limits.</p>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <GlassCard className="p-8 space-y-6">
+                                            {[
+                                                { label: "Token Threshold", desc: "Notify when compute reaches 80% usage.", status: "Active" },
+                                                { label: "Daily Spend Limit", desc: "Alert when daily spend exceeds $50.00.", status: "Inactive" },
+                                            ].map((alert, i) => (
+                                                <div key={i} className="flex items-center justify-between pb-4 last:pb-0 last:border-0 border-b border-alabaster-100">
+                                                    <div>
+                                                        <p className="text-sm font-bold text-ink-950">{alert.label}</p>
+                                                        <p className="text-xs text-slate-500">{alert.desc}</p>
+                                                    </div>
+                                                    <Button variant="ghost" size="sm" className={alert.status === 'Active' ? 'text-emerald-600' : 'text-slate-400'}>
+                                                        {alert.status}
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                            <Button variant="outline" className="w-full">Configure Advanced Alerts</Button>
                                         </GlassCard>
                                     </div>
                                 </div>
