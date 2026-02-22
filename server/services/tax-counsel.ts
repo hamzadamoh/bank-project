@@ -1,7 +1,4 @@
-/**
- * Tax Counsel Service
- * Provides AI-powered tax advice using OpenAI
- */
+import { llmService, Message } from "./llm.js";
 
 interface TaxQueryRequest {
   query: string;
@@ -18,93 +15,30 @@ interface TaxResponse {
 }
 
 export async function getTaxAdvice(request: TaxQueryRequest): Promise<TaxResponse> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    console.warn('OPENAI_API_KEY not found, using mock data');
-    // Fallback to enhanced mock if no API key
-    return getMockTaxAdvice(request);
-  }
+  const jurisdictionContext = getJurisdictionContext(request.jurisdiction);
 
-  console.log('Using OpenAI API for tax advice (key present)');
+  const messages: Message[] = [
+    {
+      role: 'system',
+      content: 'You are an expert tax advisor. Always provide accurate, well-researched tax advice with proper citations. Respond only with valid JSON.',
+    },
+    {
+      role: 'user',
+      content: `Provide a comprehensive tax analysis for ${request.jurisdiction} regarding: "${request.query}". 
+      ${jurisdictionContext}
+      
+      Format as JSON: { "shortAnswer": string, "explanation": string, "details": [{title, content}], "checklist": [string], "citations": [{code, description}], "confidence": number }`,
+    },
+  ];
 
   try {
-    const jurisdictionContext = getJurisdictionContext(request.jurisdiction);
-    
-    const prompt = `You are a professional tax advisor specializing in ${request.jurisdiction} tax law. 
-
-${jurisdictionContext}
-
-A client asks: "${request.query}"
-
-Provide a comprehensive tax analysis with:
-1. A concise short answer (2-3 sentences)
-2. A detailed explanation (2-3 paragraphs)
-3. Specific legal details with relevant articles/codes
-4. A compliance checklist of actionable items
-5. Legal citations with codes and descriptions
-6. Your confidence level (0-100)
-
-Format your response as JSON with this structure:
-{
-  "shortAnswer": "brief answer",
-  "explanation": "detailed explanation",
-  "details": [{"title": "...", "content": "..."}],
-  "checklist": ["item1", "item2"],
-  "citations": [{"code": "Art. 123", "description": "..."}],
-  "confidence": 85
-}`;
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert tax advisor. Always provide accurate, well-researched tax advice with proper citations. Respond only with valid JSON.',
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        temperature: 0.3,
-        response_format: { type: 'json_object' },
-      }),
+    const responseText = await llmService.chat(messages, {
+      temperature: 0.3,
+      responseFormat: { type: 'json_object' }
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`OpenAI API error (${response.status}):`, errorText);
-      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
-    }
+    const content = JSON.parse(responseText);
 
-    const data = await response.json();
-    
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('Invalid OpenAI response format:', JSON.stringify(data));
-      throw new Error('Invalid response format from OpenAI API');
-    }
-
-    let content;
-    try {
-      const messageContent = data.choices[0].message.content;
-      if (!messageContent || typeof messageContent !== 'string') {
-        console.error('Empty or invalid content in OpenAI response:', JSON.stringify(data));
-        throw new Error('Empty or invalid content in OpenAI response');
-      }
-      content = JSON.parse(messageContent);
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      console.error('Raw content:', data.choices[0].message.content);
-      throw new Error('Failed to parse OpenAI response as JSON');
-    }
-    
     return {
       shortAnswer: content.shortAnswer || '',
       explanation: content.explanation || '',
@@ -114,94 +48,27 @@ Format your response as JSON with this structure:
       confidence: content.confidence || 85,
     };
   } catch (error) {
-    console.error('Tax advice error:', error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
-    // Fallback to mock on error
+    console.error('Tax advice service error:', error);
     return getMockTaxAdvice(request);
   }
 }
 
 function getJurisdictionContext(jurisdiction: string): string {
   const contexts: Record<string, string> = {
-    morocco: `You are an expert in Moroccan tax law, including:
-- General Tax Code (Code Général des Impôts - CGI)
-- VAT regulations (20% standard rate)
-- Corporate tax (IR) and personal income tax (IGR)
-- Tax treaties and cross-border taxation
-- Recent tax reforms and administrative notes`,
-    
-    eu: `You are an expert in European Union tax law, including:
-- EU VAT Directive (2006/112/EC)
-- One-Stop Shop (OSS) system
-- Reverse charge mechanisms
-- Digital services taxation
-- Transfer pricing regulations`,
-    
-    oecd: `You are an expert in international tax law following OECD principles:
-- OECD Model Tax Convention
-- BEPS (Base Erosion and Profit Shifting) initiatives
-- Transfer pricing guidelines
-- Permanent establishment rules
-- Tax transparency and exchange of information`,
+    morocco: "Focus on Code Général des Impôts (CGI) and Moroccan VAT.",
+    eu: "Focus on EU VAT Directives and regional regulations.",
+    oecd: "Focus on OECD Model Tax Convention and BEPS principles."
   };
-
   return contexts[jurisdiction.toLowerCase()] || contexts.oecd;
 }
 
 function getMockTaxAdvice(request: TaxQueryRequest): TaxResponse {
-  // Enhanced mock that's context-aware
-  const mockResponses: Record<string, TaxResponse> = {
-    morocco: {
-      shortAnswer: `Moroccan SaaS companies serving EU clients must apply 20% VAT domestically and trigger EU OSS registration above €10,000 annual sales.`,
-      explanation: `For Moroccan SaaS providers serving EU clients, the VAT treatment involves both domestic Moroccan obligations and potential EU compliance requirements. Under Article 87 of the General Tax Code (CGI), SaaS services are subject to 20% VAT when provided from Morocco.`,
-      details: [
-        {
-          title: 'Moroccan VAT Application',
-          content: 'Under Article 87 of the General Tax Code (CGI), SaaS services are subject to 20% VAT when provided from Morocco, regardless of client location.',
-        },
-        {
-          title: 'EU VAT Obligations',
-          content: 'For B2B clients in the EU, the reverse charge mechanism applies under EU Directive 2006/112/EC. EU businesses account for VAT in their member state.',
-        },
-        {
-          title: 'OSS Registration Threshold',
-          content: 'Once annual EU B2C sales exceed €10,000, registration for the One-Stop Shop (OSS) system becomes mandatory per Note 728/2023.',
-        },
-      ],
-      checklist: [
-        'Register for Moroccan VAT if not already done',
-        'Implement reverse charge invoicing for EU B2B clients',
-        'Monitor annual EU B2C sales threshold',
-        'Consider OSS registration preparation',
-        'Maintain proper documentation for cross-border services',
-      ],
-      citations: [
-        { code: 'Art. 87 CGI', description: 'Morocco General Tax Code - Digital Services VAT' },
-        { code: 'EU Dir. 2006/112', description: 'EU VAT Directive - Reverse Charge Mechanism' },
-        { code: 'Note 728/2023', description: 'Morocco Tax Authority - Digital Services Clarification' },
-      ],
-      confidence: 95,
-    },
-  };
-
-  return mockResponses[request.jurisdiction.toLowerCase()] || {
-    shortAnswer: `Tax analysis for ${request.jurisdiction}: ${request.query}`,
-    explanation: 'This is a mock response. Please configure OPENAI_API_KEY for real AI-powered tax advice.',
-    details: [
-      {
-        title: 'Analysis Overview',
-        content: 'Mock tax analysis content would appear here with proper legal research and citations.',
-      },
-    ],
-    checklist: [
-      'Review applicable tax regulations',
-      'Consult with local tax advisor',
-      'Ensure proper documentation',
-    ],
-    citations: [
-      { code: 'Mock Citation', description: 'Example legal reference' },
-    ],
-    confidence: 85,
+  return {
+    shortAnswer: `Mock response for ${request.jurisdiction}`,
+    explanation: 'Configure AI provider for real advice.',
+    details: [],
+    checklist: [],
+    citations: [],
+    confidence: 50,
   };
 }
-
