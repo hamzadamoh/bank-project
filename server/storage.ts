@@ -14,7 +14,9 @@ import {
   type Waitlist,
   type InsertWaitlist,
   type Order,
-  type InsertOrder
+  type InsertOrder,
+  type AuditLog,
+  type InsertAuditLog
 } from "../shared/schema.js";
 import { randomUUID } from "crypto";
 
@@ -23,7 +25,11 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
 
-  // Demo requests
+  // Audit Logs (New)
+  createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
+  getAuditLogsByTenant(tenantId: string): Promise<AuditLog[]>;
+
+  // Demo requests (Tenant independent for now)
   createDemoRequest(demoRequest: InsertDemoRequest): Promise<DemoRequest>;
   getAllDemoRequests(): Promise<DemoRequest[]>;
   getDemoRequest(id: string): Promise<DemoRequest | undefined>;
@@ -33,19 +39,19 @@ export interface IStorage {
   getAllContactSubmissions(): Promise<ContactSubmission[]>;
   getContactSubmission(id: string): Promise<ContactSubmission | undefined>;
 
-  // Tax queries
+  // Tax queries (Tenant isolated)
   createTaxQuery(taxQuery: InsertTaxQuery): Promise<TaxQuery>;
-  getAllTaxQueries(): Promise<TaxQuery[]>;
+  getTaxQueriesByTenant(tenantId: string): Promise<TaxQuery[]>;
   getTaxQuery(id: string): Promise<TaxQuery | undefined>;
 
-  // SQL queries
+  // SQL queries (Tenant isolated)
   createSqlQuery(sqlQuery: InsertSqlQuery): Promise<SqlQuery>;
-  getAllSqlQueries(): Promise<SqlQuery[]>;
+  getSqlQueriesByTenant(tenantId: string): Promise<SqlQuery[]>;
   getSqlQuery(id: string): Promise<SqlQuery | undefined>;
 
-  // Document analysis
+  // Document analysis (Tenant isolated)
   createDocumentAnalysis(analysis: InsertDocumentAnalysis): Promise<DocumentAnalysis>;
-  getAllDocumentAnalysis(): Promise<DocumentAnalysis[]>;
+  getDocumentAnalysisByTenant(tenantId: string): Promise<DocumentAnalysis[]>;
   getDocumentAnalysis(id: string): Promise<DocumentAnalysis | undefined>;
 
   // Waitlist
@@ -54,9 +60,9 @@ export interface IStorage {
   getWaitlistEntry(id: string): Promise<Waitlist | undefined>;
   getWaitlistEntryByEmail(email: string): Promise<Waitlist | undefined>;
 
-  // Orders
+  // Orders (Tenant isolated)
   createOrder(order: InsertOrder): Promise<Order>;
-  getAllOrders(): Promise<Order[]>;
+  getOrdersByTenant(tenantId: string): Promise<Order[]>;
   getOrder(id: string): Promise<Order | undefined>;
 }
 
@@ -69,6 +75,7 @@ export class MemStorage implements IStorage {
   private documentAnalysis: Map<string, DocumentAnalysis>;
   private waitlist: Map<string, Waitlist>;
   private orders: Map<string, Order>;
+  private auditLogs: Map<string, AuditLog>;
 
   constructor() {
     this.users = new Map();
@@ -79,6 +86,7 @@ export class MemStorage implements IStorage {
     this.documentAnalysis = new Map();
     this.waitlist = new Map();
     this.orders = new Map();
+    this.auditLogs = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -96,6 +104,20 @@ export class MemStorage implements IStorage {
     const user: User = { ...insertUser, id };
     this.users.set(id, user);
     return user;
+  }
+
+  // Audit Logs
+  async createAuditLog(insertLog: InsertAuditLog): Promise<AuditLog> {
+    const id = randomUUID();
+    const log: AuditLog = { ...insertLog, id, createdAt: new Date() };
+    this.auditLogs.set(id, log);
+    return log;
+  }
+
+  async getAuditLogsByTenant(tenantId: string): Promise<AuditLog[]> {
+    return Array.from(this.auditLogs.values())
+      .filter(log => log.tenantId === tenantId)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 
   // Demo requests
@@ -154,8 +176,9 @@ export class MemStorage implements IStorage {
     return taxQuery;
   }
 
-  async getAllTaxQueries(): Promise<TaxQuery[]> {
+  async getTaxQueriesByTenant(tenantId: string): Promise<TaxQuery[]> {
     return Array.from(this.taxQueries.values())
+      .filter(q => q.tenantId === tenantId)
       .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 
@@ -176,8 +199,9 @@ export class MemStorage implements IStorage {
     return sqlQuery;
   }
 
-  async getAllSqlQueries(): Promise<SqlQuery[]> {
+  async getSqlQueriesByTenant(tenantId: string): Promise<SqlQuery[]> {
     return Array.from(this.sqlQueries.values())
+      .filter(q => q.tenantId === tenantId)
       .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 
@@ -197,8 +221,9 @@ export class MemStorage implements IStorage {
     return analysis;
   }
 
-  async getAllDocumentAnalysis(): Promise<DocumentAnalysis[]> {
+  async getDocumentAnalysisByTenant(tenantId: string): Promise<DocumentAnalysis[]> {
     return Array.from(this.documentAnalysis.values())
+      .filter(a => a.tenantId === tenantId)
       .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 
@@ -208,11 +233,8 @@ export class MemStorage implements IStorage {
 
   // Waitlist
   async createWaitlistEntry(insertWaitlist: InsertWaitlist): Promise<Waitlist> {
-    // Check if email already exists
     const existing = await this.getWaitlistEntryByEmail(insertWaitlist.email);
-    if (existing) {
-      throw new Error('Email already registered on waitlist');
-    }
+    if (existing) throw new Error('Email already registered on waitlist');
 
     const id = randomUUID();
     const waitlistEntry: Waitlist = {
@@ -252,8 +274,9 @@ export class MemStorage implements IStorage {
     return order;
   }
 
-  async getAllOrders(): Promise<Order[]> {
+  async getOrdersByTenant(tenantId: string): Promise<Order[]> {
     return Array.from(this.orders.values())
+      .filter(o => o.tenantId === tenantId)
       .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 

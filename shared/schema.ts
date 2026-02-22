@@ -7,6 +7,19 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  tenantId: text("tenant_id").notNull().default("tenant_default"),
+});
+
+export const auditLogs = pgTable("audit_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: text("tenant_id").notNull(),
+  userId: text("user_id"),
+  action: text("action").notNull(), // 'QUERY', 'LOGIN', 'EXPORT', 'DELETE'
+  resource: text("resource").notNull(), // 'TAX_CONSEL', 'QUERY_ARCHITECT', etc.
+  details: text("details").notNull(),
+  severity: text("severity").notNull(), // 'INFO', 'WARNING', 'CRITICAL'
+  ipAddress: text("ip_address"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const demoRequests = pgTable("demo_requests", {
@@ -32,6 +45,7 @@ export const contactSubmissions = pgTable("contact_submissions", {
 
 export const taxQueries = pgTable("tax_queries", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: text("tenant_id").notNull().default("tenant_default"),
   query: text("query").notNull(),
   jurisdiction: text("jurisdiction").notNull(),
   response: jsonb("response").notNull(),
@@ -41,6 +55,7 @@ export const taxQueries = pgTable("tax_queries", {
 
 export const sqlQueries = pgTable("sql_queries", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: text("tenant_id").notNull().default("tenant_default"),
   type: text("type").notNull(), // 'nl_to_sql' or 'sql_to_nl'
   input: text("input").notNull(),
   output: text("output").notNull(),
@@ -50,6 +65,7 @@ export const sqlQueries = pgTable("sql_queries", {
 
 export const documentAnalysis = pgTable("document_analysis", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: text("tenant_id").notNull().default("tenant_default"),
   filename: text("filename").notNull(),
   extractedData: jsonb("extracted_data").notNull(),
   anomalies: jsonb("anomalies").notNull(),
@@ -67,6 +83,7 @@ export const waitlist = pgTable("waitlist", {
 
 export const orders = pgTable("orders", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: text("tenant_id").notNull().default("tenant_default"),
   planId: text("plan_id").notNull(),
   planName: text("plan_name").notNull(),
   amount: text("amount").notNull(),
@@ -80,6 +97,12 @@ export const orders = pgTable("orders", {
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+  tenantId: true,
+});
+
+export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertDemoRequestSchema = createInsertSchema(demoRequests).omit({
@@ -121,6 +144,9 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+export type AuditLog = typeof auditLogs.$inferSelect;
+
 export type InsertDemoRequest = z.infer<typeof insertDemoRequestSchema>;
 export type DemoRequest = typeof demoRequests.$inferSelect;
 
@@ -141,4 +167,3 @@ export type Waitlist = typeof waitlist.$inferSelect;
 
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type Order = typeof orders.$inferSelect;
-
