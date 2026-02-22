@@ -53,40 +53,29 @@ interface DocumentAnalysisResponse {
 export async function analyzeDocument(request: DocumentAnalysisRequest): Promise<DocumentAnalysisResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
 
-  // If we have file content and API key, use real OCR
-  if (request.fileContent && apiKey) {
-    try {
-      return await extractAndAnalyzeWithAI(request.fileContent, request.fileType || 'application/pdf', apiKey);
-    } catch (error) {
-      console.error('Error in AI extraction, falling back to mock:', error);
-      // Fallback to mock if AI extraction fails
-      return getMockAnalysis(request);
-    }
-  }
-
   // Check for Groq API key for fraud detection
   const groqApiKey = process.env.GROQ_API_KEY;
 
   // If we have file content and OpenAI API key, use real OCR
   if (request.fileContent && apiKey) {
     try {
-      const extractionResult = await extractAndAnalyzeWithAI(request.fileContent, request.fileType || 'application/pdf', apiKey);
+      let analysisResult = await extractAndAnalyzeWithAI(request.fileContent, request.fileType || 'application/pdf', apiKey);
 
       // If Groq API key is available, run additional fraud detection
       if (groqApiKey) {
         try {
-          const fraudAnomalies = await detectFraudWithGroq(extractionResult.extractedData, groqApiKey);
-          extractionResult.anomalies = [...extractionResult.anomalies, ...fraudAnomalies];
+          const fraudAnomalies = await detectFraudWithGroq(analysisResult.extractedData, groqApiKey);
+          analysisResult.anomalies = [...analysisResult.anomalies, ...fraudAnomalies];
 
           // Re-evaluate decision based on new anomalies
-          extractionResult.decision = makeDecision(extractionResult.anomalies, extractionResult.extractedData);
+          analysisResult.decision = makeDecision(analysisResult.anomalies, analysisResult.extractedData);
         } catch (error) {
           console.error('Error in Groq fraud detection:', error);
           // Continue with OpenAI results if Groq fails
         }
       }
 
-      return extractionResult;
+      return analysisResult;
     } catch (error) {
       console.error('Error in AI extraction, falling back to mock:', error);
       // Fallback to mock if AI extraction fails

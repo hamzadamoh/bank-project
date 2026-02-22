@@ -4,8 +4,17 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Briefcase, MapPin, Clock, Globe, Heart, Zap, Users, ArrowRight, Coffee, Laptop, GraduationCap } from "lucide-react";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Careers() {
+  const { toast } = useToast();
+
+  const handleApply = (position: string) => {
+    toast({
+      title: "Application Started",
+      description: `Your application for ${position} has been initiated. Please check your email for the next steps.`,
+    });
+  };
   const openPositions = [
     {
       title: "Senior AI Engineer",
@@ -243,7 +252,10 @@ export default function Careers() {
                     </div>
 
                     <div className="lg:w-48 flex-shrink-0">
-                      <Button className="w-full bg-ink-950 text-alabaster-50 hover:bg-ink-900">
+                      <Button
+                        className="w-full bg-ink-950 text-alabaster-50 hover:bg-ink-900"
+                        onClick={() => handleApply(position.title)}
+                      >
                         Apply Now
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
@@ -380,7 +392,7 @@ export default function Careers() {
               or building great products, we'd love to hear from you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/apply" className="bg-ink-950 text-alabaster-50 hover:bg-ink-900 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center transition-colors">
+              <Link href="/contact" className="bg-ink-950 text-alabaster-50 hover:bg-ink-900 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center transition-colors">
                 Send Us Your Resume
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>

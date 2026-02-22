@@ -449,7 +449,12 @@ export default function Dashboard() {
                                             ))}
                                         </div>
                                         <div className="p-3 bg-alabaster-50 text-center">
-                                            <button className="text-xs font-bold text-ink-950 hover:underline">View all notifications</button>
+                                            <button
+                                                className="text-xs font-bold text-ink-950 hover:underline"
+                                                onClick={() => handleAction("View All Notifications")}
+                                            >
+                                                View all notifications
+                                            </button>
                                         </div>
                                     </motion.div>
                                 </>
@@ -676,7 +681,7 @@ export default function Dashboard() {
                                             <h2 className="text-2xl font-bold text-ink-950">User Management</h2>
                                             <p className="text-slate-500">Manage organizational members and their permissions.</p>
                                         </div>
-                                        <Button size="sm">Invite User</Button>
+                                        <Button size="sm" onClick={() => handleAction("Invite User")}>Invite User</Button>
                                     </div>
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-left">
@@ -713,7 +718,7 @@ export default function Dashboard() {
                                                         </td>
                                                         <td className="px-8 py-4 text-xs text-slate-500">{u.last}</td>
                                                         <td className="px-8 py-4">
-                                                            <Button variant="ghost" size="sm">Edit</Button>
+                                                            <Button variant="ghost" size="sm" onClick={() => handleAction("Edit User")}>Edit</Button>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -749,7 +754,7 @@ export default function Dashboard() {
                                                     {userRole === "admin" ? "AU" : "CU"}
                                                 </div>
                                                 <div>
-                                                    <Button variant="outline" size="sm" className="mb-2">Change Avatar</Button>
+                                                    <Button variant="outline" size="sm" className="mb-2" onClick={() => handleAction("Change Avatar")}>Change Avatar</Button>
                                                     <p className="text-xs text-slate-400">JPG, GIF or PNG. Max size of 800K</p>
                                                 </div>
                                             </div>
@@ -767,7 +772,7 @@ export default function Dashboard() {
                                                     <Input defaultValue={userRole === "admin" ? "admin@fiscai.co" : "user@company.com"} />
                                                 </div>
                                             </div>
-                                            <Button className="bg-ink-950 text-alabaster-50">Save Changes</Button>
+                                            <Button className="bg-ink-950 text-alabaster-50" onClick={() => handleAction("Save Changes")}>Save Changes</Button>
                                         </GlassCard>
                                     </div>
 
@@ -788,7 +793,7 @@ export default function Dashboard() {
                                                 <Badge className="bg-emerald-50 text-emerald-600 border-none">Enabled</Badge>
                                             </div>
                                             <div className="pt-6 border-t border-alabaster-100">
-                                                <Button variant="outline">Change Password</Button>
+                                                <Button variant="outline" onClick={() => handleAction("Change Password")}>Change Password</Button>
                                             </div>
                                         </GlassCard>
                                     </div>
@@ -811,10 +816,10 @@ export default function Dashboard() {
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <Button variant="ghost" size="sm" onClick={() => toast({ title: "Copied", description: "API Key copied to clipboard" })}>Copy</Button>
-                                                    <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">Revoke</Button>
+                                                    <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600" onClick={() => handleAction("Revoke API Key")}>Revoke</Button>
                                                 </div>
                                             </div>
-                                            <Button className="w-full bg-ink-950 text-alabaster-50 py-6">Generate New API Key</Button>
+                                            <Button className="w-full bg-ink-950 text-alabaster-50 py-6" onClick={() => handleAction("Generate API Key")}>Generate New API Key</Button>
                                         </GlassCard>
                                     </div>
 
@@ -838,7 +843,7 @@ export default function Dashboard() {
                                                     </Button>
                                                 </div>
                                             ))}
-                                            <Button variant="outline" className="w-full">Configure Advanced Alerts</Button>
+                                            <Button variant="outline" className="w-full" onClick={() => handleAction("Configure Advanced Alerts")}>Configure Advanced Alerts</Button>
                                         </GlassCard>
                                     </div>
                                 </div>

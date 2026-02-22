@@ -142,12 +142,12 @@ export default function Home() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-purple-400 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                       <div className="w-3 h-3 bg-white rounded-full"></div>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-ink-950 mb-1">Compliance Ready</h3>
-                      <p className="text-slate-700 text-sm">GDPR, SOC 2, and audit trail features. Certifications in progress.</p>
+                      <h3 className="font-semibold text-ink-950 mb-1">Advanced Governance</h3>
+                      <p className="text-slate-700 text-sm">Real-time audit logs, usage analytics, and automated resource alerts for enterprise control.</p>
                     </div>
                   </div>
                 </div>

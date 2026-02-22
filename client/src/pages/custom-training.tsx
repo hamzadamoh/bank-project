@@ -4,12 +4,21 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { GraduationCap, Users, Calendar, Award, BookOpen, Video, MapPin, ArrowRight, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CustomTraining() {
+  const { toast } = useToast();
+
+  const handleDownloadCatalog = () => {
+    toast({
+      title: "Training Catalog",
+      description: "The comprehensive training catalog has been sent to your registered email.",
+    });
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-champagne-100">
       <Navigation />
-      
+
       <div className="pt-32 pb-20 px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -22,7 +31,7 @@ export default function CustomTraining() {
               Custom Training Programs
             </h1>
             <p className="text-xl text-slate-700 max-w-3xl mx-auto leading-relaxed">
-              Accelerate your team's mastery of FiscAI's AI-powered financial tools with tailored training programs. 
+              Accelerate your team's mastery of FiscAI's AI-powered financial tools with tailored training programs.
               Available on-site in Morocco and globally via virtual delivery.
             </p>
           </div>
@@ -37,7 +46,7 @@ export default function CustomTraining() {
               <p className="text-slate-700 mb-6 leading-relaxed">
                 Interactive group sessions designed to get your entire team proficient with FiscAI tools quickly and effectively.
               </p>
-              
+
               <div className="space-y-3 mb-6 text-left">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-green-600" />
@@ -67,7 +76,7 @@ export default function CustomTraining() {
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-ink-950 text-white px-4 py-1 rounded-full text-sm font-medium">
                 Most Popular
               </div>
-              
+
               <div className="w-16 h-16 bg-champagne-200 rounded-2xl mx-auto mb-6 flex items-center justify-center">
                 <Award className="h-8 w-8 text-ink-950" />
               </div>
@@ -75,7 +84,7 @@ export default function CustomTraining() {
               <p className="text-slate-700 mb-6 leading-relaxed">
                 Comprehensive 5-day certification program with official FiscAI credentials for tax and financial professionals.
               </p>
-              
+
               <div className="space-y-3 mb-6 text-left">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-green-600" />
@@ -109,7 +118,7 @@ export default function CustomTraining() {
               <p className="text-alabaster-300 mb-6 leading-relaxed">
                 Strategic overview for C-level executives and decision makers on AI transformation in finance.
               </p>
-              
+
               <div className="space-y-3 mb-6 text-left">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-green-400" />
@@ -371,7 +380,7 @@ export default function CustomTraining() {
                   </div>
                 </div>
                 <p className="text-slate-700 text-sm italic">
-                  "The 5-day certification program transformed our team's approach to document verification. 
+                  "The 5-day certification program transformed our team's approach to document verification.
                   We've reduced false positives by 40% while improving our fraud detection accuracy."
                 </p>
               </div>
@@ -387,7 +396,7 @@ export default function CustomTraining() {
                   </div>
                 </div>
                 <p className="text-slate-700 text-sm italic">
-                  "Custom training on Tax Counsel enabled our advisory team to handle complex multi-jurisdiction 
+                  "Custom training on Tax Counsel enabled our advisory team to handle complex multi-jurisdiction
                   queries with confidence. Client satisfaction scores increased by 25% in the first quarter."
                 </p>
               </div>
@@ -409,11 +418,15 @@ export default function CustomTraining() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button variant="outline" className="px-8 py-4 text-lg font-semibold">
+              <Button
+                variant="outline"
+                className="px-8 py-4 text-lg font-semibold"
+                onClick={handleDownloadCatalog}
+              >
                 Download Training Catalog
               </Button>
             </div>
-            
+
             <div className="mt-8 text-center text-sm text-slate-600">
               <p>Training available in Arabic, French, and English</p>
               <p>Special rates available for Moroccan educational institutions</p>

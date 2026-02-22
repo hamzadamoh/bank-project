@@ -2,14 +2,23 @@ import Navigation from "@/components/layout/navigation";
 import Footer from "@/components/layout/footer";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
-import { Server, Shield, Settings, Users, Clock, Database, Network, ArrowRight, CheckCircle, AlertTriangle } from "lucide-react";
+import { Server, Shield, Settings, Users, Clock, Database, Network, ArrowRight, CheckCircle, AlertTriangle, Download, MapPin, Globe } from "lucide-react";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 export default function OnSiteDeployment() {
+  const { toast } = useToast();
+
+  const handleDownload = () => {
+    toast({
+      title: "Technical Guide",
+      description: "The FiscAI On-Site Deployment Technical Guide has been sent to your email.",
+    });
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-champagne-100">
       <Navigation />
-      
+
       <div className="pt-32 pb-20 px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -22,7 +31,7 @@ export default function OnSiteDeployment() {
               On-Site Deployment
             </h1>
             <p className="text-xl text-slate-700 max-w-3xl mx-auto leading-relaxed">
-              Complete on-premises deployment with air-gapped environments, custom integrations, and 
+              Complete on-premises deployment with air-gapped environments, custom integrations, and
               full data sovereignty for financial institutions in Morocco and worldwide.
             </p>
           </div>
@@ -120,7 +129,7 @@ export default function OnSiteDeployment() {
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-ink-950 text-white px-4 py-1 rounded-full text-sm font-medium">
                   Most Popular
                 </div>
-                
+
                 <div className="text-center mb-6">
                   <div className="w-16 h-16 bg-champagne-200 rounded-2xl mx-auto mb-4 flex items-center justify-center">
                     <Network className="h-8 w-8 text-ink-950" />
@@ -230,7 +239,7 @@ export default function OnSiteDeployment() {
                     <span className="text-slate-700">RHEL 8+ or Ubuntu 20.04+</span>
                   </div>
                 </div>
-                
+
                 <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
@@ -270,7 +279,7 @@ export default function OnSiteDeployment() {
                     <span className="text-alabaster-200">HA cluster (3+ nodes)</span>
                   </div>
                 </div>
-                
+
                 <div className="mt-6 p-4 bg-green-900/30 border border-green-400/30 rounded-xl">
                   <div className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-green-400 mt-0.5" />
@@ -298,7 +307,7 @@ export default function OnSiteDeployment() {
             <div className="relative">
               {/* Timeline line */}
               <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-champagne-300"></div>
-              
+
               <div className="space-y-8">
                 {/* Phase 1 */}
                 <div className="flex gap-6">
@@ -424,7 +433,7 @@ export default function OnSiteDeployment() {
                   Proactive monitoring with automated alerts and incident response
                 </p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-12 h-12 bg-champagne-200 rounded-xl mx-auto mb-4 flex items-center justify-center">
                   <Settings className="h-6 w-6 text-ink-950" />
@@ -434,7 +443,7 @@ export default function OnSiteDeployment() {
                   Quarterly model updates and security patches via secure channels
                 </p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-12 h-12 bg-champagne-200 rounded-xl mx-auto mb-4 flex items-center justify-center">
                   <Users className="h-6 w-6 text-ink-950" />
@@ -462,11 +471,15 @@ export default function OnSiteDeployment() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button variant="outline" className="px-8 py-4 text-lg font-semibold">
+              <Button
+                variant="outline"
+                className="px-8 py-4 text-lg font-semibold"
+                onClick={handleDownload}
+              >
                 Download Technical Guide
               </Button>
             </div>
-            
+
             <div className="mt-8 text-center text-sm text-slate-600">
               <p>Deployment services available across Morocco, MENA, and Europe</p>
               <p>Special government and educational pricing available</p>

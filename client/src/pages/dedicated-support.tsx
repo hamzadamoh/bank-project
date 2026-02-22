@@ -9,7 +9,7 @@ export default function DedicatedSupport() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-champagne-100">
       <Navigation />
-      
+
       <div className="pt-32 pb-20 px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -22,7 +22,7 @@ export default function DedicatedSupport() {
               Dedicated Support
             </h1>
             <p className="text-xl text-slate-700 max-w-3xl mx-auto leading-relaxed">
-              Get white-glove support with dedicated customer success and technical account managers. 
+              Get white-glove support with dedicated customer success and technical account managers.
               Available for Morocco and worldwide enterprise customers.
             </p>
           </div>
@@ -37,7 +37,7 @@ export default function DedicatedSupport() {
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-2">Standard Support</h3>
                 <p className="text-slate-700 text-sm">Included with all plans</p>
               </div>
-              
+
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600" />
@@ -64,7 +64,7 @@ export default function DedicatedSupport() {
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-ink-950 text-white px-4 py-1 rounded-full text-sm font-medium">
                 Most Popular
               </div>
-              
+
               <div className="text-center mb-6">
                 <div className="w-16 h-16 bg-champagne-200 rounded-2xl mx-auto mb-4 flex items-center justify-center">
                   <Users className="h-8 w-8 text-ink-950" />
@@ -72,7 +72,7 @@ export default function DedicatedSupport() {
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-2">Premium Support</h3>
                 <p className="text-slate-700 text-sm">For growing businesses</p>
               </div>
-              
+
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600" />
@@ -99,7 +99,7 @@ export default function DedicatedSupport() {
               <p className="text-center font-semibold text-ink-950">$299/month</p>
             </GlassCard>
 
-            <GlassCard className="p-8 relative bg-gradient-to-br from-ink-950 to-ink-900 text-white">              
+            <GlassCard className="p-8 relative bg-gradient-to-br from-ink-950 to-ink-900 text-white">
               <div className="text-center mb-6">
                 <div className="w-16 h-16 bg-champagne-200 rounded-2xl mx-auto mb-4 flex items-center justify-center">
                   <Shield className="h-8 w-8 text-ink-950" />
@@ -107,7 +107,7 @@ export default function DedicatedSupport() {
                 <h3 className="font-display font-bold text-2xl mb-2">Enterprise Support</h3>
                 <p className="text-alabaster-300 text-sm">White-glove service</p>
               </div>
-              
+
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 text-green-400" />
@@ -255,7 +255,7 @@ export default function DedicatedSupport() {
               Global Support, Local Expertise
             </h2>
             <p className="text-lg text-slate-700 max-w-2xl mx-auto mb-8">
-              Our support team understands both Moroccan financial regulations and international best practices, 
+              Our support team understands both Moroccan financial regulations and international best practices,
               providing context-aware assistance for your specific market needs.
             </p>
             <div className="grid md:grid-cols-4 gap-6 text-center">
@@ -293,9 +293,11 @@ export default function DedicatedSupport() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button variant="outline" className="px-8 py-4 text-lg font-semibold">
-                View Support Plans
-              </Button>
+              <Link href="/pricing">
+                <Button variant="outline" className="px-8 py-4 text-lg font-semibold">
+                  View Support Plans
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

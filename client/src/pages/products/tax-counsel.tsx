@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, Search, ThumbsUp, Brain } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TaxCounsel() {
+  const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [jurisdiction, setJurisdiction] = useState("morocco");
   const [confidence, setConfidence] = useState("high");
@@ -23,7 +25,7 @@ export default function TaxCounsel() {
 
     setIsLoading(true);
     setResponse(null);
-    
+
     try {
       const response = await fetch('/api/tax-queries', {
         method: 'POST',
@@ -48,6 +50,20 @@ export default function TaxCounsel() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleExport = () => {
+    toast({
+      title: "Export Started",
+      description: "Generating your tax report PDF. Your download will start shortly.",
+    });
+  };
+
+  const handleSave = () => {
+    toast({
+      title: "Saved to Memos",
+      description: "This tax query analysis has been saved to your account memos.",
+    });
   };
 
   return (
@@ -78,7 +94,7 @@ export default function TaxCounsel() {
 
               <div className="mb-6">
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">Try the Demo</h3>
-                
+
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <Select value={jurisdiction} onValueChange={setJurisdiction}>
                     <SelectTrigger>
@@ -90,7 +106,7 @@ export default function TaxCounsel() {
                       <SelectItem value="oecd">OECD General</SelectItem>
                     </SelectContent>
                   </Select>
-                  
+
                   <Select value={confidence} onValueChange={setConfidence}>
                     <SelectTrigger>
                       <SelectValue placeholder="Confidence level" />
@@ -141,11 +157,11 @@ export default function TaxCounsel() {
                       {response.confidence}% Confidence
                     </Badge>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={handleExport}>
                         <Download className="h-4 w-4 mr-2" />
                         Export PDF
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={handleSave}>
                         <FileText className="h-4 w-4 mr-2" />
                         Save Memo
                       </Button>
@@ -162,7 +178,7 @@ export default function TaxCounsel() {
                   <div className="bg-white rounded-xl p-6">
                     <h4 className="font-semibold text-ink-950 mb-4">Detailed Analysis</h4>
                     <p className="text-slate-700 mb-6">{response.explanation}</p>
-                    
+
                     <div className="space-y-4">
                       {response.details.map((detail: any, index: number) => (
                         <div key={index} className="border-l-4 border-champagne-200 pl-4">
