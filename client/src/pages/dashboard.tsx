@@ -17,7 +17,9 @@ import {
     X,
     Shield,
     User,
-    Check
+    Check,
+    Info,
+    Key
 } from "lucide-react";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
@@ -26,14 +28,76 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { Order } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { Sun, Moon } from "lucide-react";
+
+const AIInsightsPanel = ({ userRole }: { userRole: string }) => {
+    const adminInsights = [
+        { title: "Security Health", content: "All 24/7 monitors active. No abnormal ingress detected in the last 72 hours.", icon: Shield, color: "text-emerald-500" },
+        { title: "Revenue Forecast", content: "AI predicts a 14% growth in Enterprise expansions for Q2 based on current trial volumes.", icon: TrendingUp, color: "text-blue-500" },
+        { title: "Compute Efficiency", content: "SQL processing is 12% more efficient after last week's model fine-tuning.", icon: Zap, color: "text-amber-500" }
+    ];
+
+    const clientInsights = [
+        { title: "Spend Optimization", content: "AI detected $450 in redundant cloud compute tokens. Switch to Tier 2 to save $120/mo.", icon: ShoppingBag, color: "text-emerald-500" },
+        { title: "Query Prediction", content: "Most of your team's queries happen between 9-11 AM. Pre-warming models could save 2s latency.", icon: Zap, color: "text-blue-500" },
+        { title: "Tax Alert", content: "New regional regulation (v4.2) may affect your Q3 filing. Tax Counsel is ready to review.", icon: Info, color: "text-amber-500" }
+    ];
+
+    const insights = userRole === "admin" ? adminInsights : clientInsights;
+
+    return (
+        <GlassCard className="p-6 bg-gradient-to-r from-emerald-500/5 to-blue-500/5 border-emerald-400/20">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-emerald-400 rounded-xl flex items-center justify-center text-ink-950">
+                    <Zap className="h-6 w-6" />
+                </div>
+                <div>
+                    <h3 className="text-lg font-bold text-ink-950">FiscAI Insights</h3>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-widest">Real-time Intelligent Analysis</p>
+                </div>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+                {insights.map((insight, i) => (
+                    <div key={i} className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <insight.icon className={`h-4 w-4 ${insight.color}`} />
+                            <h4 className="font-bold text-sm text-ink-950">{insight.title}</h4>
+                        </div>
+                        <p className="text-xs text-slate-600 leading-relaxed">{insight.content}</p>
+                    </div>
+                ))}
+            </div>
+        </GlassCard>
+    );
+};
 
 export default function Dashboard() {
     const { toast } = useToast();
     const [location, setLocation] = useLocation();
+    const [userRole, setUserRole] = useState("client");
+    const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("overview");
-    const [userRole, setUserRole] = useState<string>("client");
     const [searchQuery, setSearchQuery] = useState("");
     const [showNotifications, setShowNotifications] = useState(false);
+    const [theme, setTheme] = useState(() => localStorage.getItem("fiscai_theme") || "light");
+
+    useEffect(() => {
+        const root = window.document.documentElement;
+        if (theme === "dark") {
+            root.classList.add("dark");
+        } else {
+            root.classList.remove("dark");
+        }
+        localStorage.setItem("fiscai_theme", theme);
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(prev => prev === "light" ? "dark" : "light");
+        toast({
+            title: `Theme Switched`,
+            description: `Dashboard is now in ${theme === 'light' ? 'dark' : 'light'} mode.`,
+        });
+    };
 
     useEffect(() => {
         const savedRole = localStorage.getItem("fiscai_user_role");
@@ -44,9 +108,10 @@ export default function Dashboard() {
                 setActiveTab("overview");
             }
         }
+        setIsLoading(false);
     }, [activeTab]);
 
-    const { data: orders, isLoading } = useQuery<{ success: boolean; data: Order[] }>({
+    const { data: orders, isLoading: isLoadingOrders } = useQuery<{ success: boolean; data: Order[] }>({
         queryKey: ["/api/orders"],
     });
 
@@ -164,6 +229,14 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center gap-6">
                         <button
+                            onClick={toggleTheme}
+                            className="p-2 rounded-xl text-slate-600 hover:bg-alabaster-50 transition-colors"
+                            title="Toggle Theme"
+                        >
+                            {theme === "light" ? <Moon className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
+                        </button>
+
+                        <button
                             onClick={() => setShowNotifications(!showNotifications)}
                             className={`relative p-2 rounded-xl transition-colors ${showNotifications ? 'bg-emerald-50 text-emerald-600' : 'text-slate-600 hover:bg-alabaster-50'}`}
                         >
@@ -242,6 +315,8 @@ export default function Dashboard() {
                                 exit={{ opacity: 0, y: -10 }}
                                 className="space-y-8"
                             >
+                                <AIInsightsPanel userRole={userRole} />
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     {[
                                         { label: "Total Revenue", value: userRole === "admin" ? "$124,592" : "$4,250", icon: CreditCard, color: "text-emerald-500", trend: "+12.5%" },
@@ -373,7 +448,7 @@ export default function Dashboard() {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-alabaster-100">
-                                                {isLoading ? (
+                                                {isLoadingOrders ? (
                                                     <tr>
                                                         <td colSpan={6} className="px-8 py-12 text-center text-slate-400 italic">Loading orders...</td>
                                                     </tr>
@@ -541,6 +616,31 @@ export default function Dashboard() {
                                             <div className="pt-6 border-t border-alabaster-100">
                                                 <Button variant="outline">Change Password</Button>
                                             </div>
+                                        </GlassCard>
+                                    </div>
+
+                                    <div className="md:col-span-1">
+                                        <h3 className="font-bold text-ink-950 mb-2">API Management</h3>
+                                        <p className="text-sm text-slate-500">Manage your access keys for OmniServe and Custom Training integration.</p>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <GlassCard className="p-8 space-y-6">
+                                            <div className="p-4 bg-alabaster-50 rounded-xl border border-alabaster-100 flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 bg-ink-950 rounded-lg flex items-center justify-center text-alabaster-50">
+                                                        <Key className="w-4 h-4" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-bold text-ink-950">LIVE_KEY_8293...</p>
+                                                        <p className="text-[10px] text-slate-500">Created Jan 12, 2024</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <Button variant="ghost" size="sm" onClick={() => toast({ title: "Copied", description: "API Key copied to clipboard" })}>Copy</Button>
+                                                    <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">Revoke</Button>
+                                                </div>
+                                            </div>
+                                            <Button className="w-full bg-ink-950 text-alabaster-50 py-6">Generate New API Key</Button>
                                         </GlassCard>
                                     </div>
                                 </div>

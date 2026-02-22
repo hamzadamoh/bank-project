@@ -9,11 +9,31 @@ import { Link } from "wouter";
 export default function Security() {
   const { toast } = useToast();
 
+  const downloadFile = (filename: string, content: string) => {
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  };
+
   const handleDownload = () => {
     toast({
       title: "Download Started",
       description: "FiscAI Security Datasheet v2.4 (PDF) is being generated...",
     });
+
+    // Simulate real file download
+    setTimeout(() => {
+      downloadFile(
+        "fiscai-security-datasheet.txt",
+        "FiscAI ENTERPRISE SECURITY DATASHEET\nVersion: 2.4\nStatus: ACCREDITED\n\nThis document confirms FiscAI's compliance with SOC 2, GDPR, and ISO 27001 standards..."
+      );
+    }, 1500);
   };
 
   const securityFeatures = [

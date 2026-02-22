@@ -4,8 +4,46 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Lock, FileText, CheckCircle, Globe, Download, ExternalLink, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 export default function TrustCenter() {
+    const { toast } = useToast();
+
+    const downloadFile = (filename: string, content: string) => {
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    };
+
+    const handleDownload = (docTitle: string) => {
+        toast({
+            title: "Download Started",
+            description: `${docTitle} is being prepared for download.`,
+        });
+
+        // Simulate real file download
+        setTimeout(() => {
+            downloadFile(
+                `${docTitle.toLowerCase().replace(/\s+/g, '-')}.txt`,
+                `FiscAI TRUST DOCUMENT: ${docTitle}\n\nThis is a certified compliance document for FiscAI Enterprise services. Verification ID: TR-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+            );
+        }, 1200);
+    };
+
+    const handleSubmitRequest = () => {
+        toast({
+            title: "Request Submitted",
+            description: "Your request for a custom DPA has been sent to our legal team.",
+        });
+    };
+
     const documents = [
         { title: "Privacy Policy", version: "2024.1", size: "1.2 MB", type: "PDF" },
         { title: "Terms of Service", version: "2024.1", size: "0.8 MB", type: "PDF" },
@@ -50,7 +88,11 @@ export default function TrustCenter() {
                                         </div>
                                         <div className="flex justify-between text-sm">
                                             <span className="text-slate-500">Security Team</span>
-                                            <span className="text-ink-950 font-bold underline cursor-pointer">Contact Page</span>
+                                            <Link href="/contact">
+                                                <span className="text-ink-950 font-bold underline cursor-pointer hover:text-emerald-600 transition-colors">
+                                                    Contact Page
+                                                </span>
+                                            </Link>
                                         </div>
                                     </div>
                                 </GlassCard>
@@ -77,12 +119,19 @@ export default function TrustCenter() {
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 {doc.restricted ? (
-                                                    <Badge variant="outline" className="text-amber-600 border-amber-600 gap-1">
-                                                        <Lock className="h-3 w-3" />
-                                                        Request Access
-                                                    </Badge>
+                                                    <Link href="/request-access">
+                                                        <Badge variant="outline" className="text-amber-600 border-amber-600 gap-1 cursor-pointer hover:bg-amber-50">
+                                                            <Lock className="h-3 w-3" />
+                                                            Request Access
+                                                        </Badge>
+                                                    </Link>
                                                 ) : (
-                                                    <Button variant="ghost" size="sm" className="gap-2 text-slate-600 group-hover:text-ink-950">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="gap-2 text-slate-600 group-hover:text-ink-950"
+                                                        onClick={() => handleDownload(doc.title)}
+                                                    >
                                                         <Download className="h-4 w-4" />
                                                         Download
                                                     </Button>
@@ -120,7 +169,10 @@ export default function TrustCenter() {
                                     <p className="text-sm text-alabaster-200 mb-6 leading-relaxed">
                                         Need a custom DPA for your organization? Our legal team can provide a tailored agreement to meet your specific regional compliance needs.
                                     </p>
-                                    <Button className="w-full bg-emerald-400 text-ink-950 font-bold hover:bg-emerald-300">
+                                    <Button
+                                        onClick={handleSubmitRequest}
+                                        className="w-full bg-emerald-400 text-ink-950 font-bold hover:bg-emerald-300"
+                                    >
                                         Submit Request
                                     </Button>
                                 </GlassCard>
