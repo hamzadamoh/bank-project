@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TaxCounselDemo() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [response, setResponse] = useState<any>(null);
+  const { toast } = useToast();
 
   const handleQuery = async () => {
     setIsProcessing(true);
@@ -23,6 +25,13 @@ export default function TaxCounselDemo() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleExport = () => {
+    toast({
+      title: "Memo Exported",
+      description: "The tax analysis memo has been exported as a PDF.",
+    });
   };
 
   return (
@@ -75,6 +84,7 @@ export default function TaxCounselDemo() {
           <Button
             variant="outline"
             size="sm"
+            onClick={handleExport}
             className="text-xs"
           >
             Export Memo

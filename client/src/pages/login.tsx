@@ -123,11 +123,10 @@ export default function Login() {
                                     <Label htmlFor="password" className="text-sm font-medium text-ink-950">
                                         Password
                                     </Label>
-                                    <a
-                                        href="#"
+                                    <button
+                                        type="button"
                                         className="text-xs text-ink-950 hover:text-slate-700 font-medium"
-                                        onClick={(e) => {
-                                            e.preventDefault();
+                                        onClick={() => {
                                             toast({
                                                 title: "Password Reset",
                                                 description: "Check your email for a password reset link.",
@@ -135,7 +134,7 @@ export default function Login() {
                                         }}
                                     >
                                         Forgot password?
-                                    </a>
+                                    </button>
                                 </div>
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />

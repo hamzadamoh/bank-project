@@ -9,11 +9,31 @@ import { useToast } from "@/hooks/use-toast";
 export default function OnSiteDeployment() {
   const { toast } = useToast();
 
+  const downloadFile = (filename: string, content: string) => {
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  };
+
   const handleDownload = () => {
     toast({
       title: "Technical Guide",
-      description: "The FiscAI On-Site Deployment Technical Guide has been sent to your email.",
+      description: "FiscAI On-Site Deployment Technical Guide is being generated...",
     });
+
+    // Simulate real file download
+    setTimeout(() => {
+      downloadFile(
+        "fiscai-onsite-deployment-guide.txt",
+        "FiscAI ON-SITE DEPLOYMENT TECHNICAL GUIDE\n\nThis document provides technical specifications and implementation steps for deploying FiscAI on-premises..."
+      );
+    }, 1500);
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-champagne-100">
