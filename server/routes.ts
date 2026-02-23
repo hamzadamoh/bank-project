@@ -39,9 +39,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // --- MFA Routes ---
   app.post("/api/mfa/setup", isAuthenticated, async (req, res) => {
     try {
+      console.log(`[API] Starting MFA Setup for user: ${req.user!.username}`);
       const secret = securityService.generateMfaSecret();
       await storage.updateUserMfa(req.user!.id, { secret, enabled: false });
-      res.json({ success: true, secret, qrCode: `otpauth://totp/FiscAI:${req.user!.username}?secret=${secret}&issuer=FiscAI` });
+
+      const qrCodeUrl = `otpauth://totp/FiscAI:${req.user!.username}?secret=${secret}&issuer=FiscAI`;
+      console.log(`[API] MFA Secret generated successfully for: ${req.user!.username}`);
+
+      res.json({
+        success: true,
+        secret,
+        qrCode: qrCodeUrl
+      });
     } catch (error) {
       console.error("[API] MFA Setup Error:", error);
       res.status(500).json({ success: false, message: "Failed to setup MFA" });
@@ -72,6 +81,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { data } = req.body;
       if (!data) return res.status(400).json({ success: false, message: "Data is required" });
+
+      console.log(`[API] Tokenizing data for user: ${req.user!.username}`);
       const token = await securityService.tokenize(data);
       res.json({ success: true, token });
     } catch (error) {
@@ -577,6 +588,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/health", async (req, res) => {
     const tenantId = req.user?.tenantId || "default";
     const residency = await securityService.getDataResidency(tenantId);
+    console.log(`[API] Health check requested (Tenant: ${tenantId}, Residency: ${residency})`);
     res.json({
       success: true,
       status: "Healthy",

@@ -36,8 +36,12 @@ export const rateLimit = (req: Request, res: Response, next: NextFunction) => {
 
 // Auth & Security Middlewares
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-    if (req.isAuthenticated()) return next();
-    res.status(401).json({ message: "Unauthorized" });
+    if (req.isAuthenticated()) {
+        console.log(`[AUTH] User ${req.user?.id} (${req.user?.username}) authenticated for ${req.method} ${req.path}`);
+        return next();
+    }
+    console.warn(`[AUTH] Unauthorized access attempt: ${req.method} ${req.path} from IP ${req.ip}`);
+    res.status(401).json({ success: false, message: "Unauthorized: Please log in" });
 };
 
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
