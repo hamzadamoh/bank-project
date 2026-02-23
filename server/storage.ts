@@ -97,6 +97,13 @@ export interface IStorage {
   deleteUserAccount(userId: string): Promise<void>;
   updateUserConsent(userId: string, settings: any): Promise<void>;
   applyRetentionPolicy(tenantId: string): Promise<void>;
+
+  // Tokenization Vault (New)
+  createToken(token: string, encryptedData: string): Promise<void>;
+  getToken(token: string): Promise<string | undefined>;
+
+  // MFA Management
+  updateUserMfa(userId: string, data: { secret?: string, enabled: boolean }): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -112,6 +119,7 @@ export class MemStorage implements IStorage {
   private kycRecords: Map<string, KycRecord>;
   private creditAssessments: Map<string, CreditAssessment>;
   private tenants: Map<string, Tenant>;
+  private tokens: Map<string, string>; // Tokenization vault
 
   constructor() {
     this.users = new Map();
@@ -126,13 +134,15 @@ export class MemStorage implements IStorage {
     this.kycRecords = new Map();
     this.creditAssessments = new Map();
     this.tenants = new Map();
+    this.tokens = new Map();
 
     // Seed default tenant
     this.createTenant({
       name: "Default Tenant",
       region: "Morocco",
       tier: "Starter",
-      queryLimit: "100"
+      queryLimit: "100",
+      ssoConfig: { enabled: false, provider: "local", domain: "" }
     });
   }
 
@@ -157,7 +167,9 @@ export class MemStorage implements IStorage {
         analytics: true,
         marketing: false,
         thirdParty: false
-      }
+      },
+      mfaEnabled: false,
+      mfaSecret: null
     };
     this.users.set(id, user);
     return user;
@@ -193,7 +205,9 @@ export class MemStorage implements IStorage {
       region: insertTenant.region || "Morocco",
       tier: insertTenant.tier || "Starter",
       queryLimit: insertTenant.queryLimit || "100",
-      retentionDays: insertTenant.retentionDays || "30"
+      retentionDays: insertTenant.retentionDays || "30",
+      mfaEnforced: insertTenant.mfaEnforced || false,
+      ssoConfig: insertTenant.ssoConfig || { enabled: false, provider: "local", domain: "" }
     };
     this.tenants.set(id, tenant);
     return tenant;
@@ -494,22 +508,38 @@ export class MemStorage implements IStorage {
     cutoff.setDate(cutoff.getDate() - days);
 
     // Filter and delete old records across all tenant-isolated tables
-    const tables = [
-      this.taxQueries,
-      this.sqlQueries,
-      this.documentAnalysis,
-      this.orders,
-      this.auditLogs
-    ];
-
-    for (const table of tables) {
-      for (const [id, record] of Array.from(table.entries())) {
-        const createdAt = (record as any).createdAt;
-        if ((record as any).tenantId === tenantId && createdAt && createdAt < cutoff) {
-          table.delete(id);
+    const purgeMap = (map: Map<string, any>) => {
+      for (const [id, record] of Array.from(map.entries())) {
+        const createdAt = record.createdAt;
+        if (record.tenantId === tenantId && createdAt && createdAt < cutoff) {
+          map.delete(id);
         }
       }
-    }
+    };
+
+    purgeMap(this.taxQueries);
+    purgeMap(this.sqlQueries);
+    purgeMap(this.documentAnalysis);
+    purgeMap(this.orders);
+    purgeMap(this.auditLogs);
+  }
+
+  // Tokenization Vault
+  async createToken(token: string, encryptedData: string): Promise<void> {
+    this.tokens.set(token, encryptedData);
+  }
+
+  async getToken(token: string): Promise<string | undefined> {
+    return this.tokens.get(token);
+  }
+
+  async updateUserMfa(userId: string, data: { secret?: string, enabled: boolean }): Promise<void> {
+    const user = this.users.get(userId);
+    if (!user) throw new Error("User not found");
+
+    if (data.secret !== undefined) user.mfaSecret = data.secret;
+    user.mfaEnabled = data.enabled;
+    this.users.set(userId, user);
   }
 }
 

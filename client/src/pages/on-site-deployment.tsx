@@ -271,7 +271,7 @@ export default function OnSiteDeployment() {
                 </div>
               </GlassCard>
 
-              <GlassCard className="p-8 bg-gradient-to-br from-ink-950 to-ink-900 text-white">
+              <GlassCard className="p-8 bg-ink-950 bg-gradient-to-br from-ink-950 to-ink-900 text-white">
                 <h3 className="font-display font-bold text-2xl mb-6">Recommended Enterprise</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center py-2 border-b border-alabaster-700">

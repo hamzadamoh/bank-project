@@ -10,6 +10,12 @@ export const tenants = pgTable("tenants", {
   tier: text("tier").notNull().default("Starter"), // 'Starter', 'Professional', 'Enterprise'
   queryLimit: text("query_limit").notNull().default("100"),
   retentionDays: text("retention_days").notNull().default("30"), // Default 30 days retention
+  mfaEnforced: boolean("mfa_enforced").notNull().default(false),
+  ssoConfig: jsonb("sso_config").notNull().default({
+    enabled: false,
+    provider: "local", // 'okta', 'azure', 'local'
+    domain: ""
+  }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -24,6 +30,8 @@ export const users = pgTable("users", {
     marketing: false,
     thirdParty: false
   }),
+  mfaEnabled: boolean("mfa_enabled").notNull().default(false),
+  mfaSecret: text("mfa_secret"),
 });
 
 export const auditLogs = pgTable("audit_logs", {

@@ -26,7 +26,39 @@ import { financialAssessor } from "./services/financial-assessor.js";
 // Configure multer for memory storage
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Auth & Security Middlewares
+// Enhanced Perimeter Security Middlewares
+const securityHeaders = (req: any, res: any, next: any) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.groq.com https://api-inference.huggingface.co;");
+  next();
+};
+
+const loginRateLimiter = new Map<string, { count: number, lastAttempt: number }>();
+const rateLimit = (req: any, res: any, next: any) => {
+  const ip = req.ip;
+  const now = Date.now();
+  const limit = 5; // 5 attempts
+  const window = 15 * 60 * 1000; // 15 minutes
+
+  const entry = loginRateLimiter.get(ip) || { count: 0, lastAttempt: 0 };
+  if (now - entry.lastAttempt > window) {
+    entry.count = 0;
+  }
+
+  if (entry.count >= limit) {
+    return res.status(429).json({ message: "Too many login attempts. Please try again later." });
+  }
+
+  entry.count++;
+  entry.lastAttempt = now;
+  loginRateLimiter.set(ip, entry);
+  next();
+};
+
+// Auth & Security Middlewares (Restored & Enhanced)
 const isAuthenticated = (req: any, res: any, next: any) => {
   if (req.isAuthenticated()) return next();
   res.status(401).json({ message: "Unauthorized" });
@@ -54,6 +86,83 @@ const checkTierLimit = async (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  app.use(securityHeaders);
+  app.use("/api/login", rateLimit);
+
+  // --- MFA Routes ---
+  app.post("/api/mfa/setup", isAuthenticated, async (req, res) => {
+    const secret = securityService.generateMfaSecret();
+    await storage.updateUserMfa(req.user!.id, { secret, enabled: false });
+    res.json({ success: true, secret, qrCode: `otpauth://totp/FiscAI:${req.user!.username}?secret=${secret}&issuer=FiscAI` });
+  });
+
+  app.post("/api/mfa/verify", isAuthenticated, async (req, res) => {
+    const { code } = req.body;
+    const user = await storage.getUser(req.user!.id);
+    if (!user?.mfaSecret) return res.status(400).json({ success: false, message: "MFA not set up" });
+
+    const isValid = securityService.verifyMfaCode(user.mfaSecret, code);
+    if (isValid) {
+      await storage.updateUserMfa(req.user!.id, { enabled: true });
+      res.json({ success: true, message: "MFA verified and enabled" });
+    } else {
+      res.status(400).json({ success: false, message: "Invalid MFA code" });
+    }
+  });
+
+  // --- Tokenization Routes ---
+  app.post("/api/security/tokenize", isAuthenticated, async (req, res) => {
+    const { data } = req.body;
+    const token = await securityService.tokenize(data);
+    res.json({ success: true, token });
+  });
+
+  app.post("/api/security/detokenize", isAuthenticated, isAdmin, async (req, res) => {
+    const { token } = req.body;
+    try {
+      const data = await securityService.detokenize(token);
+      res.json({ success: true, data });
+    } catch (e) {
+      res.status(404).json({ success: false, message: "Invalid token" });
+    }
+  });
+
+  // --- Compliance & Monitoring ---
+  app.get("/api/security/compliance-status", isAuthenticated, async (req, res) => {
+    const status = await securityService.getComplianceStatus(req.user!.tenantId);
+    res.json({ success: true, ...status });
+  });
+
+  // --- Simulated SSO Routes ---
+  app.post("/api/auth/sso/login", async (req, res) => {
+    const { domain } = req.body;
+    // Simulation: redirect to provider
+    res.json({
+      success: true,
+      redirectUrl: `/api/auth/sso/callback?domain=${domain}&token=sim_sso_${Math.random().toString(36).substring(7)}`
+    });
+  });
+
+  app.get("/api/auth/sso/callback", async (req, res) => {
+    const { domain, token } = req.query;
+    // In simulation, we just find a user from that "domain" or create one
+    const username = `sso_user_${domain}@enterprise.com`;
+    let user = await storage.getUserByUsername(username);
+
+    if (!user) {
+      user = await storage.createUser({
+        username,
+        password: "sso_managed_password",
+        tenantId: "tenant_enterprise_sim", // Should ideally find by domain
+        role: "client"
+      });
+    }
+
+    req.login(user, (err) => {
+      if (err) return res.redirect("/login?error=sso_failed");
+      res.redirect("/dashboard");
+    });
+  });
 
   // Demo request endpoint (Public-ish)
   app.post("/api/demo-requests", async (req, res) => {

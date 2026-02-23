@@ -50,7 +50,7 @@ import { setupAuth } from "./auth";
     throw err;
   });
 
-  // importantly only setup vite in development and after
+  // Importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
@@ -67,7 +67,6 @@ import { setupAuth } from "./auth";
   server.listen({
     port,
     host: "0.0.0.0",
-    reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
   });
