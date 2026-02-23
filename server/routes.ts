@@ -38,46 +38,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // --- MFA Routes ---
   app.post("/api/mfa/setup", isAuthenticated, async (req, res) => {
-    const secret = securityService.generateMfaSecret();
-    await storage.updateUserMfa(req.user!.id, { secret, enabled: false });
-    res.json({ success: true, secret, qrCode: `otpauth://totp/FiscAI:${req.user!.username}?secret=${secret}&issuer=FiscAI` });
+    try {
+      const secret = securityService.generateMfaSecret();
+      await storage.updateUserMfa(req.user!.id, { secret, enabled: false });
+      res.json({ success: true, secret, qrCode: `otpauth://totp/FiscAI:${req.user!.username}?secret=${secret}&issuer=FiscAI` });
+    } catch (error) {
+      console.error("[API] MFA Setup Error:", error);
+      res.status(500).json({ success: false, message: "Failed to setup MFA" });
+    }
   });
 
   app.post("/api/mfa/verify", isAuthenticated, async (req, res) => {
-    const { code } = req.body;
-    const user = await storage.getUser(req.user!.id);
-    if (!user?.mfaSecret) return res.status(400).json({ success: false, message: "MFA not set up" });
+    try {
+      const { code } = req.body;
+      const user = await storage.getUser(req.user!.id);
+      if (!user?.mfaSecret) return res.status(400).json({ success: false, message: "MFA not set up" });
 
-    const isValid = securityService.verifyMfaCode(user.mfaSecret, code);
-    if (isValid) {
-      await storage.updateUserMfa(req.user!.id, { enabled: true });
-      res.json({ success: true, message: "MFA verified and enabled" });
-    } else {
-      res.status(400).json({ success: false, message: "Invalid MFA code" });
+      const isValid = securityService.verifyMfaCode(user.mfaSecret, code);
+      if (isValid) {
+        await storage.updateUserMfa(req.user!.id, { enabled: true });
+        res.json({ success: true, message: "MFA verified and enabled" });
+      } else {
+        res.status(400).json({ success: false, message: "Invalid MFA code" });
+      }
+    } catch (error) {
+      console.error("[API] MFA Verify Error:", error);
+      res.status(500).json({ success: false, message: "Failed to verify MFA" });
     }
   });
 
   // --- Tokenization Routes ---
   app.post("/api/security/tokenize", isAuthenticated, async (req, res) => {
-    const { data } = req.body;
-    const token = await securityService.tokenize(data);
-    res.json({ success: true, token });
+    try {
+      const { data } = req.body;
+      if (!data) return res.status(400).json({ success: false, message: "Data is required" });
+      const token = await securityService.tokenize(data);
+      res.json({ success: true, token });
+    } catch (error) {
+      console.error("[API] Tokenize Error:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
   });
 
   app.post("/api/security/detokenize", isAuthenticated, isAdmin, async (req, res) => {
-    const { token } = req.body;
     try {
+      const { token } = req.body;
+      if (!token) return res.status(400).json({ success: false, message: "Token is required" });
       const data = await securityService.detokenize(token);
       res.json({ success: true, data });
-    } catch (e) {
-      res.status(404).json({ success: false, message: "Invalid token" });
+    } catch (error: any) {
+      console.error("[API] Detokenize Error:", error.message);
+      res.status(error.message === "Invalid token" ? 404 : 500).json({ success: false, message: error.message });
     }
   });
 
   // --- Compliance & Monitoring ---
   app.get("/api/security/compliance-status", isAuthenticated, async (req, res) => {
-    const status = await securityService.getComplianceStatus(req.user!.tenantId);
-    res.json({ success: true, ...status });
+    try {
+      const status = await securityService.getComplianceStatus(req.user!.tenantId);
+      res.json({ success: true, ...status });
+    } catch (error) {
+      console.error("[API] Compliance Status Error:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
   });
 
   // --- Simulated SSO Routes ---

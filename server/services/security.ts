@@ -2,7 +2,11 @@ import { storage } from "../storage.js";
 import { type InsertAuditLog } from "../../shared/schema.js";
 import crypto from 'crypto';
 
-const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY || '6f72616e676573617265676f6f64313233343536373839303132333435363738', 'hex'); // 32 bytes for AES-256
+const ENCRYPTION_KEY_HEX = process.env.ENCRYPTION_KEY || '6f72616e676573617265676f6f64313233343536373839303132333435363738';
+if (ENCRYPTION_KEY_HEX.length !== 64) {
+    console.error(`[SECURITY] WARNING: ENCRYPTION_KEY must be 32 bytes (64 hex characters). Current length: ${ENCRYPTION_KEY_HEX.length}`);
+}
+const ENCRYPTION_KEY = Buffer.from(ENCRYPTION_KEY_HEX, 'hex');
 const IV_LENGTH = 16;
 
 /**
@@ -87,39 +91,60 @@ class SecurityService {
      * Tokenization Vault
      */
     async tokenize(data: string): Promise<string> {
-        const token = `tok_${crypto.randomBytes(12).toString('hex')}`;
-        await storage.createToken(token, await this.encrypt(data));
-        return token;
+        try {
+            const token = `tok_${crypto.randomBytes(12).toString('hex')}`;
+            await storage.createToken(token, await this.encrypt(data));
+            return token;
+        } catch (error) {
+            console.error('[SECURITY] Tokenization failed:', error);
+            throw new Error("Failed to tokenize data");
+        }
     }
 
     async detokenize(token: string): Promise<string> {
-        const encryptedData = await storage.getToken(token);
-        if (!encryptedData) throw new Error("Invalid token");
-        return await this.decrypt(encryptedData);
+        try {
+            const encryptedData = await storage.getToken(token);
+            if (!encryptedData) throw new Error("Invalid token");
+            return await this.decrypt(encryptedData);
+        } catch (error: any) {
+            console.error('[SECURITY] Detokenization failed:', error.message);
+            throw error;
+        }
     }
 
     /**
      * Compliance Readiness Engine
      */
     async getComplianceStatus(tenantId: string): Promise<any> {
-        const logs = await storage.getAuditLogsByTenant(tenantId);
-        const tenant = await storage.getTenant(tenantId);
+        try {
+            const logs = await storage.getAuditLogsByTenant(tenantId);
+            const tenant = await storage.getTenant(tenantId);
 
-        const checks = [
-            { name: "Audit Trail active", pass: logs.length > 0, weight: 25 },
-            { name: "AES-256 Encryption active", pass: true, weight: 25 },
-            { name: "MFA Enforcement", pass: (tenant?.mfaEnforced || false), weight: 25 },
-            { name: "Isolation (Multi-tenant)", pass: true, weight: 25 }
-        ];
+            const checks = [
+                { name: "Audit Trail active", pass: (logs?.length || 0) > 0, weight: 25 },
+                { name: "AES-256 Encryption active", pass: true, weight: 25 },
+                { name: "MFA Enforcement", pass: (tenant?.mfaEnforced || false), weight: 25 },
+                { name: "Isolation (Multi-tenant)", pass: true, weight: 25 }
+            ];
 
-        const readinessScore = checks.reduce((acc, check) => acc + (check.pass ? check.weight : 0), 0);
+            const readinessScore = checks.reduce((acc, check) => acc + (check.pass ? check.weight : 0), 0);
 
-        return {
-            readinessScore,
-            lastAssessment: new Date().toISOString(),
-            status: readinessScore >= 75 ? 'READY' : readinessScore >= 50 ? 'IN_PROGRESS' : 'GAP_ANALYSIS_REQUIRED',
-            checks
-        };
+            return {
+                readinessScore,
+                lastAssessment: new Date().toISOString(),
+                status: readinessScore >= 75 ? 'READY' : readinessScore >= 50 ? 'IN_PROGRESS' : 'GAP_ANALYSIS_REQUIRED',
+                checks
+            };
+        } catch (error) {
+            console.error('[SECURITY] Compliance status check failed:', error);
+            return {
+                readinessScore: 0,
+                lastAssessment: new Date().toISOString(),
+                status: 'ERROR',
+                checks: [],
+                message: "Failed to retrieve compliance status"
+            };
+        }
     }
 }
 

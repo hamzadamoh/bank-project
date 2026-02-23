@@ -427,6 +427,7 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const record: KycRecord = {
       ...insertRecord,
+      tenantId: insertRecord.tenantId || "tenant_default",
       notes: insertRecord.notes ?? null,
       id,
       createdAt: new Date()
@@ -450,6 +451,7 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const assessment: CreditAssessment = {
       ...insertAssessment,
+      tenantId: insertAssessment.tenantId || "tenant_default",
       metadata: insertAssessment.metadata ?? null,
       id,
       createdAt: new Date()
