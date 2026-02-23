@@ -3,11 +3,27 @@ import { pgTable, text, varchar, timestamp, jsonb, boolean } from "drizzle-orm/p
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const tenants = pgTable("tenants", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  region: text("region").notNull().default("Morocco"), // Data Residency: 'Morocco', 'EU', 'US'
+  tier: text("tier").notNull().default("Starter"), // 'Starter', 'Professional', 'Enterprise'
+  queryLimit: text("query_limit").notNull().default("100"),
+  retentionDays: text("retention_days").notNull().default("30"), // Default 30 days retention
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  password: text("password").notNull(), // This will store the hash
   tenantId: text("tenant_id").notNull().default("tenant_default"),
+  role: text("role").notNull().default("client"), // 'client', 'admin'
+  consentSettings: jsonb("consent_settings").notNull().default({
+    analytics: true,
+    marketing: false,
+    thirdParty: false
+  }),
 });
 
 export const auditLogs = pgTable("audit_logs", {
@@ -118,8 +134,14 @@ export const creditAssessments = pgTable("credit_assessments", {
 // Zod schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
-  password: true,
+  password: true, // Plain text during input, hashed before storage
   tenantId: true,
+  role: true,
+});
+
+export const insertTenantSchema = createInsertSchema(tenants).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
@@ -205,3 +227,6 @@ export type KycRecord = typeof kycRecords.$inferSelect;
 
 export type InsertCreditAssessment = z.infer<typeof insertCreditAssessmentSchema>;
 export type CreditAssessment = typeof creditAssessments.$inferSelect;
+
+export type InsertTenant = z.infer<typeof insertTenantSchema>;
+export type Tenant = typeof tenants.$inferSelect;

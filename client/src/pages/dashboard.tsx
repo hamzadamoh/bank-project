@@ -32,7 +32,19 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { Order } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, ShieldOff, Trash2, Lock, RefreshCw } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Switch } from "@/components/ui/switch";
+
+interface UsageStats {
+    totalRevenue: string;
+    activeOrders: number;
+    aiRequests: number;
+    tokensSaved: string;
+    distribution: Array<{ label: string; value: number; color: string }>;
+    revenueTrend: number[];
+}
 
 const AIInsightsPanel = ({ userRole }: { userRole: string }) => {
     const adminInsights = [
@@ -129,7 +141,16 @@ const AuditLogTab = () => {
     );
 };
 
-const UsageAnalyticsTab = () => {
+const UsageAnalyticsTab = ({ stats }: { stats?: UsageStats }) => {
+    const displayStats = stats || {
+        distribution: [
+            { label: "Tax Counsel", value: 65, color: "bg-emerald-400" },
+            { label: "Query Architect", value: 20, color: "bg-blue-400" },
+            { label: "OmniServe", value: 15, color: "bg-slate-400" },
+        ],
+        revenueTrend: [30, 45, 25, 60, 80, 55, 90]
+    };
+
     return (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
             <div className="grid md:grid-cols-2 gap-8">
@@ -139,11 +160,7 @@ const UsageAnalyticsTab = () => {
                         AI Token Distribution
                     </h3>
                     <div className="space-y-4">
-                        {[
-                            { label: "Tax Counsel", value: 65, color: "bg-emerald-400" },
-                            { label: "Query Architect", value: 20, color: "bg-blue-400" },
-                            { label: "OmniServe", value: 15, color: "bg-slate-400" },
-                        ].map((item, i) => (
+                        {displayStats.distribution.map((item, i) => (
                             <div key={i}>
                                 <div className="flex justify-between text-xs font-bold mb-2">
                                     <span>{item.label}</span>
@@ -162,7 +179,7 @@ const UsageAnalyticsTab = () => {
                         Spend Analytics (Monthly)
                     </h3>
                     <div className="flex items-end justify-between h-32 gap-2">
-                        {[30, 45, 25, 60, 80, 55, 90].map((h, i) => (
+                        {displayStats.revenueTrend.map((h, i) => (
                             <div key={i} className="flex-1 bg-ink-950/10 rounded-t-lg relative group">
                                 <motion.div
                                     initial={{ height: 0 }}
@@ -221,12 +238,13 @@ const SystemHealth = () => {
 export default function Dashboard() {
     const { toast } = useToast();
     const [location, setLocation] = useLocation();
-    const [userRole, setUserRole] = useState("client");
-    const [isLoading, setIsLoading] = useState(true);
+    const { user, logoutMutation } = useAuth();
     const [activeTab, setActiveTab] = useState("overview");
     const [searchQuery, setSearchQuery] = useState("");
     const [showNotifications, setShowNotifications] = useState(false);
     const [theme, setTheme] = useState(() => localStorage.getItem("fiscai_theme") || "light");
+
+    const userRole = user?.role || "client";
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -246,24 +264,58 @@ export default function Dashboard() {
         });
     };
 
-    useEffect(() => {
-        const savedRole = localStorage.getItem("fiscai_user_role");
-        if (savedRole) {
-            setUserRole(savedRole);
-            // Non-admins shouldn't stay on users tab if they somehow got there
-            if (savedRole === "client" && activeTab === "users") {
-                setActiveTab("overview");
-            }
-        }
-        setIsLoading(false);
-    }, [activeTab]);
-
     const { data: orders, isLoading: isLoadingOrders } = useQuery<{ success: boolean; data: Order[] }>({
         queryKey: ["/api/orders"],
     });
 
-    const handleLogout = () => {
-        localStorage.removeItem("fiscai_user_role");
+    const { data: stats } = useQuery<UsageStats>({
+        queryKey: ["/api/analytics/usage"],
+        enabled: !!user,
+    });
+
+    const queryClient = useQueryClient();
+
+    const { mutate: updatePrivacy, isPending: isUpdatingPrivacy } = useMutation({
+        mutationFn: async (settings: any) => {
+            const res = await fetch("/api/user/me/privacy", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(settings),
+            });
+            if (!res.ok) throw new Error("Failed to update privacy settings");
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+            toast({ title: "Privacy Updated ✅", description: "Your data consumption preferences are now active." });
+        }
+    });
+
+    const { mutate: deleteAccount, isPending: isDeletingAccount } = useMutation({
+        mutationFn: async () => {
+            const res = await fetch("/api/user/me", { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to delete account");
+            return res.json();
+        },
+        onSuccess: () => {
+            toast({ title: "Account Erased 🛡️", description: "Right to Erasure fulfilled. All data has been permanently deleted." });
+            setLocation("/login");
+        }
+    });
+
+    const { mutate: purgeOldData, isPending: isPurging } = useMutation({
+        mutationFn: async () => {
+            const res = await fetch("/api/admin/purge-old-data", { method: "POST" });
+            if (!res.ok) throw new Error("Purge failed");
+            return res.json();
+        },
+        onSuccess: () => {
+            toast({ title: "Data Retention Applied", description: "Old records have been manually purged from the system." });
+        }
+    });
+
+    const handleLogout = async () => {
+        await logoutMutation.mutateAsync();
         setLocation("/login");
     };
 
@@ -463,14 +515,14 @@ export default function Dashboard() {
                         <div className="flex items-center gap-3 pl-6 border-l border-alabaster-100">
                             <div className="text-right">
                                 <p className="text-sm font-bold text-ink-950 leading-none">
-                                    {userRole === "admin" ? "Admin User" : "Client User"}
+                                    {user?.username || "Guest"}
                                 </p>
-                                <p className="text-xs text-slate-500 mt-1">
-                                    {userRole === "admin" ? "Global Admin" : "Standard access"}
+                                <p className="text-xs text-slate-500 mt-1 uppercase">
+                                    {userRole}
                                 </p>
                             </div>
                             <div className="w-10 h-10 rounded-xl bg-ink-950 flex items-center justify-center text-alabaster-50 font-bold">
-                                {userRole === "admin" ? "AU" : "CU"}
+                                {(user?.username || "G").charAt(0).toUpperCase()}
                             </div>
                         </div>
                     </div>
@@ -490,10 +542,10 @@ export default function Dashboard() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     {[
-                                        { label: "Total Revenue", value: userRole === "admin" ? "$124,592" : "$4,250", icon: CreditCard, color: "text-emerald-500", trend: "+12.5%" },
-                                        { label: "Active Orders", value: userRole === "admin" ? "84" : "12", icon: Package, color: "text-blue-500", trend: "+5.2%" },
-                                        { label: "AI Requests", value: userRole === "admin" ? "2,401" : "342", icon: Zap, color: "text-amber-500", trend: "+25.1%" },
-                                        { label: userRole === "admin" ? "User Growth" : "Tokens Saved", value: userRole === "admin" ? "+12%" : "45k", icon: TrendingUp, color: "text-purple-500", trend: "+2.3%" },
+                                        { label: "Total Revenue", value: stats?.totalRevenue || "$0", icon: CreditCard, color: "text-emerald-500", trend: "+12.5%" },
+                                        { label: "Active Orders", value: stats?.activeOrders || 0, icon: Package, color: "text-blue-500", trend: "+5.2%" },
+                                        { label: "AI Requests", value: stats?.aiRequests || 0, icon: Zap, color: "text-amber-500", trend: "+25.1%" },
+                                        { label: userRole === "admin" ? "User Growth" : "Tokens Saved", value: userRole === "admin" ? "+12%" : (stats?.tokensSaved || "0"), icon: TrendingUp, color: "text-purple-500", trend: "+2.3%" },
                                     ].map((stat, i) => (
                                         <GlassCard key={i} className="p-6">
                                             <div className="flex justify-between items-start mb-4">
@@ -665,7 +717,7 @@ export default function Dashboard() {
                         )}
 
                         {activeTab === "analytics" && userRole === "client" && (
-                            <UsageAnalyticsTab />
+                            <UsageAnalyticsTab stats={stats} />
                         )}
 
                         {activeTab === "users" && userRole === "admin" && (
@@ -844,6 +896,95 @@ export default function Dashboard() {
                                                 </div>
                                             ))}
                                             <Button variant="outline" className="w-full" onClick={() => handleAction("Configure Advanced Alerts")}>Configure Advanced Alerts</Button>
+                                        </GlassCard>
+                                    </div>
+
+                                    <div className="md:col-span-1">
+                                        <h3 className="font-bold text-ink-950 mb-2">Privacy & Data</h3>
+                                        <p className="text-sm text-slate-500">Exercise your GDPR rights including Erasure and Portability.</p>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <GlassCard className="p-8 space-y-8">
+                                            <div className="space-y-6">
+                                                <h4 className="text-sm font-bold text-ink-950 uppercase tracking-widest flex items-center gap-2">
+                                                    <Lock className="w-4 h-4 text-emerald-500" />
+                                                    Consent Management
+                                                </h4>
+
+                                                <div className="space-y-4">
+                                                    {[
+                                                        { id: "analytics", label: "Analytics Tracking", desc: "Allow FiscAI to use your anonymized data to improve AI models." },
+                                                        { id: "marketing", label: "Product Marketing", desc: "Receive updates about new Enterprise features and tax regulations." },
+                                                        { id: "thirdParty", label: "Third-Party Integration", desc: "Share relevant data with authorized tax advisory partners." },
+                                                    ].map((pref) => (
+                                                        <div key={pref.id} className="flex items-center justify-between">
+                                                            <div>
+                                                                <p className="text-sm font-bold text-ink-950">{pref.label}</p>
+                                                                <p className="text-xs text-slate-500">{pref.desc}</p>
+                                                            </div>
+                                                            <Switch
+                                                                defaultChecked={(user?.consentSettings as any)?.[pref.id]}
+                                                                onCheckedChange={(checked) => {
+                                                                    const newSettings = { ...(user?.consentSettings as any || {}), [pref.id]: checked };
+                                                                    updatePrivacy(newSettings);
+                                                                }}
+                                                                disabled={isUpdatingPrivacy}
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-8 border-t border-alabaster-100 space-y-6">
+                                                <h4 className="text-sm font-bold text-ink-950 uppercase tracking-widest flex items-center gap-2">
+                                                    <RefreshCw className="w-4 h-4 text-blue-500" />
+                                                    Data Retention
+                                                </h4>
+                                                <div className="p-4 bg-alabaster-50 rounded-xl border border-alabaster-100">
+                                                    <p className="text-sm text-slate-600 leading-relaxed">
+                                                        Your organization follows a <span className="font-bold text-ink-950">30-day retention policy</span>.
+                                                        Transaction logs and query histories older than 30 days are automatically purged from our production clusters.
+                                                    </p>
+                                                    {userRole === "admin" && (
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="mt-4 border-slate-200 hover:bg-white"
+                                                            onClick={() => purgeOldData()}
+                                                            disabled={isPurging}
+                                                        >
+                                                            <RefreshCw className={`w-4 h-4 mr-2 ${isPurging ? 'animate-spin' : ''}`} />
+                                                            Apply Retention Policy Now
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-8 border-t border-red-100 space-y-6">
+                                                <h4 className="text-sm font-bold text-red-600 uppercase tracking-widest flex items-center gap-2">
+                                                    <ShieldOff className="w-4 h-4" />
+                                                    Right to Erasure
+                                                </h4>
+                                                <div className="space-y-4">
+                                                    <p className="text-sm text-slate-500">
+                                                        Deleting your account will permanently erase all associated data, including query history,
+                                                        compliance records, and identity verification data. <span className="font-bold text-red-600">This action is irreversible.</span>
+                                                    </p>
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="text-red-600 hover:bg-red-50 hover:text-red-700 p-0 h-auto font-bold flex items-center gap-2"
+                                                        onClick={() => {
+                                                            if (confirm("Are you absolutely sure? This will delete all your data permanently.")) {
+                                                                deleteAccount();
+                                                            }
+                                                        }}
+                                                        disabled={isDeletingAccount}
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                        Delete Account and All Data
+                                                    </Button>
+                                                </div>
+                                            </div>
                                         </GlassCard>
                                     </div>
                                 </div>

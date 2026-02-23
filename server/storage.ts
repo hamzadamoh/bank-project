@@ -20,7 +20,9 @@ import {
   type KycRecord,
   type InsertKycRecord,
   type CreditAssessment,
-  type InsertCreditAssessment
+  type InsertCreditAssessment,
+  type Tenant,
+  type InsertTenant
 } from "../shared/schema.js";
 import { randomUUID } from "crypto";
 
@@ -32,6 +34,18 @@ export interface IStorage {
   // Audit Logs (New)
   createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
   getAuditLogsByTenant(tenantId: string): Promise<AuditLog[]>;
+
+  // Tenants
+  createTenant(tenant: InsertTenant): Promise<Tenant>;
+  getTenant(id: string): Promise<Tenant | undefined>;
+  getTenantByName(name: string): Promise<Tenant | undefined>;
+
+  // Analytics
+  getUsageStats(tenantId: string): Promise<{
+    analytics: { label: string; value: number; color: string }[];
+    spend: number[];
+    efficiency: number;
+  }>;
 
   // Demo requests (Tenant independent for now)
   createDemoRequest(demoRequest: InsertDemoRequest): Promise<DemoRequest>;
@@ -78,6 +92,11 @@ export interface IStorage {
   createCreditAssessment(assessment: InsertCreditAssessment): Promise<CreditAssessment>;
   getCreditAssessmentsByTenant(tenantId: string): Promise<CreditAssessment[]>;
   getCreditAssessment(id: string): Promise<CreditAssessment | undefined>;
+
+  // Privacy & Data (New)
+  deleteUserAccount(userId: string): Promise<void>;
+  updateUserConsent(userId: string, settings: any): Promise<void>;
+  applyRetentionPolicy(tenantId: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -92,6 +111,7 @@ export class MemStorage implements IStorage {
   private auditLogs: Map<string, AuditLog>;
   private kycRecords: Map<string, KycRecord>;
   private creditAssessments: Map<string, CreditAssessment>;
+  private tenants: Map<string, Tenant>;
 
   constructor() {
     this.users = new Map();
@@ -105,6 +125,15 @@ export class MemStorage implements IStorage {
     this.auditLogs = new Map();
     this.kycRecords = new Map();
     this.creditAssessments = new Map();
+    this.tenants = new Map();
+
+    // Seed default tenant
+    this.createTenant({
+      name: "Default Tenant",
+      region: "Morocco",
+      tier: "Starter",
+      queryLimit: "100"
+    });
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -119,7 +148,17 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id, tenantId: insertUser.tenantId || "tenant_default" };
+    const user: User = {
+      ...insertUser,
+      id,
+      tenantId: insertUser.tenantId || "tenant_default",
+      role: insertUser.role || "client",
+      consentSettings: {
+        analytics: true,
+        marketing: false,
+        thirdParty: false
+      }
+    };
     this.users.set(id, user);
     return user;
   }
@@ -142,6 +181,63 @@ export class MemStorage implements IStorage {
     return Array.from(this.auditLogs.values())
       .filter(log => log.tenantId === tenantId)
       .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  // Tenants
+  async createTenant(insertTenant: InsertTenant): Promise<Tenant> {
+    const id = insertTenant.name === "Default Tenant" ? "tenant_default" : randomUUID();
+    const tenant: Tenant = {
+      ...insertTenant,
+      id,
+      createdAt: new Date(),
+      region: insertTenant.region || "Morocco",
+      tier: insertTenant.tier || "Starter",
+      queryLimit: insertTenant.queryLimit || "100",
+      retentionDays: insertTenant.retentionDays || "30"
+    };
+    this.tenants.set(id, tenant);
+    return tenant;
+  }
+
+  async getTenant(id: string): Promise<Tenant | undefined> {
+    return this.tenants.get(id);
+  }
+
+  async getTenantByName(name: string): Promise<Tenant | undefined> {
+    return Array.from(this.tenants.values()).find(t => t.name === name);
+  }
+
+  // Analytics
+  async getUsageStats(tenantId: string): Promise<{
+    analytics: { label: string; value: number; color: string }[];
+    spend: number[];
+    efficiency: number;
+  }> {
+    const logs = Array.from(this.auditLogs.values()).filter(l => l.tenantId === tenantId);
+
+    // Calculate module distribution
+    const counts: Record<string, number> = {
+      "TAX_COUNSEL": logs.filter(l => l.resource === "TAX_COUNSEL").length,
+      "QUERY_ARCHITECT": logs.filter(l => l.resource === "QUERY_ARCHITECT").length,
+      "OMNISERVE": logs.filter(l => l.resource === "OMNISERVE").length,
+    };
+
+    const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
+
+    const analytics = [
+      { label: "Tax Counsel", value: Math.round((counts.TAX_COUNSEL / total) * 100), color: "bg-emerald-400" },
+      { label: "Query Architect", value: Math.round((counts.QUERY_ARCHITECT / total) * 100), color: "bg-blue-400" },
+      { label: "OmniServe", value: Math.round((counts.OMNISERVE / total) * 100), color: "bg-slate-400" },
+    ];
+
+    // Mock spend (for now, based on query volume)
+    const spend = [30, 45, 25, 60, 80, 55, logs.length % 100];
+
+    return {
+      analytics,
+      spend,
+      efficiency: 92 // Logic for efficiency could be more complex
+    };
   }
 
   // Demo requests
@@ -356,6 +452,64 @@ export class MemStorage implements IStorage {
 
   async getCreditAssessment(id: string): Promise<CreditAssessment | undefined> {
     return this.creditAssessments.get(id);
+  }
+
+  // Privacy & Data
+  async deleteUserAccount(userId: string): Promise<void> {
+    const user = this.users.get(userId);
+    if (!user) return;
+
+    // 1. Delete all audit logs for this user
+    for (const [id, log] of Array.from(this.auditLogs.entries())) {
+      if (log.userId === userId) this.auditLogs.delete(id);
+    }
+
+    // 2. Delete all KYC records for this user
+    for (const [id, record] of Array.from(this.kycRecords.entries())) {
+      if (record.userId === userId) this.kycRecords.delete(id);
+    }
+
+    // 3. Delete all Credit Assessments for this user
+    for (const [id, assessment] of Array.from(this.creditAssessments.entries())) {
+      if (assessment.userId === userId) this.creditAssessments.delete(id);
+    }
+
+    // 4. Finally, delete the user
+    this.users.delete(userId);
+  }
+
+  async updateUserConsent(userId: string, settings: any): Promise<void> {
+    const user = this.users.get(userId);
+    if (!user) throw new Error("User not found");
+
+    this.users.set(userId, { ...user, consentSettings: settings });
+  }
+
+  async applyRetentionPolicy(tenantId: string): Promise<void> {
+    const tenant = await this.getTenant(tenantId);
+    if (!tenant) return;
+
+    const days = parseInt(tenant.retentionDays || "30");
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+
+    // Filter and delete old records across all tenant-isolated tables
+    const tables = [
+      this.taxQueries,
+      this.sqlQueries,
+      this.documentAnalysis,
+      this.orders,
+      this.auditLogs
+    ];
+
+    for (const table of tables) {
+      for (const [id, record] of Array.from(table.entries())) {
+        const createdAt = (record as any).createdAt;
+        if ((record as any).tenantId === tenantId && createdAt && createdAt < cutoff) {
+          table.delete(id);
+        }
+      }
+    }
   }
 }
 

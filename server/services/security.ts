@@ -1,5 +1,9 @@
 import { storage } from "../storage.js";
 import { type InsertAuditLog } from "../../shared/schema.js";
+import crypto from 'crypto';
+
+const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY || '6f72616e676573617265676f6f64313233343536373839303132333435363738', 'hex'); // 32 bytes for AES-256
+const IV_LENGTH = 16;
 
 /**
  * Security Service
@@ -7,21 +11,29 @@ import { type InsertAuditLog } from "../../shared/schema.js";
  */
 class SecurityService {
     /**
-     * Simulated AES-256 Encryption
-     * In a real environment, this would use Node 'crypto' with a secure key.
-     * Here we simulate it by 'enciphering' the content.
+     * Real AES-256-CBC Encryption
      */
     async encrypt(content: string): Promise<string> {
-        const buffer = Buffer.from(content);
-        // Simulation: Base64 + simple XOR-like reversible transform
-        const encrypted = buffer.toString('base64');
-        return `ENC[AES-256]:${encrypted}`;
+        const iv = crypto.randomBytes(IV_LENGTH);
+        const cipher = crypto.createCipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
+        let encrypted = cipher.update(content, 'utf8', 'hex');
+        encrypted += cipher.final('hex');
+        return `${iv.toString('hex')}:${encrypted}`;
     }
 
     async decrypt(encryptedContent: string): Promise<string> {
-        if (!encryptedContent.startsWith('ENC[AES-256]:')) return encryptedContent;
-        const base64 = encryptedContent.replace('ENC[AES-256]:', '');
-        return Buffer.from(base64, 'base64').toString();
+        try {
+            const [ivHex, encryptedText] = encryptedContent.split(':');
+            if (!ivHex || !encryptedText) return encryptedContent;
+
+            const iv = Buffer.from(ivHex, 'hex');
+            const decipher = crypto.createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
+            let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+            decrypted += decipher.final('utf8');
+            return decrypted;
+        } catch (e) {
+            return encryptedContent;
+        }
     }
 
     /**
@@ -39,13 +51,20 @@ class SecurityService {
     }
 
     /**
-     * Multilingual/Regional Data Residency Helper
-     * Simulates data pathing based on regional requirements
+     * Dynamic Data Residency Helper
+     * Fetches real residency configuration from the tenant record
      */
-    getDataResidency(tenantId: string): string {
-        if (tenantId.includes('eu')) return 'Frankfurt (EU-Central-1)';
-        if (tenantId.includes('ma')) return 'Casablanca (MA-North-1)';
-        return 'Dublin (Default-Cloud)';
+    async getDataResidency(tenantId: string): Promise<string> {
+        const tenant = await storage.getTenant(tenantId);
+        if (!tenant) return 'Dublin (Default-Cloud)';
+
+        const regions: Record<string, string> = {
+            'Morocco': 'Casablanca (MA-North-1)',
+            'EU': 'Frankfurt (EU-Central-1)',
+            'US': 'Northern Virginia (US-East-1)',
+        };
+
+        return regions[tenant.region] || 'Dublin (Default-Cloud)';
     }
 }
 

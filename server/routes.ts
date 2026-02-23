@@ -26,16 +26,34 @@ import { financialAssessor } from "./services/financial-assessor.js";
 // Configure multer for memory storage
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Simulated Tenant Context Middleware
-const tenantContext = (req: any, res: any, next: any) => {
-  // In a real app, this would come from JWT/Auth
-  req.tenantId = "bank_alpha_eu"; // Simulated European Bank tenant
-  req.userId = "user_alpha_admin";
+// Auth & Security Middlewares
+const isAuthenticated = (req: any, res: any, next: any) => {
+  if (req.isAuthenticated()) return next();
+  res.status(401).json({ message: "Unauthorized" });
+};
+
+const isAdmin = (req: any, res: any, next: any) => {
+  if (req.isAuthenticated() && req.user?.role === 'admin') return next();
+  res.status(403).json({ message: "Forbidden: Admin access required" });
+};
+
+const checkTierLimit = async (req: any, res: any, next: any) => {
+  if (!req.isAuthenticated()) return next();
+  const tenant = await storage.getTenant(req.user!.tenantId);
+  if (!tenant) return next();
+
+  const logs = await storage.getAuditLogsByTenant(req.user!.tenantId);
+  if (logs.length >= parseInt(tenant.queryLimit)) {
+    return res.status(403).json({
+      message: "Tier limit reached",
+      limit: tenant.queryLimit,
+      usage: logs.length
+    });
+  }
   next();
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  app.use(tenantContext);
 
   // Demo request endpoint (Public-ish)
   app.post("/api/demo-requests", async (req, res) => {
@@ -68,10 +86,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Tax counsel query endpoint
-  app.post("/api/tax-queries", async (req, res) => {
+  app.post("/api/tax-queries", isAuthenticated, checkTierLimit, async (req, res) => {
     try {
       const { query, jurisdiction } = req.body;
-      const tenantId = (req as any).tenantId;
+      const tenantId = req.user!.tenantId;
 
       if (!query || !jurisdiction) {
         return res.status(400).json({ success: false, message: "Query and jurisdiction are required" });
@@ -82,7 +100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Audit Logging
       await securityService.logAction({
         tenantId,
-        userId: (req as any).userId,
+        userId: req.user!.id,
         action: 'QUERY',
         resource: 'TAX_COUNSEL',
         details: `Complex tax query processed for jurisdiction: ${jurisdiction}`,
@@ -106,10 +124,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // SQL query conversion endpoint
-  app.post("/api/sql-queries", async (req, res) => {
+  app.post("/api/sql-queries", isAuthenticated, checkTierLimit, async (req, res) => {
     try {
       const { type, input } = req.body;
-      const tenantId = (req as any).tenantId;
+      const tenantId = req.user!.tenantId;
 
       if (!type || !input) {
         return res.status(400).json({ success: false, message: "Type and input are required" });
@@ -120,7 +138,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Audit Logging
       await securityService.logAction({
         tenantId,
-        userId: (req as any).userId,
+        userId: req.user!.id,
         action: 'QUERY',
         resource: 'QUERY_ARCHITECT',
         details: `SQL conversion: ${type}`,
@@ -143,10 +161,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Document analysis endpoint
-  app.post("/api/document-analysis", async (req, res) => {
+  app.post("/api/document-analysis", isAuthenticated, checkTierLimit, async (req, res) => {
     try {
       const { filename, fileContent, fileType } = req.body;
-      const tenantId = (req as any).tenantId;
+      const tenantId = req.user!.tenantId;
 
       const analysisResult = await analyzeDocument({
         filename: filename || 'uploaded_document',
@@ -157,7 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Audit Logging
       await securityService.logAction({
         tenantId,
-        userId: (req as any).userId,
+        userId: req.user!.id,
         action: 'QUERY',
         resource: 'FACTORING_GUARDIAN',
         details: `Document analysis completed for: ${filename}`,
@@ -206,10 +224,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // OmniServe chat endpoint
-  app.post("/api/chat", async (req, res) => {
+  app.post("/api/chat", isAuthenticated, checkTierLimit, async (req, res) => {
     try {
       const { message, conversationId, language } = req.body;
-      const tenantId = (req as any).tenantId;
+      const tenantId = req.user!.tenantId;
 
       if (!message) return res.status(400).json({ success: false, message: "Message is required" });
 
@@ -218,7 +236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Audit Logging
       await securityService.logAction({
         tenantId,
-        userId: (req as any).userId,
+        userId: req.user!.id,
         action: 'QUERY',
         resource: 'OMNISERVE',
         details: `Chat interaction processed`,
@@ -233,10 +251,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // OmniServe voice chat endpoint
-  app.post("/api/omniserve/voice", upload.single('audio'), async (req, res) => {
+  app.post("/api/omniserve/voice", isAuthenticated, checkTierLimit, upload.single('audio'), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ success: false, message: "No audio file provided" });
-      const tenantId = (req as any).tenantId;
+      const tenantId = req.user!.tenantId;
 
       const transcription = await transcribeAudioWithGroq(req.file.buffer);
       if (!transcription || transcription.trim().length === 0) {
@@ -248,7 +266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Audit Logging
       await securityService.logAction({
         tenantId,
-        userId: (req as any).userId,
+        userId: req.user!.id,
         action: 'QUERY',
         resource: 'OMNISERVE_VOICE',
         details: `Voice interaction processed`,
@@ -263,17 +281,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Rhalia wellbeing analysis endpoint
-  app.post("/api/wellbeing-analysis", async (req, res) => {
+  app.post("/api/wellbeing-analysis", isAuthenticated, checkTierLimit, async (req, res) => {
     try {
       const { physicalMetrics, mentalMetrics, socialMetrics } = req.body;
-      const tenantId = (req as any).tenantId;
+      const tenantId = req.user!.tenantId;
 
       const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
 
       // Audit Logging
       await securityService.logAction({
         tenantId,
-        userId: (req as any).userId,
+        userId: req.user!.id,
         action: 'QUERY',
         resource: 'RHALIA',
         details: `Wellbeing analysis processed`,
@@ -288,17 +306,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // SatisfAI satisfaction analysis endpoint
-  app.post("/api/satisfaction-analysis", async (req, res) => {
+  app.post("/api/satisfaction-analysis", isAuthenticated, checkTierLimit, async (req, res) => {
     try {
       const { responses, context } = req.body;
-      const tenantId = (req as any).tenantId;
+      const tenantId = req.user!.tenantId;
 
       const analysis = await analyzeSatisfaction({ responses });
 
       // Audit Logging
       await securityService.logAction({
         tenantId,
-        userId: (req as any).userId,
+        userId: req.user!.id,
         action: 'QUERY',
         resource: 'SATISFAI',
         details: `Satisfaction analysis processed`,
@@ -313,12 +331,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // KYC Submission endpoint
-  app.post("/api/kyc/submit", upload.single('document'), async (req, res) => {
+  app.post("/api/kyc/submit", isAuthenticated, checkTierLimit, upload.single('document'), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ success: false, message: "No document provided" });
       const { documentType } = req.body;
-      const tenantId = (req as any).tenantId;
-      const userId = (req as any).userId;
+      const tenantId = req.user!.tenantId;
+      const userId = req.user!.id;
 
       const kycResult = await financialAssessor.processKyc({
         documentType: documentType || 'ID_CARD',
@@ -354,11 +372,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Credit Risk Assessment endpoint
-  app.post("/api/credit-risk/assess", async (req, res) => {
+  app.post("/api/credit-risk/assess", isAuthenticated, checkTierLimit, async (req, res) => {
     try {
       const { financialData, context } = req.body;
-      const tenantId = (req as any).tenantId;
-      const userId = (req as any).userId;
+      const tenantId = req.user!.tenantId;
+      const userId = req.user!.id;
 
       if (!financialData) return res.status(400).json({ success: false, message: "Financial data is required" });
 
@@ -409,9 +427,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Orders endpoints
-  app.get("/api/orders", async (req, res) => {
+  app.get("/api/orders", isAuthenticated, async (req, res) => {
     try {
-      const tenantId = (req as any).tenantId;
+      const tenantId = req.user!.tenantId;
       const orders = await storage.getOrdersByTenant(tenantId);
       res.json({ success: true, data: orders });
     } catch (error) {
@@ -419,10 +437,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/orders", async (req, res) => {
+  app.post("/api/orders", isAuthenticated, async (req, res) => {
     try {
       const validatedData = insertOrderSchema.parse(req.body);
-      const tenantId = (req as any).tenantId;
+      const tenantId = req.user!.tenantId;
       const order = await storage.createOrder({ ...validatedData, tenantId });
       res.json({ success: true, data: order });
     } catch (error) {
@@ -434,12 +452,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Privacy & Data endpoints
+  app.put("/api/user/me/privacy", isAuthenticated, async (req, res) => {
+    try {
+      await storage.updateUserConsent(req.user!.id, req.body);
+      res.json({ success: true, message: "Consent settings updated" });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Failed to update consent" });
+    }
+  });
+
+  app.delete("/api/user/me", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      await storage.deleteUserAccount(userId);
+      req.logout((err) => {
+        if (err) return res.status(500).json({ success: false, message: "Logout failed during deletion" });
+        res.json({ success: true, message: "Account and all associated data deleted successfully" });
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Account deletion failed" });
+    }
+  });
+
+  app.post("/api/admin/purge-old-data", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      await storage.applyRetentionPolicy(req.user!.tenantId);
+      res.json({ success: true, message: "Data retention policy applied. Old records purged." });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Data purge failed" });
+    }
+  });
+
+  // Analytics endpoints
+  app.get("/api/analytics/usage", isAuthenticated, async (req, res) => {
+    try {
+      const stats = await storage.getUsageStats(req.user!.tenantId);
+      res.json({ success: true, ...stats });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Failed to fetch analytics" });
+    }
+  });
+
   // Health check endpoint (Public)
-  app.get("/api/health", (req, res) => {
+  app.get("/api/health", async (req, res) => {
+    const tenantId = req.user?.tenantId || "default";
+    const residency = await securityService.getDataResidency(tenantId);
     res.json({
       success: true,
-      message: "FiscAI API is running (Bank-Grade Security Active)",
-      residency: securityService.getDataResidency((req as any).tenantId || "default"),
+      status: "Healthy",
+      version: "1.2.0-Enterprise",
+      residency,
+      services: {
+        database: "Connected",
+        ai_gateway: "Active",
+        encryption_node: "AES-256-GCM"
+      },
       timestamp: new Date().toISOString()
     });
   });

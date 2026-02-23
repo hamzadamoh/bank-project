@@ -94,16 +94,20 @@ function Router() {
   );
 }
 
+import { AuthProvider } from "./hooks/use-auth";
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <div className="min-h-screen bg-alabaster-50">
-          <Toaster />
-          <Router />
-          <VoiceChatbot />
-        </div>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <div className="min-h-screen bg-alabaster-50">
+            <Toaster />
+            <Router />
+            <VoiceChatbot />
+          </div>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

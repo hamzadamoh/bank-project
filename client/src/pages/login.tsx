@@ -12,17 +12,21 @@ import { Lock, Mail, Eye, EyeOff, Shield, User, Settings } from "lucide-react";
 
 type UserRole = "client" | "admin";
 
+import { useAuth } from "@/hooks/use-auth";
+
 export default function Login() {
     const { toast } = useToast();
     const [, setLocation] = useLocation();
+    const { loginMutation } = useAuth();
     const [role, setRole] = useState<UserRole>("client");
     const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const [form, setForm] = useState({
         email: "",
         password: "",
         rememberMe: false,
     });
+
+    const isLoading = loginMutation.isPending;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -36,23 +40,21 @@ export default function Login() {
             return;
         }
 
-        setIsLoading(true);
+        try {
+            await loginMutation.mutateAsync({
+                username: form.email,
+                password: form.password,
+            });
 
-        // Simulate authentication
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+            toast({
+                title: `Welcome back! 👋`,
+                description: `Signed in successfully. Redirecting to dashboard...`,
+            });
 
-        toast({
-            title: `Welcome back! 👋`,
-            description: `Signed in as ${role === "admin" ? "Administrator" : "Client"}. Redirecting to dashboard...`,
-        });
-
-        setIsLoading(false);
-
-        // Redirect to dashboard after brief delay
-        setTimeout(() => {
-            localStorage.setItem("fiscai_user_role", role);
             setLocation("/dashboard");
-        }, 1000);
+        } catch (error) {
+            // Error is handled by the mutation's onError
+        }
     };
 
     return (

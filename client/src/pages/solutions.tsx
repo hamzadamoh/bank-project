@@ -23,13 +23,7 @@ export default function Solutions() {
         "Real-time risk monitoring",
         "Automated audit preparation",
         "Enhanced customer experience"
-      ],
-      caseStudy: {
-        client: "Al Barid Bank",
-        challenge: "Manual invoice processing led to 15% fraud losses and 3-day processing delays",
-        solution: "Deployed Factoring Guardian for automated document analysis and anomaly detection",
-        results: "99.2% fraud detection accuracy, 90% processing time reduction, $2M annual savings"
-      }
+      ]
     },
     {
       id: "fintech",
@@ -48,13 +42,7 @@ export default function Solutions() {
         "99.9% API uptime guarantee",
         "Horizontal scaling capability",
         "Developer-friendly integration"
-      ],
-      caseStudy: {
-        client: "PayTech Morocco",
-        challenge: "Needed multilingual chatbot supporting French, Arabic, and Darija for customer service",
-        solution: "Implemented OmniServe with custom training data for financial services",
-        results: "78% automation rate, 45% reduction in support costs, 4.8/5 customer satisfaction"
-      }
+      ]
     },
     {
       id: "audit",
@@ -73,13 +61,7 @@ export default function Solutions() {
         "Comprehensive citation accuracy",
         "Risk-based audit approach",
         "Professional memo formatting"
-      ],
-      caseStudy: {
-        client: "KPMG Morocco",
-        challenge: "Tax research across multiple jurisdictions taking 4-6 hours per complex query",
-        solution: "Deployed FiscAI Tax Counsel with Morocco, EU, and OECD tax databases",
-        results: "85% time reduction, 100% citation accuracy, 300% increase in client capacity"
-      }
+      ]
     },
     {
       id: "smb",
@@ -98,13 +80,7 @@ export default function Solutions() {
         "Real-time financial visibility",
         "Simplified tax compliance",
         "Cost-effective automation"
-      ],
-      caseStudy: {
-        client: "Morocco SME Collective",
-        challenge: "200+ small businesses struggling with manual invoice processing and tax compliance",
-        solution: "Rolled out simplified Factoring Guardian and Tax Counsel interfaces",
-        results: "90% adoption rate, 60% time savings, 95% tax filing accuracy improvement"
-      }
+      ]
     }
   ];
 
@@ -187,81 +163,47 @@ export default function Solutions() {
               className={`py-24 px-6 lg:px-8 scroll-mt-20 ${index % 2 === 0 ? 'bg-white' : 'bg-alabaster-50'}`}
             >
               <div className="max-w-7xl mx-auto">
-                <div className="grid lg:grid-cols-2 gap-16 items-center">
-                  <div>
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-16 h-16 bg-champagne-200 rounded-2xl flex items-center justify-center">
-                        <IconComponent className="h-8 w-8 text-ink-950" />
-                      </div>
-                      <h2 className="font-display font-bold text-4xl text-ink-950">{solution.title}</h2>
+                <div className="max-w-3xl mx-auto">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-16 h-16 bg-champagne-200 rounded-2xl flex items-center justify-center">
+                      <IconComponent className="h-8 w-8 text-ink-950" />
                     </div>
-
-                    <p className="text-xl text-slate-700 mb-8">{solution.description}</p>
-
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="font-semibold text-ink-950 mb-4">Complete Feature Set</h3>
-                        <ul className="space-y-3">
-                          {solution.features.map((feature, featureIndex) => (
-                            <li key={featureIndex} className="flex items-start gap-3">
-                              <div className="w-5 h-5 bg-champagne-200 rounded-full flex items-center justify-center mt-0.5">
-                                <div className="w-2 h-2 bg-ink-950 rounded-full"></div>
-                              </div>
-                              <span className="text-slate-700">{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <h3 className="font-semibold text-ink-950 mb-4">Proven Benefits</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                          {solution.benefits.map((benefit, benefitIndex) => (
-                            <div key={benefitIndex} className="bg-white rounded-xl p-4 text-center">
-                              <div className="font-semibold text-emerald-400 text-sm">{benefit}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    <h2 className="font-display font-bold text-4xl text-ink-950">{solution.title}</h2>
                   </div>
 
-                  {/* Case Study */}
-                  <div>
-                    <GlassCard className="p-8">
-                      <div className="mb-6">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                          <span className="text-sm font-medium text-slate-600">Success Story</span>
-                        </div>
-                        <h3 className="font-display font-bold text-2xl text-ink-950 mb-2">
-                          {solution.caseStudy.client}
-                        </h3>
+                  <p className="text-xl text-slate-700 mb-8">{solution.description}</p>
+
+                  <div className="space-y-8">
+                    <div>
+                      <h3 className="font-semibold text-ink-950 mb-4 text-xl">Complete Feature Set</h3>
+                      <ul className="space-y-3">
+                        {solution.features.map((feature, featureIndex) => (
+                          <li key={featureIndex} className="flex items-start gap-3">
+                            <div className="w-5 h-5 bg-champagne-200 rounded-full flex items-center justify-center mt-0.5 shrink-0">
+                              <div className="w-2 h-2 bg-ink-950 rounded-full"></div>
+                            </div>
+                            <span className="text-slate-700">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold text-ink-950 mb-4 text-xl">Proven Benefits</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        {solution.benefits.map((benefit, benefitIndex) => (
+                          <div key={benefitIndex} className="bg-white rounded-xl p-4 text-center border border-alabaster-100 flex items-center justify-center">
+                            <div className="font-semibold text-emerald-400 text-sm leading-tight">{benefit}</div>
+                          </div>
+                        ))}
                       </div>
+                    </div>
 
-                      <div className="space-y-6">
-                        <div>
-                          <h4 className="font-semibold text-ink-950 mb-2">Challenge</h4>
-                          <p className="text-sm text-slate-700">{solution.caseStudy.challenge}</p>
-                        </div>
-
-                        <div>
-                          <h4 className="font-semibold text-ink-950 mb-2">Solution</h4>
-                          <p className="text-sm text-slate-700">{solution.caseStudy.solution}</p>
-                        </div>
-
-                        <div>
-                          <h4 className="font-semibold text-ink-950 mb-2">Results</h4>
-                          <p className="text-sm text-slate-700">{solution.caseStudy.results}</p>
-                        </div>
-                      </div>
-
-                      <div className="mt-6 pt-6 border-t border-champagne-200">
-                        <Link href="/contact" className="w-full bg-ink-950 text-alabaster-50 py-3 rounded-xl font-semibold hover:bg-ink-900 transition-colors block text-center">
-                          Discuss Your Use Case
-                        </Link>
-                      </div>
-                    </GlassCard>
+                    <div className="pt-8 border-t border-champagne-200">
+                      <Link href="/contact" className="w-full sm:w-auto inline-block bg-ink-950 text-alabaster-50 px-8 py-3 rounded-xl font-semibold hover:bg-ink-900 transition-colors text-center">
+                        Discuss {solution.title} Transformation
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
