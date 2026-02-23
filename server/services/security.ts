@@ -7,6 +7,7 @@ if (ENCRYPTION_KEY_HEX.length !== 64) {
     console.error(`[SECURITY] WARNING: ENCRYPTION_KEY must be 32 bytes (64 hex characters). Current length: ${ENCRYPTION_KEY_HEX.length}`);
 }
 const ENCRYPTION_KEY = Buffer.from(ENCRYPTION_KEY_HEX, 'hex');
+console.log(`[SECURITY] Encryption Key initialized. Length: ${ENCRYPTION_KEY.length} bytes`);
 const IV_LENGTH = 16;
 
 /**
@@ -92,22 +93,32 @@ class SecurityService {
      */
     async tokenize(data: string): Promise<string> {
         try {
+            console.log(`[SECURITY] Starting tokenization for data length: ${data.length}`);
             const token = `tok_${crypto.randomBytes(12).toString('hex')}`;
-            await storage.createToken(token, await this.encrypt(data));
+            const encryptedData = await this.encrypt(data);
+            console.log(`[SECURITY] Data encrypted successfully for token: ${token}`);
+            await storage.createToken(token, encryptedData);
+            console.log(`[SECURITY] Token stored in vault: ${token}`);
             return token;
-        } catch (error) {
-            console.error('[SECURITY] Tokenization failed:', error);
-            throw new Error("Failed to tokenize data");
+        } catch (error: any) {
+            console.error('[SECURITY] Tokenization failed:', error.message, error.stack);
+            throw new Error(`Failed to tokenize data: ${error.message}`);
         }
     }
 
     async detokenize(token: string): Promise<string> {
         try {
+            console.log(`[SECURITY] Starting detokenization for token: ${token}`);
             const encryptedData = await storage.getToken(token);
-            if (!encryptedData) throw new Error("Invalid token");
-            return await this.decrypt(encryptedData);
+            if (!encryptedData) {
+                console.warn(`[SECURITY] Detokenization failed: Invalid token ${token}`);
+                throw new Error("Invalid token");
+            }
+            const data = await this.decrypt(encryptedData);
+            console.log(`[SECURITY] Token ${token} detokenized successfully`);
+            return data;
         } catch (error: any) {
-            console.error('[SECURITY] Detokenization failed:', error.message);
+            console.error('[SECURITY] Detokenization failed:', error.message, error.stack);
             throw error;
         }
     }

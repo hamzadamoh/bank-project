@@ -82,12 +82,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { data } = req.body;
       if (!data) return res.status(400).json({ success: false, message: "Data is required" });
 
-      console.log(`[API] Tokenizing data for user: ${req.user!.username}`);
+      if (!req.user) {
+        console.error("[API] Tokenize Error: No user in request");
+        return res.status(401).json({ success: false, message: "Authentication required" });
+      }
+
+      console.log(`[API] Tokenizing data for user: ${req.user.username}`);
       const token = await securityService.tokenize(data);
       res.json({ success: true, token });
-    } catch (error) {
-      console.error("[API] Tokenize Error:", error);
-      res.status(500).json({ success: false, message: "Internal server error" });
+    } catch (error: any) {
+      console.error("[API] Tokenize Error:", error.message, error.stack);
+      res.status(500).json({ success: false, message: error.message || "Internal server error" });
     }
   });
 
@@ -98,7 +103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = await securityService.detokenize(token);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("[API] Detokenize Error:", error.message);
+      console.error("[API] Detokenize Error:", error.message, error.stack);
       res.status(error.message === "Invalid token" ? 404 : 500).json({ success: false, message: error.message });
     }
   });
