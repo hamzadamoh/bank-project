@@ -26,68 +26,15 @@ import { financialAssessor } from "./services/financial-assessor.js";
 // Configure multer for memory storage
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Enhanced Perimeter Security Middlewares
-const securityHeaders = (req: any, res: any, next: any) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.groq.com https://api-inference.huggingface.co;");
-  next();
-};
-
-const loginRateLimiter = new Map<string, { count: number, lastAttempt: number }>();
-const rateLimit = (req: any, res: any, next: any) => {
-  const ip = req.ip;
-  const now = Date.now();
-  const limit = 5; // 5 attempts
-  const window = 15 * 60 * 1000; // 15 minutes
-
-  const entry = loginRateLimiter.get(ip) || { count: 0, lastAttempt: 0 };
-  if (now - entry.lastAttempt > window) {
-    entry.count = 0;
-  }
-
-  if (entry.count >= limit) {
-    return res.status(429).json({ message: "Too many login attempts. Please try again later." });
-  }
-
-  entry.count++;
-  entry.lastAttempt = now;
-  loginRateLimiter.set(ip, entry);
-  next();
-};
-
-// Auth & Security Middlewares (Restored & Enhanced)
-const isAuthenticated = (req: any, res: any, next: any) => {
-  if (req.isAuthenticated()) return next();
-  res.status(401).json({ message: "Unauthorized" });
-};
-
-const isAdmin = (req: any, res: any, next: any) => {
-  if (req.isAuthenticated() && req.user?.role === 'admin') return next();
-  res.status(403).json({ message: "Forbidden: Admin access required" });
-};
-
-const checkTierLimit = async (req: any, res: any, next: any) => {
-  if (!req.isAuthenticated()) return next();
-  const tenant = await storage.getTenant(req.user!.tenantId);
-  if (!tenant) return next();
-
-  const logs = await storage.getAuditLogsByTenant(req.user!.tenantId);
-  if (logs.length >= parseInt(tenant.queryLimit)) {
-    return res.status(403).json({
-      message: "Tier limit reached",
-      limit: tenant.queryLimit,
-      usage: logs.length
-    });
-  }
-  next();
-};
+import {
+  securityHeaders,
+  rateLimit,
+  isAuthenticated,
+  isAdmin,
+  checkTierLimit
+} from "./middleware.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  app.use(securityHeaders);
-  app.use("/api/login", rateLimit);
 
   // --- MFA Routes ---
   app.post("/api/mfa/setup", isAuthenticated, async (req, res) => {

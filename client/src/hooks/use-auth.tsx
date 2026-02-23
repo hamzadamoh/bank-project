@@ -5,7 +5,7 @@ import {
     UseMutationResult,
 } from "@tanstack/react-query";
 import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
-import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
+import { getQueryFn, apiRequest, queryClient, safeJsonParse } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 type AuthContextType = {
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const loginMutation = useMutation({
         mutationFn: async (credentials: LoginData) => {
             const res = await apiRequest("POST", "/api/login", credentials);
-            return await res.json();
+            return await safeJsonParse(res);
         },
         onSuccess: (user: SelectUser) => {
             queryClient.setQueryData(["/api/user"], user);
@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const registerMutation = useMutation({
         mutationFn: async (newUser: InsertUser) => {
             const res = await apiRequest("POST", "/api/register", newUser);
-            return await res.json();
+            return await safeJsonParse(res);
         },
         onSuccess: (user: SelectUser) => {
             queryClient.setQueryData(["/api/user"], user);

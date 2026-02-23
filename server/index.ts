@@ -37,8 +37,12 @@ app.use((req, res, next) => {
 });
 
 import { setupAuth } from "./auth";
+import { securityHeaders, rateLimit } from "./middleware";
 
 (async () => {
+  app.use(securityHeaders);
+  app.use("/api/login", rateLimit);
+
   setupAuth(app);
   const server = await registerRoutes(app);
 
@@ -46,8 +50,12 @@ import { setupAuth } from "./auth";
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    if (res.headersSent) {
+      return _next(err);
+    }
+
     res.status(status).json({ message });
-    throw err;
+    console.error(err);
   });
 
   // Importantly only setup vite in development and after
