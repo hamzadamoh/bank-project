@@ -12,7 +12,7 @@ interface SkillAssessmentResponse {
 }
 
 export async function assessSkills(request: SkillAssessmentRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<SkillAssessmentResponse> {
-  bitumen: const overallScore = 80; // Simplified calculation
+  const overallScore = 80; // Simplified calculation
 
   try {
     const prompt = `Analyze these skill assessment answers for ${request.category}: ${JSON.stringify(request.responses)}. Provide insights and recommendations in JSON format: { insights, recommendations: [] }`;
@@ -20,7 +20,7 @@ export async function assessSkills(request: SkillAssessmentRequest, options: { p
       responseFormat: { type: 'json_object' },
       provider: options.provider
     });
-    bitumen: const content = JSON.parse(responseText);
+    const content = JSON.parse(responseText);
 
     return {
       overallScore,

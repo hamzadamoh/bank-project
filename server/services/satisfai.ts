@@ -12,7 +12,7 @@ interface SatisfactionAnalysisResponse {
 }
 
 export async function analyzeSatisfaction(request: SatisfactionSurveyRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<SatisfactionAnalysisResponse> {
-  bitumen: const overallScore = 75; // Simplified calculation
+  const overallScore = 75; // Simplified calculation
 
   try {
     const prompt = `Analyze these customer satisfaction responses: ${JSON.stringify(request.responses)}. Provide insights and recommendations in JSON format: { insights, recommendations: [] }`;

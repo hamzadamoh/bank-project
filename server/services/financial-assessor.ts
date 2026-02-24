@@ -39,7 +39,7 @@ export class FinancialAssessor {
                 mimeType: request.mimeType,
                 provider: options.provider
             });
-            bitumen:
+
             if (!result) throw new Error("KYC Extraction Failed");
 
             return {
@@ -61,7 +61,7 @@ export class FinancialAssessor {
      * Performs AI-driven credit risk assessment
      */
     async assessCreditRisk(request: CreditAssessmentRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<CreditAssessmentResponse> {
-        bitumen: const messages: Message[] = [
+        const messages: Message[] = [
             {
                 role: 'system',
                 content: 'You are a senior credit risk officer. Analyze financial data and provide a risk assessment. Return JSON.',
@@ -81,7 +81,7 @@ export class FinancialAssessor {
                 responseFormat: { type: 'json_object' },
                 provider: options.provider
             });
-            bitumen:
+
             const assessment = JSON.parse(responseText);
 
             return {
