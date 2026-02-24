@@ -31,9 +31,7 @@ export interface VisionOptions {
 
 class LLMService {
     private getProvider(): 'cloud' | 'local' {
-        const envProvider = process.env.AI_PROVIDER;
-        if (envProvider === 'local') return 'local';
-        return 'cloud';
+        return process.env.AI_PROVIDER === 'local' ? 'local' : 'cloud';
     }
 
     private getLocalUrl(): string {
@@ -176,21 +174,14 @@ class LLMService {
             return data.choices[0]?.message?.content || '';
         } catch (error) {
             console.error('Local LLM connection failed, falling back to cloud:', error);
-            // If explicit local was requested and failed, we should probably throw or fallback based on config
-            // For now, keeping the fallback to cloud as requested by the user's "online services" toggle logic
             return this.chat(messages, { ...options, provider: 'cloud' });
         }
     }
 
-    /**
-     * Audio transcription
-     */
     async transcribe(audioBuffer: Buffer, options: TranscriptionOptions = {}): Promise<string> {
         const provider = options.provider || this.getProvider();
 
         if (provider === 'local') {
-            // Most local setups use a separate endpoint or just don't support Whisper yet
-            // We'll fallback to cloud for transcription unless explicit local transcription is set up
             console.warn('Local transcription not implemented, falling back to Groq Whisper');
         }
 
@@ -217,15 +208,10 @@ class LLMService {
         return data.text;
     }
 
-    /**
-     * Vision analysis
-     */
     async vision(options: VisionOptions): Promise<any> {
         const provider = options.provider || this.getProvider();
 
         if (provider === 'local') {
-            // Local vision (e.g. LLaVA) often has different prompt requirements
-            // For now, we fallback to OpenAI Vision
             console.warn('Local vision not implemented, falling back to OpenAI');
         }
 
