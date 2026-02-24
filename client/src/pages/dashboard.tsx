@@ -273,7 +273,31 @@ export default function Dashboard() {
         enabled: !!user,
     });
 
+    const { data: aiProviderData } = useQuery<{ success: boolean; provider: 'cloud' | 'local' }>({
+        queryKey: ["/api/tenant/ai-provider"],
+        enabled: !!user,
+    });
+
     const queryClient = useQueryClient();
+
+    const { mutate: updateAiProvider, isPending: isUpdatingProvider } = useMutation({
+        mutationFn: async (provider: 'cloud' | 'local') => {
+            const res = await fetch("/api/tenant/ai-provider", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ provider }),
+            });
+            if (!res.ok) throw new Error("Failed to update AI provider");
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["/api/tenant/ai-provider"] });
+            toast({
+                title: "AI Provider Switched 🚀",
+                description: "Your organization is now using the selected LLM infrastructure."
+            });
+        }
+    });
 
     const { mutate: updatePrivacy, isPending: isUpdatingPrivacy } = useMutation({
         mutationFn: async (settings: any) => {
@@ -846,6 +870,43 @@ export default function Dashboard() {
                                             </div>
                                             <div className="pt-6 border-t border-alabaster-100">
                                                 <Button variant="outline" onClick={() => handleAction("Change Password")}>Change Password</Button>
+                                            </div>
+                                        </GlassCard>
+                                    </div>
+
+                                    <div className="md:col-span-1">
+                                        <h3 className="font-bold text-ink-950 mb-2">AI Infrastructure</h3>
+                                        <p className="text-sm text-slate-500">Choose between cloud-based LLMs or privacy-focused local models.</p>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <GlassCard className="p-8 space-y-6">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <Server className="w-5 h-5 text-blue-500" />
+                                                    <div>
+                                                        <p className="text-sm font-bold text-ink-950">Provider Selection</p>
+                                                        <p className="text-xs text-slate-500">
+                                                            {aiProviderData?.provider === 'local'
+                                                                ? "Currently using local LLM infrastructure (Ollama/LM Studio)."
+                                                                : "Currently using cloud-based AI providers (Groq/OpenAI)."}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    <span className={`text-xs font-bold ${aiProviderData?.provider === 'cloud' ? 'text-emerald-500' : 'text-slate-400'}`}>Cloud</span>
+                                                    <Switch
+                                                        checked={aiProviderData?.provider === 'local'}
+                                                        onCheckedChange={(checked) => updateAiProvider(checked ? 'local' : 'cloud')}
+                                                        disabled={isUpdatingProvider}
+                                                    />
+                                                    <span className={`text-xs font-bold ${aiProviderData?.provider === 'local' ? 'text-blue-500' : 'text-slate-400'}`}>Local</span>
+                                                </div>
+                                            </div>
+                                            <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                                                <p className="text-[10px] text-blue-600 font-medium leading-relaxed">
+                                                    <Info className="w-3 h-3 inline mr-1 mb-0.5" />
+                                                    Local LLMs offer maximum data privacy but may have higher latency. Cloud providers offer faster response times and larger model capacity.
+                                                </p>
                                             </div>
                                         </GlassCard>
                                     </div>

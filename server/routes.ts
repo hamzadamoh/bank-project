@@ -185,12 +185,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { query, jurisdiction } = req.body;
       const tenantId = req.user!.tenantId;
+      const tenant = await storage.getTenant(tenantId);
+      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       if (!query || !jurisdiction) {
         return res.status(400).json({ success: false, message: "Query and jurisdiction are required" });
       }
 
-      const taxResponse = await getTaxAdvice({ query, jurisdiction });
+      const taxResponse = await getTaxAdvice({ query, jurisdiction }, { provider });
 
       // Audit Logging
       await securityService.logAction({
@@ -223,12 +225,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { type, input } = req.body;
       const tenantId = req.user!.tenantId;
+      const tenant = await storage.getTenant(tenantId);
+      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       if (!type || !input) {
         return res.status(400).json({ success: false, message: "Type and input are required" });
       }
 
-      const conversionResult = await convertQuery({ type, input });
+      const conversionResult = await convertQuery({ type, input }, { provider });
 
       // Audit Logging
       await securityService.logAction({
@@ -260,12 +264,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { filename, fileContent, fileType } = req.body;
       const tenantId = req.user!.tenantId;
+      const tenant = await storage.getTenant(tenantId);
+      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       const analysisResult = await analyzeDocument({
         filename: filename || 'uploaded_document',
         fileContent: fileContent ? Buffer.from(fileContent, 'base64') : undefined,
         fileType
-      });
+      }, { provider });
 
       // Audit Logging
       await securityService.logAction({
@@ -297,9 +303,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/skill-assessments", async (req, res) => {
     try {
       const { category, responses } = req.body;
-      const tenantId = (req as any).tenantId;
+      const tenantId = (req as any).tenantId || req.user?.tenantId || 'tenant_default';
+      const tenant = await storage.getTenant(tenantId);
+      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
-      const assessment = await assessSkills({ category, responses });
+      const assessment = await assessSkills({ category, responses }, { provider });
 
       // Audit Logging
       await securityService.logAction({
@@ -323,10 +331,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { message, conversationId, language } = req.body;
       const tenantId = req.user!.tenantId;
+      const tenant = await storage.getTenant(tenantId);
+      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       if (!message) return res.status(400).json({ success: false, message: "Message is required" });
 
-      const chatResponse = await chat({ message, conversationId, language });
+      const chatResponse = await chat({ message, conversationId, language }, { provider });
 
       // Audit Logging
       await securityService.logAction({
@@ -350,13 +360,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       if (!req.file) return res.status(400).json({ success: false, message: "No audio file provided" });
       const tenantId = req.user!.tenantId;
+      const tenant = await storage.getTenant(tenantId);
+      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
-      const transcription = await transcribeAudioWithGroq(req.file.buffer);
+      const transcription = await transcribeAudioWithGroq(req.file.buffer, provider);
       if (!transcription || transcription.trim().length === 0) {
         return res.json({ success: true, transcription: "", response: "I couldn't hear anything." });
       }
 
-      const chatResponse = await chat({ message: transcription, language: 'auto' });
+      const chatResponse = await chat({ message: transcription, language: 'auto' }, { provider });
 
       // Audit Logging
       await securityService.logAction({
@@ -380,8 +392,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { physicalMetrics, mentalMetrics, socialMetrics } = req.body;
       const tenantId = req.user!.tenantId;
+      const tenant = await storage.getTenant(tenantId);
+      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
-      const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
+      const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics }, { provider });
 
       // Audit Logging
       await securityService.logAction({
@@ -405,8 +419,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { responses, context } = req.body;
       const tenantId = req.user!.tenantId;
+      const tenant = await storage.getTenant(tenantId);
+      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
-      const analysis = await analyzeSatisfaction({ responses });
+      const analysis = await analyzeSatisfaction({ responses }, { provider });
 
       // Audit Logging
       await securityService.logAction({
@@ -432,12 +448,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { documentType } = req.body;
       const tenantId = req.user!.tenantId;
       const userId = req.user!.id;
+      const tenant = await storage.getTenant(tenantId);
+      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       const kycResult = await financialAssessor.processKyc({
         documentType: documentType || 'ID_CARD',
         imageBuffer: req.file.buffer,
         mimeType: req.file.mimetype
-      });
+      }, { provider });
 
       // Audit Logging
       await securityService.logAction({
@@ -472,10 +490,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { financialData, context } = req.body;
       const tenantId = req.user!.tenantId;
       const userId = req.user!.id;
+      const tenant = await storage.getTenant(tenantId);
+      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       if (!financialData) return res.status(400).json({ success: false, message: "Financial data is required" });
 
-      const assessmentResult = await financialAssessor.assessCreditRisk({ financialData, context });
+      const assessmentResult = await financialAssessor.assessCreditRisk({ financialData, context }, { provider });
 
       // Audit Logging
       await securityService.logAction({
@@ -586,6 +606,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, ...stats });
     } catch (error) {
       res.status(500).json({ success: false, message: "Failed to fetch analytics" });
+    }
+  });
+
+  app.get("/api/tenant/ai-provider", isAuthenticated, async (req, res) => {
+    try {
+      const tenant = await storage.getTenant(req.user!.tenantId);
+      res.json({ success: true, provider: tenant?.aiProvider || 'cloud' });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Failed to fetch AI provider" });
+    }
+  });
+
+  app.put("/api/tenant/ai-provider", isAuthenticated, async (req, res) => {
+    try {
+      const { provider } = req.body;
+      if (provider !== 'cloud' && provider !== 'local') {
+        return res.status(400).json({ success: false, message: "Invalid provider. Must be 'cloud' or 'local'" });
+      }
+      await storage.updateTenantAiProvider(req.user!.tenantId, provider);
+      res.json({ success: true, provider });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Failed to update AI provider" });
     }
   });
 

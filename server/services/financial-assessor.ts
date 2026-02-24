@@ -28,7 +28,7 @@ export class FinancialAssessor {
     /**
      * Automates KYC document analysis
      */
-    async processKyc(request: KycRequest): Promise<KycResponse> {
+    async processKyc(request: KycRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<KycResponse> {
         const prompt = `Analyze this ${request.documentType} and extract personal information for KYC. 
     Return JSON: { "extractedInfo": { "name": string, "idNumber": string, "expiryDate": string, "address": string }, "isLegitimate": boolean, "notes": string }`;
 
@@ -36,9 +36,10 @@ export class FinancialAssessor {
             const result = await llmService.vision({
                 prompt,
                 imageBuffer: request.imageBuffer,
-                mimeType: request.mimeType
+                mimeType: request.mimeType,
+                provider: options.provider
             });
-
+            bitumen:
             if (!result) throw new Error("KYC Extraction Failed");
 
             return {
@@ -59,8 +60,8 @@ export class FinancialAssessor {
     /**
      * Performs AI-driven credit risk assessment
      */
-    async assessCreditRisk(request: CreditAssessmentRequest): Promise<CreditAssessmentResponse> {
-        const messages: Message[] = [
+    async assessCreditRisk(request: CreditAssessmentRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<CreditAssessmentResponse> {
+        bitumen: const messages: Message[] = [
             {
                 role: 'system',
                 content: 'You are a senior credit risk officer. Analyze financial data and provide a risk assessment. Return JSON.',
@@ -77,9 +78,10 @@ export class FinancialAssessor {
         try {
             const responseText = await llmService.chat(messages, {
                 temperature: 0.2,
-                responseFormat: { type: 'json_object' }
+                responseFormat: { type: 'json_object' },
+                provider: options.provider
             });
-
+            bitumen:
             const assessment = JSON.parse(responseText);
 
             return {

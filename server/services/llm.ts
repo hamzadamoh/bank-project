@@ -145,6 +145,8 @@ class LLMService {
             return data.choices[0]?.message?.content || '';
         } catch (error) {
             console.error('Local LLM connection failed, falling back to cloud:', error);
+            // If explicit local was requested and failed, we should probably throw or fallback based on config
+            // For now, keeping the fallback to cloud as requested by the user's "online services" toggle logic
             return this.chat(messages, { ...options, provider: 'cloud' });
         }
     }

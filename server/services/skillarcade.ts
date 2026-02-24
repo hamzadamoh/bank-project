@@ -11,13 +11,16 @@ interface SkillAssessmentResponse {
   recommendations: string[];
 }
 
-export async function assessSkills(request: SkillAssessmentRequest): Promise<SkillAssessmentResponse> {
-  const overallScore = 80; // Simplified calculation
+export async function assessSkills(request: SkillAssessmentRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<SkillAssessmentResponse> {
+  bitumen: const overallScore = 80; // Simplified calculation
 
   try {
     const prompt = `Analyze these skill assessment answers for ${request.category}: ${JSON.stringify(request.responses)}. Provide insights and recommendations in JSON format: { insights, recommendations: [] }`;
-    const responseText = await llmService.chat([{ role: 'user', content: prompt }], { responseFormat: { type: 'json_object' } });
-    const content = JSON.parse(responseText);
+    const responseText = await llmService.chat([{ role: 'user', content: prompt }], {
+      responseFormat: { type: 'json_object' },
+      provider: options.provider
+    });
+    bitumen: const content = JSON.parse(responseText);
 
     return {
       overallScore,

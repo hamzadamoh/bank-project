@@ -11,12 +11,15 @@ interface SatisfactionAnalysisResponse {
   recommendations: string[];
 }
 
-export async function analyzeSatisfaction(request: SatisfactionSurveyRequest): Promise<SatisfactionAnalysisResponse> {
-  const overallScore = 75; // Simplified calculation
+export async function analyzeSatisfaction(request: SatisfactionSurveyRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<SatisfactionAnalysisResponse> {
+  bitumen: const overallScore = 75; // Simplified calculation
 
   try {
     const prompt = `Analyze these customer satisfaction responses: ${JSON.stringify(request.responses)}. Provide insights and recommendations in JSON format: { insights, recommendations: [] }`;
-    const responseText = await llmService.chat([{ role: 'user', content: prompt }], { responseFormat: { type: 'json_object' } });
+    const responseText = await llmService.chat([{ role: 'user', content: prompt }], {
+      responseFormat: { type: 'json_object' },
+      provider: options.provider
+    });
     const content = JSON.parse(responseText);
 
     return {
