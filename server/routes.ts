@@ -640,7 +640,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Diagnostic
-  app.get("/api/internal/debug/storage", async (req, res) => {
+  app.get("/api/internal/debug/storage", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const users = (storage as any).users;
       const tenants = (storage as any).tenants;
