@@ -214,9 +214,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       res.json({ success: true, id: taxQuery.id, response: taxResponse });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Tax query error:", error);
-      res.status(500).json({ success: false, message: "Internal server error" });
+      res.status(500).json({
+        success: false,
+        message: error.message || "Internal server error",
+        debug: { user: req.user ? { id: req.user.id, tenantId: req.user.tenantId } : null }
+      });
     }
   });
 
@@ -544,11 +548,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Orders endpoints
   app.get("/api/orders", isAuthenticated, async (req, res) => {
     try {
-      const tenantId = req.user!.tenantId;
+      if (!req.user) throw new Error("User not found in request");
+      const tenantId = req.user.tenantId;
+      if (!tenantId) throw new Error("tenantId not found in user object");
+
       const orders = await storage.getOrdersByTenant(tenantId);
       res.json({ success: true, data: orders });
-    } catch (error) {
-      res.status(500).json({ success: false, message: "Internal server error" });
+    } catch (error: any) {
+      console.error("Orders fetching error:", error);
+      res.status(500).json({ success: false, message: error.message || "Internal server error", debug: { user: req.user ? { id: req.user.id, tenantId: req.user.tenantId } : null } });
     }
   });
 
@@ -628,6 +636,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, provider });
     } catch (error) {
       res.status(500).json({ success: false, message: "Failed to update AI provider" });
+    }
+  });
+
+  // Diagnostic
+  app.get("/api/internal/debug/storage", async (req, res) => {
+    try {
+      const users = (storage as any).users;
+      const tenants = (storage as any).tenants;
+      res.json({
+        userCount: users?.size || 0,
+        tenantCount: tenants?.size || 0,
+        users: Array.from(users.values()).map((u: any) => ({ id: u.id, tenantId: u.tenantId, username: u.username })),
+        tenants: Array.from(tenants.values()).map((t: any) => ({ id: t.id, name: t.name, aiProvider: t.aiProvider }))
+      });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
     }
   });
 

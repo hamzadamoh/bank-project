@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import { storage } from "./storage.js";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -42,6 +43,26 @@ import { securityHeaders, rateLimit } from "./middleware";
 (async () => {
   app.use(securityHeaders);
   app.use("/api/login", rateLimit);
+
+  // Diagnostic endpoint
+  app.get("/api/debug/status", async (req, res) => {
+    try {
+      res.json({
+        success: true,
+        env: {
+          AI_PROVIDER: process.env.AI_PROVIDER || "not set",
+          NODE_ENV: process.env.NODE_ENV
+        },
+        storage: {
+          users: (storage as any).users?.size,
+          tenants: (storage as any).tenants?.size,
+          defaults: !!(await storage.getTenant("tenant_default"))
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
 
   setupAuth(app);
   const server = await registerRoutes(app);

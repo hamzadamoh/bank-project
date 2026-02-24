@@ -191,9 +191,14 @@ export class MemStorage implements IStorage {
   }
 
   async getAuditLogsByTenant(tenantId: string): Promise<AuditLog[]> {
+    if (!tenantId) return [];
     return Array.from(this.auditLogs.values())
       .filter(log => log.tenantId === tenantId)
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+      .sort((a, b) => {
+        const timeA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
+        const timeB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
+        return timeB - timeA;
+      });
   }
 
   // Tenants
@@ -415,9 +420,14 @@ export class MemStorage implements IStorage {
   }
 
   async getOrdersByTenant(tenantId: string): Promise<Order[]> {
+    if (!tenantId) return [];
     return Array.from(this.orders.values())
       .filter(o => o.tenantId === tenantId)
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+      .sort((a, b) => {
+        const timeA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
+        const timeB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
+        return timeB - timeA;
+      });
   }
 
   async getOrder(id: string): Promise<Order | undefined> {
