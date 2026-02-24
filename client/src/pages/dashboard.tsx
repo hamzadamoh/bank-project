@@ -36,6 +36,7 @@ import { Sun, Moon, ShieldOff, Trash2, Lock, RefreshCw } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface UsageStats {
     totalRevenue: string;
@@ -280,6 +281,17 @@ export default function Dashboard() {
 
     const queryClient = useQueryClient();
 
+    const { data: connectionStatus, isLoading: isTestingConnection } = useQuery<{ success: boolean; message: string }>({
+        queryKey: ["/api/tenant/ai-provider/test", aiProviderData?.provider],
+        enabled: !!aiProviderData?.provider,
+        refetchInterval: 30000, // Check every 30s
+        queryFn: async () => {
+            const res = await fetch(`/api/tenant/ai-provider/test?provider=${aiProviderData?.provider}`);
+            if (!res.ok) throw new Error("Connection test failed");
+            return res.json();
+        }
+    });
+
     const { mutate: updateAiProvider, isPending: isUpdatingProvider } = useMutation({
         mutationFn: async (provider: 'cloud' | 'local') => {
             const res = await fetch("/api/tenant/ai-provider", {
@@ -295,6 +307,13 @@ export default function Dashboard() {
             toast({
                 title: "AI Provider Switched 🚀",
                 description: "Your organization is now using the selected LLM infrastructure."
+            });
+        },
+        onError: (error: any) => {
+            toast({
+                title: "Switch Failed ❌",
+                description: error.message || "Failed to connect to the selected AI infrastructure.",
+                variant: "destructive"
             });
         }
     });
@@ -884,7 +903,18 @@ export default function Dashboard() {
                                                 <div className="flex items-center gap-3">
                                                     <Server className="w-5 h-5 text-blue-500" />
                                                     <div>
-                                                        <p className="text-sm font-bold text-ink-950">Provider Selection</p>
+                                                        <div className="flex items-center gap-2">
+                                                            <p className="text-sm font-bold text-ink-950">Provider Selection</p>
+                                                            {connectionStatus && (
+                                                                <Badge className={connectionStatus.success
+                                                                    ? "bg-emerald-50 text-emerald-600 border-none text-[8px] h-4 py-0"
+                                                                    : "bg-red-50 text-red-600 border-none text-[8px] h-4 py-0"
+                                                                }>
+                                                                    {connectionStatus.success ? "Connected" : "Disconnected"}
+                                                                </Badge>
+                                                            )}
+                                                            {isTestingConnection && <RefreshCw className="w-3 h-3 text-slate-400 animate-spin" />}
+                                                        </div>
                                                         <p className="text-xs text-slate-500">
                                                             {aiProviderData?.provider === 'local'
                                                                 ? "Currently using local LLM infrastructure (Ollama/LM Studio)."
@@ -893,19 +923,34 @@ export default function Dashboard() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-4">
-                                                    <span className={`text-xs font-bold ${aiProviderData?.provider === 'cloud' ? 'text-emerald-500' : 'text-slate-400'}`}>Cloud</span>
-                                                    <Switch
-                                                        checked={aiProviderData?.provider === 'local'}
-                                                        onCheckedChange={(checked) => updateAiProvider(checked ? 'local' : 'cloud')}
-                                                        disabled={isUpdatingProvider}
-                                                    />
-                                                    <span className={`text-xs font-bold ${aiProviderData?.provider === 'local' ? 'text-blue-500' : 'text-slate-400'}`}>Local</span>
+                                                    <Tabs
+                                                        value={aiProviderData?.provider || 'cloud'}
+                                                        onValueChange={(value) => updateAiProvider(value as 'cloud' | 'local')}
+                                                        className="w-[180px]"
+                                                    >
+                                                        <TabsList className="grid w-full grid-cols-2 bg-alabaster-100/50">
+                                                            <TabsTrigger
+                                                                value="cloud"
+                                                                disabled={isUpdatingProvider}
+                                                                className="data-[state=active]:bg-emerald-400 data-[state=active]:text-ink-950 text-[10px] font-bold"
+                                                            >
+                                                                Cloud
+                                                            </TabsTrigger>
+                                                            <TabsTrigger
+                                                                value="local"
+                                                                disabled={isUpdatingProvider}
+                                                                className="data-[state=active]:bg-blue-500 data-[state=active]:text-white text-[10px] font-bold"
+                                                            >
+                                                                Local
+                                                            </TabsTrigger>
+                                                        </TabsList>
+                                                    </Tabs>
                                                 </div>
                                             </div>
                                             <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
                                                 <p className="text-[10px] text-blue-600 font-medium leading-relaxed">
                                                     <Info className="w-3 h-3 inline mr-1 mb-0.5" />
-                                                    Local LLMs offer maximum data privacy but may have higher latency. Cloud providers offer faster response times and larger model capacity.
+                                                    Local LLMs offer maximum data privacy but require Ollama or LM Studio running at {window.location.protocol}//localhost:11434. Cloud providers offer faster response times.
                                                 </p>
                                             </div>
                                         </GlassCard>

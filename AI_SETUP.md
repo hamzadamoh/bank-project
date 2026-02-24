@@ -118,18 +118,37 @@ For the **Voice Chatbot** to function:
 2. The system uses `whisper-large-v3` for speech-to-text and `openai/gpt-oss-120b` for responses.
 3. Browser permission for microphone access is required.
 
-### Troubleshooting
+## AI Infrastructure Selection
 
-### Tools not working with AI?
-- Check that `OPENAI_API_KEY`, `GROQ_API_KEY`, or `HUGGINGFACE_API_TOKEN` is set in environment variables
-- Verify the API key is valid and has credits
-- Check server logs for API errors
-- Tools will fallback to mock data if API fails
+FiscAI supports both Cloud-based and Local LLMs. You can toggle between these in the **Dashboard Settings**.
 
+### 1. Cloud AI (Default)
+- **Providers**: Groq, OpenAI
+- **Requirement**: `GROQ_API_KEY` or `OPENAI_API_KEY` in environment variables.
+- **Best for**: Performance, latency, and high-capacity models.
 
-### Getting errors?
-- Ensure your OpenAI account has credits
-- Check API rate limits
-- Verify network connectivity
-- Check browser console and server logs
+### 2. Local AI (Privacy-Focused)
+- **Requirement**: A running instance of Ollama or LM Studio on your local machine.
+- **Default URL**: `http://localhost:11434/v1`
+- **Setup**:
+  1. Download and install [Ollama](https://ollama.ai).
+  2. Run `ollama run llama3`.
+  3. In FiscAI Dashboard, switch to **Local**.
+- **Best for**: Maximum data privacy and air-gapped environments.
+
+### 3. Connectivity Verification
+The Dashboard includes a **Connection Status** indicator:
+- **Connected (Green)**: FiscAI can successfully talk to your selected AI infrastructure.
+- **Disconnected (Red)**: The provider is unreachable. Check your API keys (Cloud) or ensure your local service is running (Local).
+
+## Troubleshooting
+
+### "Switch Failed" Error
+If you cannot switch to **Local AI**:
+1. Ensure Ollama/LM Studio is running.
+2. Verify you can access `http://localhost:11434/v1/models` in your browser.
+3. Check `LOCAL_LLM_URL` in your `.env` if you are using a non-standard port.
+
+### Missing Admin Permissions
+Only **Admin** users can change the organization's AI Infrastructure setting. If the tabs are disabled or you get a "403 Forbidden", contact your administrator.
 

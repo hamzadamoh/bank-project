@@ -31,7 +31,9 @@ export interface VisionOptions {
 
 class LLMService {
     private getProvider(): 'cloud' | 'local' {
-        return (process.env.AI_PROVIDER as 'cloud' | 'local') || 'cloud';
+        const envProvider = process.env.AI_PROVIDER;
+        if (envProvider === 'local') return 'local';
+        return 'cloud';
     }
 
     private getLocalUrl(): string {
@@ -115,6 +117,35 @@ class LLMService {
 
         const data = await response.json();
         return data.choices[0]?.message?.content || '';
+    }
+
+    async testConnection(provider: 'cloud' | 'local'): Promise<{ success: boolean; message: string }> {
+        if (provider === 'cloud') {
+            return { success: true, message: "Cloud providers are active." };
+        }
+
+        const url = `${this.getLocalUrl()}/chat/completions`;
+        try {
+            console.log(`[LLM] Testing connection to: ${url}`);
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: this.getLocalModel('llama3'),
+                    messages: [{ role: 'user', content: 'test' }],
+                    max_tokens: 1
+                }),
+                signal: AbortSignal.timeout(3000) // 3s timeout
+            });
+
+            if (response.ok) {
+                return { success: true, message: "Successfully connected to local LLM." };
+            }
+            return { success: false, message: `Local LLM returned status ${response.status}.` };
+        } catch (error: any) {
+            console.warn(`[LLM] Local connection test failed: ${error.message}`);
+            return { success: false, message: "Could not connect to local LLM. Ensure Ollama/LM Studio is running." };
+        }
     }
 
     private async chatLocal(messages: Message[], options: ChatOptions): Promise<string> {

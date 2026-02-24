@@ -34,6 +34,8 @@ import {
   checkTierLimit
 } from "./middleware.js";
 
+import { llmService } from "./services/llm.js";
+
 export async function registerRoutes(app: Express): Promise<Server> {
 
   // --- MFA Routes ---
@@ -643,15 +645,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/tenant/ai-provider", isAuthenticated, async (req, res) => {
+  app.get("/api/tenant/ai-provider/test", isAuthenticated, async (req, res) => {
+    try {
+      const provider = req.query.provider as 'cloud' | 'local' || 'cloud';
+      const result = await llmService.testConnection(provider);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Connection test failed" });
+    }
+  });
+
+  app.put("/api/tenant/ai-provider", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { provider } = req.body;
       if (provider !== 'cloud' && provider !== 'local') {
         return res.status(400).json({ success: false, message: "Invalid provider. Must be 'cloud' or 'local'" });
       }
+
+      // Test connection before allowing switch
+      const connection = await llmService.testConnection(provider);
+      if (!connection.success) {
+        return res.status(400).json({
+          success: false,
+          message: connection.message
+        });
+      }
+
       await storage.updateTenantAiProvider(req.user!.tenantId, provider);
       res.json({ success: true, provider });
     } catch (error) {
+      console.error("[API] Failed to update AI provider:", error);
       res.status(500).json({ success: false, message: "Failed to update AI provider" });
     }
   });

@@ -143,7 +143,8 @@ export class MemStorage implements IStorage {
       region: "Morocco",
       tier: "Starter",
       queryLimit: "100",
-      ssoConfig: { enabled: false, provider: "local", domain: "" }
+      ssoConfig: { enabled: false, provider: "local", domain: "" },
+      aiProvider: "cloud"
     });
   }
 
