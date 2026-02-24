@@ -192,7 +192,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ success: false, message: "Query and jurisdiction are required" });
       }
 
+      console.log(`[TAX-QUERY] Starting analysis for jurisdiction: ${jurisdiction}`);
       const taxResponse = await getTaxAdvice({ query, jurisdiction }, { provider });
+      console.log(`[TAX-QUERY] Service returned results with confidence: ${taxResponse.confidence}`);
 
       // Audit Logging
       await securityService.logAction({
@@ -205,21 +207,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ipAddress: req.ip
       });
 
+      console.log(`[TAX-QUERY] Finalizing record in storage...`);
       const taxQuery = await storage.createTaxQuery({
         tenantId,
         query,
         jurisdiction,
         response: taxResponse,
-        confidence: taxResponse.confidence >= 80 ? "high" : taxResponse.confidence >= 60 ? "medium" : "low"
+        confidence: (taxResponse.confidence || 0) >= 80 ? "high" : (taxResponse.confidence || 0) >= 60 ? "medium" : "low"
       });
 
       res.json({ success: true, id: taxQuery.id, response: taxResponse });
     } catch (error: any) {
-      console.error("Tax query error:", error);
+      console.error("[TAX-QUERY] CRITICAL FAILURE:", error.message);
       res.status(500).json({
         success: false,
         message: error.message || "Internal server error",
-        debug: { user: req.user ? { id: req.user.id, tenantId: req.user.tenantId } : null }
+        error: error.message,
+        debug: {
+          user: req.user ? { id: req.user.id, tenantId: req.user.tenantId } : null,
+          stack: error.stack?.substring(0, 500)
+        }
       });
     }
   });
@@ -548,15 +555,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Orders endpoints
   app.get("/api/orders", isAuthenticated, async (req, res) => {
     try {
+      console.log(`[ORDERS] Fetching orders for user ${req.user?.id} (Tenant: ${req.user?.tenantId})...`);
       if (!req.user) throw new Error("User not found in request");
       const tenantId = req.user.tenantId;
       if (!tenantId) throw new Error("tenantId not found in user object");
 
       const orders = await storage.getOrdersByTenant(tenantId);
+      console.log(`[ORDERS] Successfully retrieved ${orders.length} orders.`);
       res.json({ success: true, data: orders });
     } catch (error: any) {
-      console.error("Orders fetching error:", error);
-      res.status(500).json({ success: false, message: error.message || "Internal server error", debug: { user: req.user ? { id: req.user.id, tenantId: req.user.tenantId } : null } });
+      console.error("[ORDERS] Critical failure:", error.message);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Internal server error",
+        error: error.message,
+        debug: {
+          user: req.user ? { id: req.user.id, tenantId: req.user.tenantId } : null,
+          stack: error.stack?.substring(0, 500)
+        }
+      });
     }
   });
 
