@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, Search, ThumbsUp, Brain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function TaxCounsel() {
   const { toast } = useToast();
@@ -27,26 +28,19 @@ export default function TaxCounsel() {
     setResponse(null);
 
     try {
-      const response = await fetch('/api/tax-queries', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query,
-          jurisdiction,
-        }),
+      const res = await apiRequest("POST", "/api/tax-queries", {
+        query,
+        jurisdiction,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get tax advice');
-      }
-
-      const data = await response.json();
+      const data = await res.json();
       setResponse(data.response);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching tax advice:', error);
-      alert('Failed to get tax advice. Please try again.');
+      const message = error.message?.includes('401')
+        ? 'Please log in to use Tax Counsel.'
+        : 'Failed to get tax advice. Please try again.';
+      alert(message);
     } finally {
       setIsLoading(false);
     }
