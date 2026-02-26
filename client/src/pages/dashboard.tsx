@@ -37,6 +37,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { apiRequest } from "@/lib/queryClient";
 
 interface UsageStats {
     totalRevenue: string;
@@ -286,20 +287,14 @@ export default function Dashboard() {
         enabled: !!aiProviderData?.provider,
         refetchInterval: 30000, // Check every 30s
         queryFn: async () => {
-            const res = await fetch(`/api/tenant/ai-provider/test?provider=${aiProviderData?.provider}`);
-            if (!res.ok) throw new Error("Connection test failed");
+            const res = await apiRequest("GET", `/api/tenant/ai-provider/test?provider=${aiProviderData?.provider}`);
             return res.json();
         }
     });
 
     const { mutate: updateAiProvider, isPending: isUpdatingProvider } = useMutation({
         mutationFn: async (provider: 'cloud' | 'local') => {
-            const res = await fetch("/api/tenant/ai-provider", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ provider }),
-            });
-            if (!res.ok) throw new Error("Failed to update AI provider");
+            const res = await apiRequest("PUT", "/api/tenant/ai-provider", { provider });
             return res.json();
         },
         onSuccess: () => {
@@ -320,12 +315,7 @@ export default function Dashboard() {
 
     const { mutate: updatePrivacy, isPending: isUpdatingPrivacy } = useMutation({
         mutationFn: async (settings: any) => {
-            const res = await fetch("/api/user/me/privacy", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(settings),
-            });
-            if (!res.ok) throw new Error("Failed to update privacy settings");
+            const res = await apiRequest("PUT", "/api/user/me/privacy", settings);
             return res.json();
         },
         onSuccess: () => {
@@ -336,8 +326,7 @@ export default function Dashboard() {
 
     const { mutate: deleteAccount, isPending: isDeletingAccount } = useMutation({
         mutationFn: async () => {
-            const res = await fetch("/api/user/me", { method: "DELETE" });
-            if (!res.ok) throw new Error("Failed to delete account");
+            const res = await apiRequest("DELETE", "/api/user/me");
             return res.json();
         },
         onSuccess: () => {
@@ -348,8 +337,7 @@ export default function Dashboard() {
 
     const { mutate: purgeOldData, isPending: isPurging } = useMutation({
         mutationFn: async () => {
-            const res = await fetch("/api/admin/purge-old-data", { method: "POST" });
-            if (!res.ok) throw new Error("Purge failed");
+            const res = await apiRequest("POST", "/api/admin/purge-old-data");
             return res.json();
         },
         onSuccess: () => {

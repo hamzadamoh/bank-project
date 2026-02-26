@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Heart, Brain, Users, TrendingUp, CheckCircle, AlertTriangle } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Rhalia() {
   const [metrics, setMetrics] = useState({
@@ -28,37 +29,30 @@ export default function Rhalia() {
     setAnalysis(null);
 
     try {
-      const response = await fetch('/api/wellbeing-analysis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const res = await apiRequest("POST", "/api/wellbeing-analysis", {
+        physicalMetrics: {
+          sleepHours: metrics.sleepHours,
+          exerciseMinutes: metrics.exerciseMinutes,
+          steps: metrics.steps,
         },
-        body: JSON.stringify({
-          physicalMetrics: {
-            sleepHours: metrics.sleepHours,
-            exerciseMinutes: metrics.exerciseMinutes,
-            steps: metrics.steps,
-          },
-          mentalMetrics: {
-            stressLevel: metrics.stressLevel,
-            mood: metrics.mood,
-            energyLevel: metrics.energyLevel,
-          },
-          socialMetrics: {
-            teamCollaboration: metrics.teamCollaboration,
-          },
-        }),
+        mentalMetrics: {
+          stressLevel: metrics.stressLevel,
+          mood: metrics.mood,
+          energyLevel: metrics.energyLevel,
+        },
+        socialMetrics: {
+          teamCollaboration: metrics.teamCollaboration,
+        },
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze wellbeing');
-      }
-
-      const data = await response.json();
+      const data = await res.json();
       setAnalysis(data.analysis);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error analyzing wellbeing:', error);
-      alert('Failed to analyze wellbeing. Please try again.');
+      const message = error.message?.includes('401')
+        ? 'Please log in to use Rhalia.'
+        : 'Failed to analyze wellbeing. Please try again.';
+      alert(message);
     } finally {
       setIsAnalyzing(false);
     }
@@ -102,7 +96,7 @@ export default function Rhalia() {
             {/* Input Form */}
             <GlassCard className="max-w-4xl mx-auto p-8 mb-8">
               <h3 className="font-display font-bold text-2xl text-ink-950 mb-6">Enter Your Metrics</h3>
-              
+
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Physical Metrics */}
                 <div className="space-y-4">
@@ -110,7 +104,7 @@ export default function Rhalia() {
                     <Heart className="h-5 w-5 text-rose-400" />
                     Physical Health
                   </h4>
-                  
+
                   <div>
                     <Label>Sleep Hours: {metrics.sleepHours}h</Label>
                     <Slider
@@ -154,7 +148,7 @@ export default function Rhalia() {
                     <Brain className="h-5 w-5 text-blue-400" />
                     Mental & Social Health
                   </h4>
-                  
+
                   <div>
                     <Label>Stress Level: {metrics.stressLevel}/10</Label>
                     <Slider

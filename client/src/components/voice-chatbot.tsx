@@ -73,6 +73,7 @@ export function VoiceChatbot() {
             const response = await fetch('/api/omniserve/voice', {
                 method: 'POST',
                 body: formData,
+                credentials: 'include',
             });
 
             if (!response.ok) {
@@ -172,8 +173,8 @@ export function VoiceChatbot() {
                                         >
                                             <div
                                                 className={`rounded-lg px-3 py-2 max-w-[85%] text-sm ${msg.role === 'user'
-                                                        ? 'bg-primary text-primary-foreground'
-                                                        : 'bg-muted'
+                                                    ? 'bg-primary text-primary-foreground'
+                                                    : 'bg-muted'
                                                     }`}
                                             >
                                                 {msg.content}

@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Database, Zap, Shield } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function QueryArchitect() {
   const [input, setInput] = useState("");
@@ -34,28 +35,21 @@ export default function QueryArchitect() {
 
     setIsLoading(true);
     setOutput("");
-    
+
     try {
-      const response = await fetch('/api/sql-queries', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: mode,
-          input: input.trim(),
-        }),
+      const res = await apiRequest("POST", "/api/sql-queries", {
+        type: mode,
+        input: input.trim(),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to convert query');
-      }
-
-      const data = await response.json();
+      const data = await res.json();
       setOutput(data.output);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error converting query:', error);
-      alert('Failed to convert query. Please try again.');
+      const message = error.message?.includes('401')
+        ? 'Please log in to use Query Architect.'
+        : 'Failed to convert query. Please try again.';
+      alert(message);
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +80,7 @@ export default function QueryArchitect() {
             <GlassCard className="max-w-6xl mx-auto p-8">
               <div className="mb-6">
                 <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">Live Demo</h3>
-                
+
                 <Tabs value={mode} onValueChange={(value) => setMode(value as any)} className="mb-6">
                   <TabsList className="grid w-full max-w-md grid-cols-2">
                     <TabsTrigger value="nl_to_sql">Natural Language → SQL</TabsTrigger>
@@ -104,9 +98,9 @@ export default function QueryArchitect() {
                       {mode === "nl_to_sql" ? "Natural Language Query" : "SQL Query"}
                     </span>
                   </div>
-                  
+
                   <Textarea
-                    placeholder={mode === "nl_to_sql" 
+                    placeholder={mode === "nl_to_sql"
                       ? "Describe what you want to know in plain English..."
                       : "Paste your SQL query here..."
                     }
@@ -114,7 +108,7 @@ export default function QueryArchitect() {
                     onChange={(e) => setInput(e.target.value)}
                     className="h-32 mb-4 font-mono text-sm"
                   />
-                  
+
                   <Button onClick={handleGenerate} disabled={!input.trim() || isLoading} className="mb-4">
                     {isLoading ? "Processing..." : (mode === "nl_to_sql" ? "Generate SQL" : "Explain Query")}
                   </Button>
@@ -144,17 +138,16 @@ export default function QueryArchitect() {
                       {mode === "nl_to_sql" ? "Generated SQL" : "Natural Language Explanation"}
                     </span>
                   </div>
-                  
+
                   {isLoading ? (
                     <div className="bg-alabaster-50 rounded-xl p-8 flex items-center justify-center h-32">
                       <div className="animate-spin rounded-full h-6 w-6 border-2 border-ink-950 border-t-transparent"></div>
                     </div>
                   ) : output ? (
-                    <div className={`rounded-xl p-4 h-64 overflow-y-auto ${
-                      mode === "nl_to_sql" 
-                        ? "bg-ink-950 text-emerald-400" 
+                    <div className={`rounded-xl p-4 h-64 overflow-y-auto ${mode === "nl_to_sql"
+                        ? "bg-ink-950 text-emerald-400"
                         : "bg-alabaster-50 text-slate-700"
-                    }`}>
+                      }`}>
                       <pre className="text-sm font-mono whitespace-pre-wrap">{output}</pre>
                     </div>
                   ) : (
@@ -169,7 +162,7 @@ export default function QueryArchitect() {
                         <Badge variant="outline">Performance: ~1.2s execution</Badge>
                         <Badge variant="outline">Rows: 12,450 scanned</Badge>
                       </div>
-                      
+
                       {mode === "nl_to_sql" && (
                         <div className="text-xs text-slate-600">
                           <span className="font-medium">Optimization tips:</span> Query uses proper indexing and includes LIMIT for safety

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Heart, TrendingUp, CheckCircle, AlertCircle, Smile } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 const categories = [
   { id: 'work', label: 'Work Satisfaction', icon: '💼' },
@@ -50,25 +51,18 @@ export default function SatisfAI() {
     }));
 
     try {
-      const response = await fetch('/api/satisfaction-analysis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          responses,
-        }),
+      const res = await apiRequest("POST", "/api/satisfaction-analysis", {
+        responses,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze satisfaction');
-      }
-
-      const data = await response.json();
+      const data = await res.json();
       setAnalysis(data.analysis);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error analyzing satisfaction:', error);
-      alert('Failed to analyze satisfaction. Please try again.');
+      const message = error.message?.includes('401')
+        ? 'Please log in to use SatisfAI.'
+        : 'Failed to analyze satisfaction. Please try again.';
+      alert(message);
     } finally {
       setIsAnalyzing(false);
     }
@@ -100,7 +94,7 @@ export default function SatisfAI() {
             {/* Survey Form */}
             <GlassCard className="max-w-4xl mx-auto p-8 mb-8">
               <h3 className="font-display font-bold text-2xl text-ink-950 mb-6">Satisfaction Survey</h3>
-              
+
               <div className="space-y-8">
                 {categories.map((category) => (
                   <div key={category.id} className="bg-white rounded-xl p-6">
@@ -108,7 +102,7 @@ export default function SatisfAI() {
                       <span className="text-2xl">{category.icon}</span>
                       <Label className="text-lg font-semibold">{category.label}</Label>
                     </div>
-                    
+
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-slate-600">Rating: {ratings[category.id]}/10</span>
@@ -164,7 +158,7 @@ export default function SatisfAI() {
                     </Badge>
                   </div>
                   <Progress value={analysis.overallScore} className="h-4 mb-4" />
-                  
+
                   {/* Emotional Profile */}
                   <div className="bg-alabaster-50 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
@@ -211,9 +205,8 @@ export default function SatisfAI() {
                     {analysis.keyDrivers.map((driver: any, index: number) => (
                       <div
                         key={index}
-                        className={`flex items-center justify-between p-3 rounded-lg ${
-                          driver.impact === 'positive' ? 'bg-emerald-50' : 'bg-amber-50'
-                        }`}
+                        className={`flex items-center justify-between p-3 rounded-lg ${driver.impact === 'positive' ? 'bg-emerald-50' : 'bg-amber-50'
+                          }`}
                       >
                         <div className="flex items-center gap-2">
                           {driver.impact === 'positive' ? (

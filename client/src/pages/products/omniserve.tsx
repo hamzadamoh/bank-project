@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Send, Globe, Bot, Mic } from "lucide-react";
 import { VoiceChatbot } from "@/components/voice-chatbot";
+import { apiRequest } from "@/lib/queryClient";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -63,23 +64,13 @@ export default function OmniServe() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessage.content,
-          conversationId,
-          language,
-        }),
+      const res = await apiRequest("POST", "/api/chat", {
+        message: userMessage.content,
+        conversationId,
+        language,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-
-      const data = await response.json();
+      const data = await res.json();
 
       if (!conversationId) {
         setConversationId(data.conversationId);
@@ -92,9 +83,12 @@ export default function OmniServe() {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
-      alert('Failed to send message. Please try again.');
+      const message = error.message?.includes('401')
+        ? 'Please log in to use OmniServe.'
+        : 'Failed to send message. Please try again.';
+      alert(message);
     } finally {
       setIsLoading(false);
     }

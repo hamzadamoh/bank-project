@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Target, TrendingUp, Award, ArrowRight, ArrowLeft } from "lucide-react";
 import { questionsByCategory, type Question } from "@/lib/skillarcade-questions";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function SkillArcade() {
   const [category, setCategory] = useState("technical");
@@ -64,28 +65,21 @@ export default function SkillArcade() {
     });
 
     try {
-      const response = await fetch('/api/skill-assessments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          category,
-          responses,
-        }),
+      const res = await apiRequest("POST", "/api/skill-assessments", {
+        category,
+        responses,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to assess skills');
-      }
-
-      const data = await response.json();
+      const data = await res.json();
       setAssessment(data.assessment);
       setCurrentQuestionIndex(0);
       setAnswers({});
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error assessing skills:', error);
-      alert('Failed to assess skills. Please try again.');
+      const message = error.message?.includes('401')
+        ? 'Please log in to use SkillArcade.'
+        : 'Failed to assess skills. Please try again.';
+      alert(message);
     } finally {
       setIsAssessing(false);
     }
@@ -112,7 +106,7 @@ export default function SkillArcade() {
               {!assessment && questions.length === 0 && !isAssessing && (
                 <div className="mb-6">
                   <h3 className="font-display font-bold text-2xl text-ink-950 mb-4">Take an Assessment</h3>
-                  
+
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-slate-700 mb-2">Skill Category</label>
                     <Select value={category} onValueChange={setCategory} disabled={isAssessing}>
@@ -162,18 +156,16 @@ export default function SkillArcade() {
                         <button
                           key={index}
                           onClick={() => handleAnswer(index)}
-                          className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                            answers[questions[currentQuestionIndex].id] === index
+                          className={`w-full text-left p-4 rounded-lg border-2 transition-all ${answers[questions[currentQuestionIndex].id] === index
                               ? 'border-ink-950 bg-champagne-100'
                               : 'border-slate-200 hover:border-champagne-200 hover:bg-alabaster-50'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center gap-3">
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                              answers[questions[currentQuestionIndex].id] === index
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${answers[questions[currentQuestionIndex].id] === index
                                 ? 'border-ink-950 bg-ink-950'
                                 : 'border-slate-300'
-                            }`}>
+                              }`}>
                               {answers[questions[currentQuestionIndex].id] === index && (
                                 <div className="w-2 h-2 bg-white rounded-full" />
                               )}

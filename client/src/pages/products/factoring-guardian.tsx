@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, AlertTriangle, CheckCircle, X } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function FactoringGuardian() {
   const { toast } = useToast();
@@ -84,24 +85,13 @@ export default function FactoringGuardian() {
 
         try {
           // Call the actual API with file data
-          const response = await fetch('/api/document-analysis', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              filename: selectedFile.name,
-              fileContent: base64Content,
-              fileType: selectedFile.type,
-            }),
+          const res = await apiRequest("POST", "/api/document-analysis", {
+            filename: selectedFile.name,
+            fileContent: base64Content,
+            fileType: selectedFile.type,
           });
 
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to analyze document');
-          }
-
-          const data = await response.json();
+          const data = await res.json();
           setUploadProgress(100);
           setTimeout(() => {
             setIsAnalyzing(false);
@@ -109,11 +99,14 @@ export default function FactoringGuardian() {
             setAnalysisResult(data);
             clearInterval(progressInterval);
           }, 500);
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error analyzing document:', error);
           clearInterval(progressInterval);
           setIsAnalyzing(false);
-          alert(error instanceof Error ? error.message : 'Failed to analyze document. Please try again.');
+          const message = error.message?.includes('401')
+            ? 'Please log in to use FactoringGuardian.'
+            : (error.message || 'Failed to analyze document. Please try again.');
+          alert(message);
         }
       };
 
