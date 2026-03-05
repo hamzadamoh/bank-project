@@ -70,10 +70,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             queryClient.setQueryData(["/api/user"], user);
             toast({ title: "Welcome back!", description: "Successfully logged in." });
         },
-        onError: (error: Error) => {
+        onError: (error: any) => {
+            const message = error.code ? `[${error.code}] ${error.message}` : error.message;
             toast({
                 title: "Login failed",
-                description: error.message,
+                description: message,
                 variant: "destructive",
             });
         },
@@ -81,24 +82,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const registerMutation = useMutation({
         mutationFn: async (newUser: InsertUser) => {
-            // 1. Create in Firebase Auth
-            const userCredential = await createUserWithEmailAndPassword(auth, newUser.username, newUser.password);
+            try {
+                // 1. Create in Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, newUser.username, newUser.password);
 
-            // 2. Create profile in Firestore via our API, passing the UID
-            const res = await apiRequest("POST", "/api/register", {
-                ...newUser,
-                id: userCredential.user.uid
-            });
-            return await safeJsonParse(res);
+                // 2. Create profile in Firestore via our API, passing the UID
+                const res = await apiRequest("POST", "/api/register", {
+                    ...newUser,
+                    id: userCredential.user.uid
+                });
+                return await safeJsonParse(res);
+            } catch (error: any) {
+                console.error("[AUTH] Registration error details:", error.code, error.message);
+                throw error;
+            }
         },
         onSuccess: (user: SelectUser) => {
             queryClient.setQueryData(["/api/user"], user);
             toast({ title: "Account created!", description: "Welcome to FiscAI." });
         },
-        onError: (error: Error) => {
+        onError: (error: any) => {
+            const message = error.code ? `[${error.code}] ${error.message}` : error.message;
             toast({
                 title: "Registration failed",
-                description: error.message,
+                description: message,
                 variant: "destructive",
             });
         },
@@ -128,10 +135,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             queryClient.setQueryData(["/api/user"], user);
             toast({ title: "Welcome back!", description: "Successfully logged in with Google." });
         },
-        onError: (error: Error) => {
+        onError: (error: any) => {
+            const message = error.code ? `[${error.code}] ${error.message}` : error.message;
             toast({
                 title: "Google login failed",
-                description: error.message,
+                description: message,
                 variant: "destructive",
             });
         },

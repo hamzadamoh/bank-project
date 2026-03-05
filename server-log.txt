@@ -80,3 +80,5 @@ ate-db#readme
 [2m10:00:37 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.tsx?v=PWzdbfrAQVc8GjFigMYM1, /src/index.css?v=PWzdbfrAQVc8GjFigMYM1[22m
 [2m10:01:45 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/login.tsx, /src/index.css?v=PWzdbfrAQVc8GjFigMYM1[22m
 [2m10:04:07 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/request-access.tsx, /src/index.css?v=PWzdbfrAQVc8GjFigMYM1[22m
+[2m10:42:37 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/hooks/use-auth.tsx, /src/index.css?v=PWzdbfrAQVc8GjFigMYM1[22m
+[2m10:42:49 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/hooks/use-auth.tsx, /src/index.css?v=PWzdbfrAQVc8GjFigMYM1[22m
