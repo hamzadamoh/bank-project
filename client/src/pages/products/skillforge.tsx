@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Target, TrendingUp, Award, ArrowRight, ArrowLeft } from "lucide-react";
-import { questionsByCategory, type Question } from "@/lib/SkillForge-questions";
+import { questionsByCategory, type Question } from "@/lib/skillforge-questions";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function SkillForge() {
@@ -157,14 +157,14 @@ export default function SkillForge() {
                           key={index}
                           onClick={() => handleAnswer(index)}
                           className={`w-full text-left p-4 rounded-lg border-2 transition-all ${answers[questions[currentQuestionIndex].id] === index
-                              ? 'border-ink-950 bg-champagne-100'
-                              : 'border-slate-200 hover:border-champagne-200 hover:bg-alabaster-50'
+                            ? 'border-ink-950 bg-champagne-100'
+                            : 'border-slate-200 hover:border-champagne-200 hover:bg-alabaster-50'
                             }`}
                         >
                           <div className="flex items-center gap-3">
                             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${answers[questions[currentQuestionIndex].id] === index
-                                ? 'border-ink-950 bg-ink-950'
-                                : 'border-slate-300'
+                              ? 'border-ink-950 bg-ink-950'
+                              : 'border-slate-300'
                               }`}>
                               {answers[questions[currentQuestionIndex].id] === index && (
                                 <div className="w-2 h-2 bg-white rounded-full" />
