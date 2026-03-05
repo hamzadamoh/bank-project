@@ -16,7 +16,7 @@ export const tenants = pgTable("tenants", {
     provider: "local", // 'okta', 'azure', 'local'
     domain: ""
   }),
-  aiProvider: text("ai_provider").notNull().default("cloud"), // 'cloud', 'local'
+
   createdAt: timestamp("created_at").defaultNow(),
 });
 

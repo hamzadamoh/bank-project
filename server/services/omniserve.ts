@@ -22,7 +22,7 @@ interface ChatResponse {
 
 const conversations = new Map<string, ChatMessage[]>();
 
-export async function chat(request: ChatRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<ChatResponse> {
+export async function chat(request: ChatRequest): Promise<ChatResponse> {
   // Detect language if auto
   const language = request.language === 'auto' ? detectLanguage(request.message) : request.language || 'fr';
 
@@ -63,7 +63,6 @@ export async function chat(request: ChatRequest, options: { provider?: 'cloud' |
     response = await llmService.chat(messages, {
       temperature: 0.7,
       maxTokens: 500,
-      provider: options.provider
     });
   } catch (error) {
     console.error('Error in chat service:', error);
@@ -148,6 +147,6 @@ function getDefaultResponse(message: string, language: string): string {
   return responses[language] || responses.en;
 }
 
-export async function transcribeAudioWithGroq(audioBuffer: Buffer, provider?: 'cloud' | 'local'): Promise<string> {
-  return llmService.transcribe(audioBuffer, { provider });
+export async function transcribeAudioWithGroq(audioBuffer: Buffer): Promise<string> {
+  return llmService.transcribe(audioBuffer);
 }

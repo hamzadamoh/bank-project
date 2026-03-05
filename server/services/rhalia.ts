@@ -16,7 +16,7 @@ interface WellbeingAnalysisResponse {
   recommendations: string[];
 }
 
-export async function analyzeWellbeing(request: WellbeingDataRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<WellbeingAnalysisResponse> {
+export async function analyzeWellbeing(request: WellbeingDataRequest): Promise<WellbeingAnalysisResponse> {
   const physicalScore = calculatePhysicalScore(request.physicalMetrics || {});
   const mentalScore = calculateMentalScore(request.mentalMetrics || {});
   const socialScore = calculateSocialScore(request.socialMetrics || {});
@@ -31,7 +31,6 @@ export async function analyzeWellbeing(request: WellbeingDataRequest, options: {
 
     const responseText = await llmService.chat([{ role: 'user', content: prompt }], {
       responseFormat: { type: 'json_object' },
-      provider: options.provider
     });
     const content = JSON.parse(responseText);
 

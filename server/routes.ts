@@ -34,7 +34,7 @@ import {
   checkTierLimit
 } from "./middleware.js";
 
-import { llmService } from "./services/llm.js";
+
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
@@ -187,15 +187,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { query, jurisdiction } = req.body;
       const tenantId = req.user!.tenantId;
-      const tenant = await storage.getTenant(tenantId);
-      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       if (!query || !jurisdiction) {
         return res.status(400).json({ success: false, message: "Query and jurisdiction are required" });
       }
 
       console.log(`[TAX-QUERY] Starting analysis for jurisdiction: ${jurisdiction}`);
-      const taxResponse = await getTaxAdvice({ query, jurisdiction }, { provider });
+      const taxResponse = await getTaxAdvice({ query, jurisdiction });
       console.log(`[TAX-QUERY] Service returned results with confidence: ${taxResponse.confidence}`);
 
       // Audit Logging
@@ -238,14 +236,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { type, input } = req.body;
       const tenantId = req.user!.tenantId;
-      const tenant = await storage.getTenant(tenantId);
-      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       if (!type || !input) {
         return res.status(400).json({ success: false, message: "Type and input are required" });
       }
 
-      const conversionResult = await convertQuery({ type, input }, { provider });
+      const conversionResult = await convertQuery({ type, input });
 
       // Audit Logging
       await securityService.logAction({
@@ -277,14 +273,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { filename, fileContent, fileType } = req.body;
       const tenantId = req.user!.tenantId;
-      const tenant = await storage.getTenant(tenantId);
-      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       const analysisResult = await analyzeDocument({
         filename: filename || 'uploaded_document',
         fileContent: fileContent ? Buffer.from(fileContent, 'base64') : undefined,
         fileType
-      }, { provider });
+      });
 
       // Audit Logging
       await securityService.logAction({
@@ -317,10 +311,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { category, responses } = req.body;
       const tenantId = (req as any).tenantId || req.user?.tenantId || 'tenant_default';
-      const tenant = await storage.getTenant(tenantId);
-      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
-      const assessment = await assessSkills({ category, responses }, { provider });
+      const assessment = await assessSkills({ category, responses });
 
       // Audit Logging
       await securityService.logAction({
@@ -344,12 +336,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { message, conversationId, language } = req.body;
       const tenantId = req.user!.tenantId;
-      const tenant = await storage.getTenant(tenantId);
-      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       if (!message) return res.status(400).json({ success: false, message: "Message is required" });
 
-      const chatResponse = await chat({ message, conversationId, language }, { provider });
+      const chatResponse = await chat({ message, conversationId, language });
 
       // Audit Logging
       await securityService.logAction({
@@ -373,15 +363,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       if (!req.file) return res.status(400).json({ success: false, message: "No audio file provided" });
       const tenantId = req.user!.tenantId;
-      const tenant = await storage.getTenant(tenantId);
-      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
-      const transcription = await transcribeAudioWithGroq(req.file.buffer, provider);
+      const transcription = await transcribeAudioWithGroq(req.file.buffer);
       if (!transcription || transcription.trim().length === 0) {
         return res.json({ success: true, transcription: "", response: "I couldn't hear anything." });
       }
 
-      const chatResponse = await chat({ message: transcription, language: 'auto' }, { provider });
+      const chatResponse = await chat({ message: transcription, language: 'auto' });
 
       // Audit Logging
       await securityService.logAction({
@@ -405,10 +393,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { physicalMetrics, mentalMetrics, socialMetrics } = req.body;
       const tenantId = req.user!.tenantId;
-      const tenant = await storage.getTenant(tenantId);
-      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
-      const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics }, { provider });
+      const analysis = await analyzeWellbeing({ physicalMetrics, mentalMetrics, socialMetrics });
 
       // Audit Logging
       await securityService.logAction({
@@ -432,10 +418,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { responses, context } = req.body;
       const tenantId = req.user!.tenantId;
-      const tenant = await storage.getTenant(tenantId);
-      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
-      const analysis = await analyzeSatisfaction({ responses }, { provider });
+      const analysis = await analyzeSatisfaction({ responses });
 
       // Audit Logging
       await securityService.logAction({
@@ -461,14 +445,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { documentType } = req.body;
       const tenantId = req.user!.tenantId;
       const userId = req.user!.id;
-      const tenant = await storage.getTenant(tenantId);
-      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       const kycResult = await financialAssessor.processKyc({
         documentType: documentType || 'ID_CARD',
         imageBuffer: req.file.buffer,
         mimeType: req.file.mimetype
-      }, { provider });
+      });
 
       // Audit Logging
       await securityService.logAction({
@@ -503,12 +485,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { financialData, context } = req.body;
       const tenantId = req.user!.tenantId;
       const userId = req.user!.id;
-      const tenant = await storage.getTenant(tenantId);
-      const provider = (tenant?.aiProvider as 'cloud' | 'local') || 'cloud';
 
       if (!financialData) return res.status(400).json({ success: false, message: "Financial data is required" });
 
-      const assessmentResult = await financialAssessor.assessCreditRisk({ financialData, context }, { provider });
+      const assessmentResult = await financialAssessor.assessCreditRisk({ financialData, context });
 
       // Audit Logging
       await securityService.logAction({
@@ -636,48 +616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/tenant/ai-provider", isAuthenticated, async (req, res) => {
-    try {
-      const tenant = await storage.getTenant(req.user!.tenantId);
-      res.json({ success: true, provider: tenant?.aiProvider || 'cloud' });
-    } catch (error) {
-      res.status(500).json({ success: false, message: "Failed to fetch AI provider" });
-    }
-  });
 
-  app.get("/api/tenant/ai-provider/test", isAuthenticated, async (req, res) => {
-    try {
-      const provider = req.query.provider as 'cloud' | 'local' || 'cloud';
-      const result = await llmService.testConnection(provider);
-      res.json(result);
-    } catch (error) {
-      res.status(500).json({ success: false, message: "Connection test failed" });
-    }
-  });
-
-  app.put("/api/tenant/ai-provider", isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const { provider } = req.body;
-      if (provider !== 'cloud' && provider !== 'local') {
-        return res.status(400).json({ success: false, message: "Invalid provider. Must be 'cloud' or 'local'" });
-      }
-
-      // Test connection before allowing switch
-      const connection = await llmService.testConnection(provider);
-      if (!connection.success) {
-        return res.status(400).json({
-          success: false,
-          message: connection.message
-        });
-      }
-
-      await storage.updateTenantAiProvider(req.user!.tenantId, provider);
-      res.json({ success: true, provider });
-    } catch (error) {
-      console.error("[API] Failed to update AI provider:", error);
-      res.status(500).json({ success: false, message: "Failed to update AI provider" });
-    }
-  });
 
   // Diagnostic
   app.get("/api/internal/debug/storage", isAuthenticated, isAdmin, async (req, res) => {

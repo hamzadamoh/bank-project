@@ -14,7 +14,7 @@ interface TaxResponse {
   confidence: number;
 }
 
-export async function getTaxAdvice(request: TaxQueryRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<TaxResponse> {
+export async function getTaxAdvice(request: TaxQueryRequest): Promise<TaxResponse> {
   const jurisdictionContext = getJurisdictionContext(request.jurisdiction);
 
   const messages: Message[] = [
@@ -35,7 +35,6 @@ export async function getTaxAdvice(request: TaxQueryRequest, options: { provider
     const responseText = await llmService.chat(messages, {
       temperature: 0.3,
       responseFormat: { type: 'json_object' },
-      provider: options.provider
     });
 
     const content = JSON.parse(responseText);

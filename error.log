@@ -1,0 +1,41 @@
+﻿[SECURITY] Encryption Key initialized. Length: 32 bytes
+node : file:///C:/Users
+/LENOVO/Desktop/ilyas%2
+0project/dist/index.js:
+2107
+At line:1 char:1
++ node dist/index.js 
+2>&1 | Out-File 
+-Encoding utf8 
+error.log; type err ...
++ 
+~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (file:///C:/Us   
+ er...t/index.js:21    
+07:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+    path2.resolve(__dir
+name || 
+import.meta.dirname, 
+"..", "dist", "public")
+                  ^
+
+ReferenceError: 
+__dirname is not 
+defined
+    at serveStatic (fil
+e:///C:/Users/LENOVO/De
+sktop/ilyas%20project/d
+ist/index.js:2107:19)
+    at file:///C:/Users
+/LENOVO/Desktop/ilyas%2
+0project/dist/index.js:
+2326:5
+
+Node.js v22.14.0

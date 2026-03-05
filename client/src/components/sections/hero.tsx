@@ -6,7 +6,7 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="font-display font-bold text-5xl md:text-6xl lg:text-7xl leading-tight mb-8">
-            <span className="text-ink-950">Smarter finance,</span><br />
+            <span className="text-ink-950">Smarter finance</span><br />
             <span className="bg-gradient-to-r from-champagne-200 to-champagne-300 bg-clip-text text-transparent">faster decisions</span>
           </h1>
           <p className="text-xl md:text-2xl text-slate-700 mb-12 leading-relaxed">

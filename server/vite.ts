@@ -73,7 +73,7 @@ export function serveStatic(app: Express) {
     path.resolve(import.meta.dirname, "..", "dist", "public"),
     path.resolve(process.cwd(), "dist", "public"),
     path.resolve(process.cwd(), ".vercel", "output", "static"),
-    path.resolve(__dirname || import.meta.dirname, "..", "dist", "public"),
+    path.resolve(import.meta.dirname, "..", "dist", "public"),
   ];
 
   let distPath: string | null = null;
@@ -88,7 +88,7 @@ export function serveStatic(app: Express) {
     console.error("Could not find build directory. Tried paths:", possiblePaths);
     // Instead of throwing, return a simple error handler
     app.use("*", (_req, res) => {
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Static files not found. Please ensure the project is built correctly.",
         tried: possiblePaths
       });

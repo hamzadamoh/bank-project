@@ -17,12 +17,12 @@ interface QueryConversionResponse {
   };
 }
 
-export async function convertQuery(request: QueryConversionRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<QueryConversionResponse> {
+export async function convertQuery(request: QueryConversionRequest): Promise<QueryConversionResponse> {
   try {
     if (request.type === 'nl_to_sql') {
-      return await convertNLToSQL(request.input, options.provider);
+      return await convertNLToSQL(request.input);
     } else {
-      return await convertSQLToNL(request.input, options.provider);
+      return await convertSQLToNL(request.input);
     }
   } catch (error) {
     console.error('Query conversion error:', error);
@@ -30,7 +30,7 @@ export async function convertQuery(request: QueryConversionRequest, options: { p
   }
 }
 
-async function convertNLToSQL(nlQuery: string, provider?: 'cloud' | 'local'): Promise<QueryConversionResponse> {
+async function convertNLToSQL(nlQuery: string): Promise<QueryConversionResponse> {
   const messages: Message[] = [
     {
       role: 'system',
@@ -44,7 +44,6 @@ async function convertNLToSQL(nlQuery: string, provider?: 'cloud' | 'local'): Pr
 
   const sql = await llmService.chat(messages, {
     temperature: 0.1,
-    provider
   });
 
   return {
@@ -59,7 +58,7 @@ async function convertNLToSQL(nlQuery: string, provider?: 'cloud' | 'local'): Pr
   };
 }
 
-async function convertSQLToNL(sqlQuery: string, provider?: 'cloud' | 'local'): Promise<QueryConversionResponse> {
+async function convertSQLToNL(sqlQuery: string): Promise<QueryConversionResponse> {
   const messages: Message[] = [
     {
       role: 'system',
@@ -73,7 +72,6 @@ async function convertSQLToNL(sqlQuery: string, provider?: 'cloud' | 'local'): P
 
   const explanation = await llmService.chat(messages, {
     temperature: 0.3,
-    provider
   });
 
   return {

@@ -29,7 +29,7 @@ interface DocumentAnalysisResponse {
   confidence: number;
 }
 
-export async function analyzeDocument(request: DocumentAnalysisRequest, options: { provider?: 'cloud' | 'local' } = {}): Promise<DocumentAnalysisResponse> {
+export async function analyzeDocument(request: DocumentAnalysisRequest): Promise<DocumentAnalysisResponse> {
   if (request.fileContent) {
     try {
       const prompt = `Analyze this invoice and extract data to JSON: { supplier: {name, taxId, address, iban}, invoice: {number, date, dueDate, currency, totalHT, totalTVA, totalTTC}, lineItems: [{description, quantity, unitPrice, total}] }`;
@@ -38,7 +38,6 @@ export async function analyzeDocument(request: DocumentAnalysisRequest, options:
         prompt,
         imageBuffer: request.fileContent,
         mimeType: request.fileType || 'image/png',
-        provider: options.provider
       });
 
       if (!extractedData) throw new Error('Failed to extract data via Vision');
@@ -50,7 +49,6 @@ export async function analyzeDocument(request: DocumentAnalysisRequest, options:
         { role: 'user', content: fraudPrompt }
       ], {
         responseFormat: { type: 'json_object' },
-        provider: options.provider
       });
 
       const fraudResult = JSON.parse(fraudResponseText);

@@ -97,7 +97,7 @@ export interface IStorage {
   deleteUserAccount(userId: string): Promise<void>;
   updateUserConsent(userId: string, settings: any): Promise<void>;
   applyRetentionPolicy(tenantId: string): Promise<void>;
-  updateTenantAiProvider(tenantId: string, provider: "cloud" | "local"): Promise<void>;
+
 
   // Tokenization Vault (New)
   createToken(token: string, encryptedData: string): Promise<void>;
@@ -143,8 +143,7 @@ export class MemStorage implements IStorage {
       region: "Morocco",
       tier: "Starter",
       queryLimit: "100",
-      ssoConfig: { enabled: false, provider: "local", domain: "" },
-      aiProvider: "cloud"
+      ssoConfig: { enabled: false, provider: "local", domain: "" }
     });
   }
 
@@ -215,7 +214,7 @@ export class MemStorage implements IStorage {
       retentionDays: insertTenant.retentionDays || "30",
       mfaEnforced: insertTenant.mfaEnforced || false,
       ssoConfig: insertTenant.ssoConfig || { enabled: false, provider: "local", domain: "" },
-      aiProvider: (insertTenant as any).aiProvider || "cloud"
+
     };
     this.tenants.set(id, tenant);
     return tenant;
@@ -557,12 +556,7 @@ export class MemStorage implements IStorage {
     this.users.set(userId, user);
   }
 
-  async updateTenantAiProvider(tenantId: string, provider: "cloud" | "local"): Promise<void> {
-    const tenant = this.tenants.get(tenantId);
-    if (!tenant) throw new Error("Tenant not found");
-    tenant.aiProvider = provider;
-    this.tenants.set(tenantId, tenant);
-  }
+
 }
 
 export const storage = new MemStorage();
