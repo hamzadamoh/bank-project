@@ -43,6 +43,11 @@ export function setupAuth(app: Express) {
             return res.status(401).send('Unauthorized: No token provided');
         }
 
+        if (!adminAuth) {
+            console.error('[AUTH] Critical: Firebase Admin Auth not initialized.');
+            return res.status(500).send('Internal Server Error: Authentication service not initialized on server.');
+        }
+
         try {
             const decodedToken = await adminAuth.verifyIdToken(idToken);
             const user = await storage.getUser(decodedToken.uid);
@@ -51,7 +56,7 @@ export function setupAuth(app: Express) {
                 next();
             } else {
                 console.log(`[AUTH] User not found in database for UID: ${decodedToken.uid}`);
-                res.status(401).send('Unauthorized: User not found in database');
+                res.status(401).send('Unauthorized: User not found in database. Please register first.');
             }
         } catch (error: any) {
             console.error('[AUTH] Token verification failed:', error.message);

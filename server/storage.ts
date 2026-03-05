@@ -134,14 +134,24 @@ export class FirestoreStorage implements IStorage {
   }
 
   async getUser(id: string): Promise<User | undefined> {
-    const doc = await db.collection("users").doc(id).get();
-    if (!doc.exists) return undefined;
+    try {
+      console.log(`[STORAGE] Fetching user profile for UID: ${id}`);
+      const doc = await db.collection("users").doc(id).get();
+      if (!doc.exists) {
+        console.log(`[STORAGE] User profile not found for UID: ${id}`);
+        return undefined;
+      }
 
-    const data = doc.data() as User;
-    if (data.createdAt && (data.createdAt as any).toDate) {
-      data.createdAt = (data.createdAt as any).toDate();
+      const data = doc.data() as User;
+      if (data.createdAt && (data.createdAt as any).toDate) {
+        data.createdAt = (data.createdAt as any).toDate();
+      }
+      console.log(`[STORAGE] User profile retrieved for: ${data.username} (UID: ${id})`);
+      return { ...data, id };
+    } catch (error: any) {
+      console.error(`[STORAGE] Error fetching user profile for UID ${id}:`, error.message);
+      throw error;
     }
-    return data;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
