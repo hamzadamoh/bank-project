@@ -22,6 +22,7 @@ import CookiePolicy from "@/pages/cookie-policy";
 import RefundPolicy from "@/pages/refund-policy";
 import Checkout from "@/pages/checkout";
 import Login from "@/pages/login";
+import Register from "@/pages/register";
 import About from "@/pages/about";
 import Careers from "@/pages/careers";
 import Dashboard from "@/pages/dashboard";
@@ -63,6 +64,7 @@ function Router() {
         <Route path="/refund-policy" component={RefundPolicy} />
         <Route path="/checkout" component={Checkout} />
         <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
         <Route path="/about" component={About} />
         <Route path="/careers" component={Careers} />
         <Route path="/dashboard" component={Dashboard} />

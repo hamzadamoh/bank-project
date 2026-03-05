@@ -13,6 +13,8 @@ import {
     createUserWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
+    signInWithPopup,
+    GoogleAuthProvider,
     User as FirebaseUser
 } from "firebase/auth";
 
@@ -21,6 +23,7 @@ type AuthContextType = {
     isLoading: boolean;
     error: Error | null;
     loginMutation: UseMutationResult<SelectUser, Error, LoginData>;
+    googleLoginMutation: UseMutationResult<SelectUser, Error, void>;
     logoutMutation: UseMutationResult<void, Error, void>;
     registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
 };
@@ -101,6 +104,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
     });
 
+    const googleLoginMutation = useMutation({
+        mutationFn: async () => {
+            const provider = new GoogleAuthProvider();
+            const userCredential = await signInWithPopup(auth, provider);
+            console.log("[AUTH] Google login success:", userCredential.user.uid);
+
+            // Sync with profile
+            const res = await apiRequest("GET", "/api/user");
+            const profile = await safeJsonParse(res);
+
+            if (!profile) {
+                // If profile doesn't exist yet, we might need to create it
+                // For simplicity, we assume the server handles user creation/sync on first SSO login
+                // or the user needs to register first. 
+                // However, based on the backend auth.ts, it expects the user to exist in storage.
+                // Let's check user existence and redirect if needed or toast.
+                throw new Error("No profile found for this Google account. Please register first.");
+            }
+            return profile;
+        },
+        onSuccess: (user: SelectUser) => {
+            queryClient.setQueryData(["/api/user"], user);
+            toast({ title: "Welcome back!", description: "Successfully logged in with Google." });
+        },
+        onError: (error: Error) => {
+            toast({
+                title: "Google login failed",
+                description: error.message,
+                variant: "destructive",
+            });
+        },
+    });
+
     const logoutMutation = useMutation({
         mutationFn: async () => {
             await signOut(auth);
@@ -126,6 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isLoading: !isAuthInited || isProfileLoading,
                 error,
                 loginMutation,
+                googleLoginMutation,
                 logoutMutation,
                 registerMutation,
             }}

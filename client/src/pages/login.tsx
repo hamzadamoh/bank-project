@@ -17,7 +17,7 @@ import { useAuth } from "@/hooks/use-auth";
 export default function Login() {
     const { toast } = useToast();
     const [, setLocation] = useLocation();
-    const { loginMutation } = useAuth();
+    const { loginMutation, googleLoginMutation } = useAuth();
     const [role, setRole] = useState<UserRole>("client");
     const [showPassword, setShowPassword] = useState(false);
     const [form, setForm] = useState({
@@ -26,7 +26,7 @@ export default function Login() {
         rememberMe: false,
     });
 
-    const isLoading = loginMutation.isPending;
+    const isLoading = loginMutation.isPending || googleLoginMutation.isPending;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -197,18 +197,21 @@ export default function Login() {
                         </div>
 
                         {/* Social Login */}
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 gap-3">
                             <Button
                                 variant="outline"
-                                className="py-5"
-                                onClick={() =>
-                                    toast({
-                                        title: "Google SSO",
-                                        description: "Google Sign-In will be available once OAuth is configured.",
-                                    })
-                                }
+                                className="py-6 flex items-center justify-center gap-3"
+                                disabled={isLoading}
+                                onClick={async () => {
+                                    try {
+                                        await googleLoginMutation.mutateAsync();
+                                        setLocation("/dashboard");
+                                    } catch (err) {
+                                        // Handled by mutation
+                                    }
+                                }}
                             >
-                                <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
+                                <svg className="h-5 w-5" viewBox="0 0 24 24">
                                     <path
                                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
                                         fill="#4285F4"
@@ -226,33 +229,15 @@ export default function Login() {
                                         fill="#EA4335"
                                     />
                                 </svg>
-                                Google
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="py-5"
-                                onClick={() =>
-                                    toast({
-                                        title: "Microsoft SSO",
-                                        description: "Microsoft Sign-In will be available once OAuth is configured.",
-                                    })
-                                }
-                            >
-                                <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
-                                    <rect x="1" y="1" width="10" height="10" fill="#F25022" />
-                                    <rect x="13" y="1" width="10" height="10" fill="#7FBA00" />
-                                    <rect x="1" y="13" width="10" height="10" fill="#00A4EF" />
-                                    <rect x="13" y="13" width="10" height="10" fill="#FFB900" />
-                                </svg>
-                                Microsoft
+                                Continue with Google
                             </Button>
                         </div>
 
                         {/* Sign Up Link */}
                         <p className="text-center text-sm text-slate-600 mt-6">
                             Don't have an account?{" "}
-                            <Link href="/request-access" className="text-ink-950 font-semibold hover:underline">
-                                Request Access
+                            <Link href="/register" className="text-ink-950 font-semibold hover:underline">
+                                Registration
                             </Link>
                         </p>
                     </GlassCard>
