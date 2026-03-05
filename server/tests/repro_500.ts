@@ -12,13 +12,13 @@ async function runRepro() {
             tenantId: "tenant_default",
             role: "client"
         });
-        console.log("User created:", user.id);
+        console.log("User created:", user.id!);
 
         // 2. Test MFA Setup
         try {
             console.log("Testing MFA Setup...");
             const secret = securityService.generateMfaSecret();
-            await storage.updateUserMfa(user.id, { secret, enabled: false });
+            await storage.updateUserMfa(user.id!, { secret, enabled: false });
             console.log("MFA Setup Success");
         } catch (e: any) {
             console.error("MFA Setup Failed:", e.message);
@@ -36,7 +36,7 @@ async function runRepro() {
         // 4. Test Compliance Status
         try {
             console.log("Testing Compliance Status...");
-            const status = await securityService.getComplianceStatus(user.tenantId);
+            const status = await securityService.getComplianceStatus(user.tenantId!);
             console.log("Compliance Status Success:", status.status);
         } catch (e: any) {
             console.error("Compliance Status Failed:", e.message);
@@ -45,7 +45,7 @@ async function runRepro() {
         // 5. Test Privacy Update
         try {
             console.log("Testing Privacy Update...");
-            await storage.updateUserConsent(user.id, { marketing: false });
+            await storage.updateUserConsent(user.id!, { marketing: false });
             console.log("Privacy Update Success");
         } catch (e: any) {
             console.error("Privacy Update Failed:", e.message);

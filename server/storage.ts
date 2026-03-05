@@ -25,6 +25,7 @@ import {
   type InsertTenant
 } from "../shared/schema.js";
 import { randomUUID } from "crypto";
+import { db } from "./db.js";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -98,7 +99,6 @@ export interface IStorage {
   updateUserConsent(userId: string, settings: any): Promise<void>;
   applyRetentionPolicy(tenantId: string): Promise<void>;
 
-
   // Tokenization Vault (New)
   createToken(token: string, encryptedData: string): Promise<void>;
   getToken(token: string): Promise<string | undefined>;
@@ -107,63 +107,61 @@ export interface IStorage {
   updateUserMfa(userId: string, data: { secret?: string, enabled: boolean }): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private demoRequests: Map<string, DemoRequest>;
-  private contactSubmissions: Map<string, ContactSubmission>;
-  private taxQueries: Map<string, TaxQuery>;
-  private sqlQueries: Map<string, SqlQuery>;
-  private documentAnalysis: Map<string, DocumentAnalysis>;
-  private waitlist: Map<string, Waitlist>;
-  private orders: Map<string, Order>;
-  private auditLogs: Map<string, AuditLog>;
-  private kycRecords: Map<string, KycRecord>;
-  private creditAssessments: Map<string, CreditAssessment>;
-  private tenants: Map<string, Tenant>;
-  private tokens: Map<string, string>; // Tokenization vault
-
+export class FirestoreStorage implements IStorage {
   constructor() {
-    this.users = new Map();
-    this.demoRequests = new Map();
-    this.contactSubmissions = new Map();
-    this.taxQueries = new Map();
-    this.sqlQueries = new Map();
-    this.documentAnalysis = new Map();
-    this.waitlist = new Map();
-    this.orders = new Map();
-    this.auditLogs = new Map();
-    this.kycRecords = new Map();
-    this.creditAssessments = new Map();
-    this.tenants = new Map();
-    this.tokens = new Map();
+    this.seedDefaultTenant();
+  }
 
-    // Seed default tenant
-    this.createTenant({
-      name: "Default Tenant",
-      region: "Morocco",
-      tier: "Starter",
-      queryLimit: "100",
-      ssoConfig: { enabled: false, provider: "local", domain: "" }
-    });
+  private async seedDefaultTenant() {
+    try {
+      const doc = await db.collection("tenants").doc("tenant_default").get();
+      if (!doc.exists) {
+        await db.collection("tenants").doc("tenant_default").set({
+          id: "tenant_default",
+          name: "Default Tenant",
+          region: "Morocco",
+          tier: "Starter",
+          queryLimit: "100",
+          retentionDays: "30",
+          mfaEnforced: false,
+          ssoConfig: { enabled: false, provider: "local", domain: "" },
+          createdAt: new Date()
+        });
+      }
+    } catch (e) {
+      console.error("Failed to seed default tenant:", e);
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const doc = await db.collection("users").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as User;
+    if (data.createdAt && (data.createdAt as any).toDate) {
+      data.createdAt = (data.createdAt as any).toDate();
+    }
+    return data;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const snapshot = await db.collection("users").where("username", "==", username).limit(1).get();
+    if (snapshot.empty) return undefined;
+
+    const data = snapshot.docs[0].data() as User;
+    if (data.createdAt && (data.createdAt as any).toDate) {
+      data.createdAt = (data.createdAt as any).toDate();
+    }
+    return data;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
+  async createUser(insertUser: InsertUser & { id?: string }): Promise<User> {
+    const id = insertUser.id || randomUUID();
     const user: User = {
-      ...insertUser,
+      ...(insertUser as any),
       id,
-      tenantId: insertUser.tenantId || "tenant_default",
-      role: insertUser.role || "client",
+      tenantId: (insertUser as any).tenantId || "tenant_default",
+      role: (insertUser as any).role || "client",
       consentSettings: {
         analytics: true,
         marketing: false,
@@ -172,7 +170,7 @@ export class MemStorage implements IStorage {
       mfaEnabled: false,
       mfaSecret: null
     };
-    this.users.set(id, user);
+    await db.collection("users").doc(id).set(user);
     return user;
   }
 
@@ -186,19 +184,22 @@ export class MemStorage implements IStorage {
       ipAddress: insertLog.ipAddress ?? null,
       createdAt: new Date()
     };
-    this.auditLogs.set(id, log);
+    await db.collection("auditLogs").doc(id).set(log);
     return log;
   }
 
   async getAuditLogsByTenant(tenantId: string): Promise<AuditLog[]> {
     if (!tenantId) return [];
-    return Array.from(this.auditLogs.values())
-      .filter(log => log.tenantId === tenantId)
-      .sort((a, b) => {
-        const timeA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
-        const timeB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
-        return timeB - timeA;
-      });
+    const snapshot = await db.collection("auditLogs")
+      .where("tenantId", "==", tenantId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as AuditLog;
+      if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+      return data;
+    });
   }
 
   // Tenants
@@ -213,19 +214,28 @@ export class MemStorage implements IStorage {
       queryLimit: insertTenant.queryLimit || "100",
       retentionDays: insertTenant.retentionDays || "30",
       mfaEnforced: insertTenant.mfaEnforced || false,
-      ssoConfig: insertTenant.ssoConfig || { enabled: false, provider: "local", domain: "" },
-
+      ssoConfig: insertTenant.ssoConfig || { enabled: false, provider: "local", domain: "" }
     };
-    this.tenants.set(id, tenant);
+    await db.collection("tenants").doc(id).set(tenant);
     return tenant;
   }
 
   async getTenant(id: string): Promise<Tenant | undefined> {
-    return this.tenants.get(id);
+    const doc = await db.collection("tenants").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as Tenant;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   async getTenantByName(name: string): Promise<Tenant | undefined> {
-    return Array.from(this.tenants.values()).find(t => t.name === name);
+    const snapshot = await db.collection("tenants").where("name", "==", name).limit(1).get();
+    if (snapshot.empty) return undefined;
+
+    const data = snapshot.docs[0].data() as Tenant;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   // Analytics
@@ -234,7 +244,7 @@ export class MemStorage implements IStorage {
     spend: number[];
     efficiency: number;
   }> {
-    const logs = Array.from(this.auditLogs.values()).filter(l => l.tenantId === tenantId);
+    const logs = await this.getAuditLogsByTenant(tenantId);
 
     // Calculate module distribution
     const counts: Record<string, number> = {
@@ -257,7 +267,7 @@ export class MemStorage implements IStorage {
     return {
       analytics,
       spend,
-      efficiency: 92 // Logic for efficiency could be more complex
+      efficiency: 92
     };
   }
 
@@ -270,17 +280,26 @@ export class MemStorage implements IStorage {
       id,
       createdAt: new Date()
     };
-    this.demoRequests.set(id, demoRequest);
+    await db.collection("demoRequests").doc(id).set(demoRequest);
     return demoRequest;
   }
 
   async getAllDemoRequests(): Promise<DemoRequest[]> {
-    return Array.from(this.demoRequests.values())
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    const snapshot = await db.collection("demoRequests").orderBy("createdAt", "desc").get();
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as DemoRequest;
+      if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+      return data;
+    });
   }
 
   async getDemoRequest(id: string): Promise<DemoRequest | undefined> {
-    return this.demoRequests.get(id);
+    const doc = await db.collection("demoRequests").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as DemoRequest;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   // Contact submissions
@@ -292,17 +311,26 @@ export class MemStorage implements IStorage {
       id,
       createdAt: new Date()
     };
-    this.contactSubmissions.set(id, contact);
+    await db.collection("contactSubmissions").doc(id).set(contact);
     return contact;
   }
 
   async getAllContactSubmissions(): Promise<ContactSubmission[]> {
-    return Array.from(this.contactSubmissions.values())
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    const snapshot = await db.collection("contactSubmissions").orderBy("createdAt", "desc").get();
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as ContactSubmission;
+      if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+      return data;
+    });
   }
 
   async getContactSubmission(id: string): Promise<ContactSubmission | undefined> {
-    return this.contactSubmissions.get(id);
+    const doc = await db.collection("contactSubmissions").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as ContactSubmission;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   // Tax queries
@@ -314,18 +342,30 @@ export class MemStorage implements IStorage {
       tenantId: insertTaxQuery.tenantId ?? "tenant_default",
       createdAt: new Date()
     };
-    this.taxQueries.set(id, taxQuery);
+    await db.collection("taxQueries").doc(id).set(taxQuery);
     return taxQuery;
   }
 
   async getTaxQueriesByTenant(tenantId: string): Promise<TaxQuery[]> {
-    return Array.from(this.taxQueries.values())
-      .filter(q => q.tenantId === tenantId)
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    const snapshot = await db.collection("taxQueries")
+      .where("tenantId", "==", tenantId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as TaxQuery;
+      if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+      return data;
+    });
   }
 
   async getTaxQuery(id: string): Promise<TaxQuery | undefined> {
-    return this.taxQueries.get(id);
+    const doc = await db.collection("taxQueries").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as TaxQuery;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   // SQL queries
@@ -338,18 +378,30 @@ export class MemStorage implements IStorage {
       tenantId: insertSqlQuery.tenantId ?? "tenant_default",
       createdAt: new Date()
     };
-    this.sqlQueries.set(id, sqlQuery);
+    await db.collection("sqlQueries").doc(id).set(sqlQuery);
     return sqlQuery;
   }
 
   async getSqlQueriesByTenant(tenantId: string): Promise<SqlQuery[]> {
-    return Array.from(this.sqlQueries.values())
-      .filter(q => q.tenantId === tenantId)
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    const snapshot = await db.collection("sqlQueries")
+      .where("tenantId", "==", tenantId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as SqlQuery;
+      if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+      return data;
+    });
   }
 
   async getSqlQuery(id: string): Promise<SqlQuery | undefined> {
-    return this.sqlQueries.get(id);
+    const doc = await db.collection("sqlQueries").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as SqlQuery;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   // Document analysis
@@ -361,18 +413,30 @@ export class MemStorage implements IStorage {
       tenantId: insertAnalysis.tenantId ?? "tenant_default",
       createdAt: new Date()
     };
-    this.documentAnalysis.set(id, analysis);
+    await db.collection("documentAnalysis").doc(id).set(analysis);
     return analysis;
   }
 
   async getDocumentAnalysisByTenant(tenantId: string): Promise<DocumentAnalysis[]> {
-    return Array.from(this.documentAnalysis.values())
-      .filter(a => a.tenantId === tenantId)
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    const snapshot = await db.collection("documentAnalysis")
+      .where("tenantId", "==", tenantId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as DocumentAnalysis;
+      if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+      return data;
+    });
   }
 
   async getDocumentAnalysis(id: string): Promise<DocumentAnalysis | undefined> {
-    return this.documentAnalysis.get(id);
+    const doc = await db.collection("documentAnalysis").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as DocumentAnalysis;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   // Waitlist
@@ -387,23 +451,35 @@ export class MemStorage implements IStorage {
       id,
       createdAt: new Date()
     };
-    this.waitlist.set(id, waitlistEntry);
+    await db.collection("waitlist").doc(id).set(waitlistEntry);
     return waitlistEntry;
   }
 
   async getAllWaitlistEntries(): Promise<Waitlist[]> {
-    return Array.from(this.waitlist.values())
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    const snapshot = await db.collection("waitlist").orderBy("createdAt", "desc").get();
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as Waitlist;
+      if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+      return data;
+    });
   }
 
   async getWaitlistEntry(id: string): Promise<Waitlist | undefined> {
-    return this.waitlist.get(id);
+    const doc = await db.collection("waitlist").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as Waitlist;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   async getWaitlistEntryByEmail(email: string): Promise<Waitlist | undefined> {
-    return Array.from(this.waitlist.values()).find(
-      (entry) => entry.email.toLowerCase() === email.toLowerCase()
-    );
+    const snapshot = await db.collection("waitlist").where("email", "==", email.toLowerCase()).limit(1).get();
+    if (snapshot.empty) return undefined;
+
+    const data = snapshot.docs[0].data() as Waitlist;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   // Orders
@@ -415,23 +491,31 @@ export class MemStorage implements IStorage {
       tenantId: insertOrder.tenantId ?? "tenant_default",
       createdAt: new Date()
     };
-    this.orders.set(id, order);
+    await db.collection("orders").doc(id).set(order);
     return order;
   }
 
   async getOrdersByTenant(tenantId: string): Promise<Order[]> {
     if (!tenantId) return [];
-    return Array.from(this.orders.values())
-      .filter(o => o.tenantId === tenantId)
-      .sort((a, b) => {
-        const timeA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
-        const timeB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
-        return timeB - timeA;
-      });
+    const snapshot = await db.collection("orders")
+      .where("tenantId", "==", tenantId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as Order;
+      if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+      return data;
+    });
   }
 
   async getOrder(id: string): Promise<Order | undefined> {
-    return this.orders.get(id);
+    const doc = await db.collection("orders").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as Order;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   // KYC
@@ -444,18 +528,30 @@ export class MemStorage implements IStorage {
       id,
       createdAt: new Date()
     };
-    this.kycRecords.set(id, record);
+    await db.collection("kycRecords").doc(id).set(record);
     return record;
   }
 
   async getKycRecordsByTenant(tenantId: string): Promise<KycRecord[]> {
-    return Array.from(this.kycRecords.values())
-      .filter(r => r.tenantId === tenantId)
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    const snapshot = await db.collection("kycRecords")
+      .where("tenantId", "==", tenantId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as KycRecord;
+      if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+      return data;
+    });
   }
 
   async getKycRecord(id: string): Promise<KycRecord | undefined> {
-    return this.kycRecords.get(id);
+    const doc = await db.collection("kycRecords").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as KycRecord;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   // Credit Assessments
@@ -468,49 +564,65 @@ export class MemStorage implements IStorage {
       id,
       createdAt: new Date()
     };
-    this.creditAssessments.set(id, assessment);
+    await db.collection("creditAssessments").doc(id).set(assessment);
     return assessment;
   }
 
   async getCreditAssessmentsByTenant(tenantId: string): Promise<CreditAssessment[]> {
-    return Array.from(this.creditAssessments.values())
-      .filter(a => a.tenantId === tenantId)
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    const snapshot = await db.collection("creditAssessments")
+      .where("tenantId", "==", tenantId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as CreditAssessment;
+      if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+      return data;
+    });
   }
 
   async getCreditAssessment(id: string): Promise<CreditAssessment | undefined> {
-    return this.creditAssessments.get(id);
+    const doc = await db.collection("creditAssessments").doc(id).get();
+    if (!doc.exists) return undefined;
+
+    const data = doc.data() as CreditAssessment;
+    if (data.createdAt && (data.createdAt as any).toDate) data.createdAt = (data.createdAt as any).toDate();
+    return data;
   }
 
   // Privacy & Data
   async deleteUserAccount(userId: string): Promise<void> {
-    const user = this.users.get(userId);
-    if (!user) return;
+    const userRef = db.collection("users").doc(userId);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) return;
 
+    // We can't do cascading deletes easily without multiple queries
     // 1. Delete all audit logs for this user
-    for (const [id, log] of Array.from(this.auditLogs.entries())) {
-      if (log.userId === userId) this.auditLogs.delete(id);
-    }
+    const logsSnap = await db.collection("auditLogs").where("userId", "==", userId).get();
+    const batchDelete = async (snapshot: any) => {
+      const b = db.batch();
+      snapshot.forEach((doc: any) => b.delete(doc.ref));
+      if (!snapshot.empty) await b.commit();
+    };
+
+    await batchDelete(logsSnap);
 
     // 2. Delete all KYC records for this user
-    for (const [id, record] of Array.from(this.kycRecords.entries())) {
-      if (record.userId === userId) this.kycRecords.delete(id);
-    }
+    const kycSnap = await db.collection("kycRecords").where("userId", "==", userId).get();
+    await batchDelete(kycSnap);
 
     // 3. Delete all Credit Assessments for this user
-    for (const [id, assessment] of Array.from(this.creditAssessments.entries())) {
-      if (assessment.userId === userId) this.creditAssessments.delete(id);
-    }
+    const creditSnap = await db.collection("creditAssessments").where("userId", "==", userId).get();
+    await batchDelete(creditSnap);
 
     // 4. Finally, delete the user
-    this.users.delete(userId);
+    await userRef.delete();
   }
 
   async updateUserConsent(userId: string, settings: any): Promise<void> {
-    const user = this.users.get(userId);
-    if (!user) throw new Error("User not found");
-
-    this.users.set(userId, { ...user, consentSettings: settings });
+    await db.collection("users").doc(userId).update({
+      consentSettings: settings
+    });
   }
 
   async applyRetentionPolicy(tenantId: string): Promise<void> {
@@ -518,45 +630,48 @@ export class MemStorage implements IStorage {
     if (!tenant) return;
 
     const days = parseInt(tenant.retentionDays || "30");
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - days);
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
 
-    // Filter and delete old records across all tenant-isolated tables
-    const purgeMap = (map: Map<string, any>) => {
-      for (const [id, record] of Array.from(map.entries())) {
-        const createdAt = record.createdAt;
-        if (record.tenantId === tenantId && createdAt && createdAt < cutoff) {
-          map.delete(id);
+    // Using Firestore batch deletes for older documents
+    const collectionsToPurge = ["taxQueries", "sqlQueries", "documentAnalysis", "orders", "auditLogs"];
+
+    for (const col of collectionsToPurge) {
+      try {
+        const snapshot = await db.collection(col)
+          .where("tenantId", "==", tenantId)
+          .where("createdAt", "<", cutoffDate)
+          .get();
+
+        if (!snapshot.empty) {
+          const b = db.batch();
+          snapshot.forEach(doc => b.delete(doc.ref));
+          await b.commit();
         }
+      } catch (e) {
+        console.error(`Error purging ${col}:`, e);
       }
-    };
-
-    purgeMap(this.taxQueries);
-    purgeMap(this.sqlQueries);
-    purgeMap(this.documentAnalysis);
-    purgeMap(this.orders);
-    purgeMap(this.auditLogs);
+    }
   }
 
   // Tokenization Vault
   async createToken(token: string, encryptedData: string): Promise<void> {
-    this.tokens.set(token, encryptedData);
+    await db.collection("vault").doc(token).set({ encryptedData });
   }
 
   async getToken(token: string): Promise<string | undefined> {
-    return this.tokens.get(token);
+    const doc = await db.collection("vault").doc(token).get();
+    if (!doc.exists) return undefined;
+    return doc.data()?.encryptedData;
   }
 
   async updateUserMfa(userId: string, data: { secret?: string, enabled: boolean }): Promise<void> {
-    const user = this.users.get(userId);
-    if (!user) throw new Error("User not found");
-
-    if (data.secret !== undefined) user.mfaSecret = data.secret;
-    user.mfaEnabled = data.enabled;
-    this.users.set(userId, user);
+    const updateData: any = { mfaEnabled: data.enabled };
+    if (data.secret !== undefined) {
+      updateData.mfaSecret = data.secret;
+    }
+    await db.collection("users").doc(userId).update(updateData);
   }
-
-
 }
 
-export const storage = new MemStorage();
+export const storage = new FirestoreStorage();

@@ -1,11 +1,9 @@
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
 import session from "express-session";
 import { storage } from "./storage.js";
 import { User as SelectUser } from "../shared/schema.js";
-import crypto from "crypto";
 import MemoryStore from "memorystore";
+import { auth as adminAuth } from "./db.js";
 
 const SessionStore = MemoryStore(session);
 
@@ -13,19 +11,6 @@ declare global {
     namespace Express {
         interface User extends SelectUser { }
     }
-}
-
-// Password hashing helper
-function hashPassword(password: string): string {
-    const salt = crypto.randomBytes(16).toString("hex");
-    const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, "sha512").toString("hex");
-    return `${salt}:${hash}`;
-}
-
-function comparePasswords(password: string, storedHash: string): boolean {
-    const [salt, hash] = storedHash.split(":");
-    const currentHash = crypto.pbkdf2Sync(password, salt, 1000, 64, "sha512").toString("hex");
-    return hash === currentHash;
 }
 
 export function setupAuth(app: Express) {
@@ -47,34 +32,35 @@ export function setupAuth(app: Express) {
     }
 
     app.use(session(sessionSettings));
-    app.use(passport.initialize());
-    app.use(passport.session());
 
-    passport.use(
-        new LocalStrategy(async (username, password, done) => {
-            try {
-                const user = await storage.getUserByUsername(username);
-                if (!user || !comparePasswords(password, user.password)) {
-                    return done(null, false, { message: "Invalid username or password" });
-                }
-                return done(null, user);
-            } catch (err) {
-                return done(err);
-            }
-        }),
-    );
-
-    passport.serializeUser((user, done) => {
-        done(null, user.id);
-    });
-
-    passport.deserializeUser(async (id: string, done) => {
-        try {
-            const user = await storage.getUser(id);
-            done(null, user);
-        } catch (err) {
-            done(err);
+    // Custom middleware to verify Firebase tokens
+    const verifyToken = async (req: any, res: any, next: any) => {
+        const idToken = req.headers.authorization?.split('Bearer ')[1];
+        if (!idToken) {
+            return res.status(401).send('Unauthorized: No token provided');
         }
+
+        try {
+            const decodedToken = await adminAuth.verifyIdToken(idToken);
+            const user = await storage.getUser(decodedToken.uid);
+            if (user) {
+                req.user = user;
+                next();
+            } else {
+                res.status(401).send('Unauthorized: User not found in database');
+            }
+        } catch (error) {
+            console.error('Error verifying token:', error);
+            res.status(401).send('Unauthorized: Invalid token');
+        }
+    };
+
+    // Make req.isAuthenticated available for legacy routes
+    app.use((req: any, res, next) => {
+        req.isAuthenticated = () => {
+            return !!req.user;
+        };
+        next();
     });
 
     app.post("/api/register", async (req, res, next) => {
@@ -84,65 +70,51 @@ export function setupAuth(app: Express) {
                 return res.status(400).json({ message: "Username already exists" });
             }
 
-            // Automatically create a tenant for new registrations if not specified
             let tenantId = req.body.tenantId;
             if (!tenantId) {
                 const tenant = await storage.createTenant({
                     name: `${req.body.username}'s Organization`,
                     region: "Morocco",
                     tier: "Starter",
-                    queryLimit: "100"
+                    queryLimit: "100",
+                    retentionDays: "30",
+                    mfaEnforced: false,
+                    ssoConfig: { enabled: false, provider: "local", domain: "" }
                 });
                 tenantId = tenant.id;
             }
 
+            // Create user in Firestore via storage wrapper
             const user = await storage.createUser({
                 ...req.body,
-                password: hashPassword(req.body.password),
+                password: "firebase_managed", // We don't store passwords locally anymore
                 tenantId,
                 role: "client"
             });
 
-            req.login(user, (err) => {
-                if (err) return next(err);
-                res.status(201).json(user);
-            });
+            // If we're fully migrating, the actual account creation happens on the client via Firebase Auth,
+            // and this endpoint should probably verify the token and then sync the user profile into Firestore.
+            // For now, returning the created profile.
+            res.status(201).json(user);
         } catch (err) {
             next(err);
         }
     });
 
-    app.post("/api/login", (req, res, next) => {
-        console.log(`[Auth] Login attempt for user: ${req.body.username}`);
-        passport.authenticate("local", (err: any, user: Express.User, info: any) => {
-            if (err) {
-                console.error(`[Auth] Passport authentication error:`, err);
-                return next(err);
-            }
-            if (!user) {
-                console.warn(`[Auth] Login failed for user: ${req.body.username}`, info);
-                return res.status(401).json(info || { message: "Invalid username or password" });
-            }
-            req.login(user, (err) => {
-                if (err) {
-                    console.error(`[Auth] req.login error:`, err);
-                    return next(err);
-                }
-                console.log(`[Auth] Login successful for user: ${user.username}`);
-                res.json(user);
-            });
-        })(req, res, next);
+    // In a pure Firebase setup, login is handled purely client side. 
+    // This endpoint is left here to provide legacy support if the client hasn't migrated UI yet.
+    app.post("/api/login", async (req, res, next) => {
+        return res.status(400).json({ message: "Please use Firebase client authentication." });
     });
 
-    app.post("/api/logout", (req, res, next) => {
-        req.logout((err) => {
+    app.post("/api/logout", (req: any, res, next) => {
+        req.session.destroy((err: any) => {
             if (err) return next(err);
             res.sendStatus(200);
         });
     });
 
-    app.get("/api/user", (req, res) => {
-        if (!req.isAuthenticated()) return res.sendStatus(401);
+    app.get("/api/user", verifyToken, (req: any, res) => {
         res.json(req.user);
     });
 }

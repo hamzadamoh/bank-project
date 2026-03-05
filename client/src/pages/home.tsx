@@ -1,9 +1,7 @@
 import Navigation from "@/components/layout/navigation";
 import Footer from "@/components/layout/footer";
 import Hero from "@/components/sections/hero";
-import ProductsShowcase from "@/components/sections/products-showcase";
-import Testimonials from "@/components/sections/testimonials";
-import { useEffect } from "react";
+import ProductsShowcase from "@/components/sections/products-showcase"; import { useEffect } from "react";
 import { useLocation, Link } from "wouter";
 
 export default function Home() {
@@ -37,8 +35,6 @@ export default function Home() {
       <main>
         <Hero />
         <ProductsShowcase />
-
-        <Testimonials />
 
         <section className="py-24 px-6 lg:px-8 bg-ink-950">
           <div className="max-w-4xl mx-auto text-center">

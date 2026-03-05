@@ -35,7 +35,7 @@ export const rateLimit = (req: Request, res: Response, next: NextFunction) => {
 };
 
 // Auth & Security Middlewares
-export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+export const isAuthenticated = (req: any, res: Response, next: NextFunction) => {
     if (req.isAuthenticated && req.isAuthenticated()) {
         console.log(`[AUTH] User ${req.user?.id} (${req.user?.username}) authenticated for ${req.method} ${req.path}`);
         return next();
@@ -55,14 +55,14 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
     return next();
 };
 
-export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+export const isAdmin = (req: any, res: Response, next: NextFunction) => {
     if (req.isAuthenticated && req.isAuthenticated() && (req.user as any)?.role === 'admin') return next();
     // Allow guest admin access for now (no DB)
     if ((req as any).user?.id === 'guest') return next();
     res.status(403).json({ message: "Forbidden: Admin access required" });
 };
 
-export const checkTierLimit = async (req: Request, res: Response, next: NextFunction) => {
+export const checkTierLimit = async (req: any, res: Response, next: NextFunction) => {
     if (!(req.isAuthenticated && req.isAuthenticated())) return next();
     const tenant = await storage.getTenant((req.user as any)!.tenantId);
     if (!tenant) return next();

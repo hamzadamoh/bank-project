@@ -34,7 +34,7 @@ export default function Pricing() {
     {
       name: "Professional",
       description: "For growing teams that need advanced AI capabilities",
-      price: "$2,500",
+      price: "$150",
       period: "per month",
       popular: true,
       features: [
@@ -79,32 +79,6 @@ export default function Pricing() {
     }
   ];
 
-  const addOns = [
-    {
-      name: "Additional Jurisdictions",
-      description: "Extend TaxWise to additional countries and regions",
-      price: "$500",
-      period: "per jurisdiction/month"
-    },
-    {
-      name: "Premium Support",
-      description: "24/7 phone and chat support with 1-hour response SLA",
-      price: "$1,200",
-      period: "per month"
-    },
-    {
-      name: "Professional Services",
-      description: "Implementation, training, and custom workflow development",
-      price: "$2,000",
-      period: "per day"
-    },
-    {
-      name: "Advanced Analytics",
-      description: "Custom dashboards, reporting, and business intelligence",
-      price: "$800",
-      period: "per month"
-    }
-  ];
 
   const faqs = [
     {
@@ -150,77 +124,80 @@ export default function Pricing() {
             </div>
 
             {/* Pricing Cards */}
-            <div className="grid lg:grid-cols-3 gap-8 mb-16">
+            <div className="grid lg:grid-cols-3 gap-8 mb-16 pt-8">
               {plans.map((plan, index) => (
-                <GlassCard
-                  key={index}
-                  className={`p-8 relative ${plan.popular ? 'ring-2 ring-ink-950' : ''}`}
-                >
+                <div key={index} className="relative mt-4 lg:mt-0 lg:h-full">
                   {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-ink-950 text-alabaster-50 px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-1">
-                      <Star className="h-4 w-4" />
-                      Most Popular
-                    </div>
-                  )}
-
-                  <div className="text-center mb-8">
-                    <h3 className="font-display font-bold text-2xl text-ink-950 mb-2">{plan.name}</h3>
-                    <p className="text-slate-700 mb-6">{plan.description}</p>
-                    <div className="mb-6">
-                      <span className="font-display font-bold text-4xl text-ink-950">{plan.price}</span>
-                      <span className="text-slate-600 ml-2">/ {plan.period}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 mb-8">
-                    {plan.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-start gap-3">
-                        <Check className="h-5 w-5 text-emerald-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-slate-700 text-sm">{feature}</span>
+                    <div className="absolute -top-4 left-0 right-0 flex justify-center z-10">
+                      <div className="bg-ink-950 text-alabaster-50 px-4 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 shadow-md">
+                        <Star className="h-4 w-4" />
+                        Most Popular
                       </div>
-                    ))}
-                  </div>
-
-                  {plan.limitations.length > 0 && (
-                    <div className="mb-8">
-                      <h4 className="font-semibold text-ink-950 mb-3 text-sm">Limitations:</h4>
-                      <ul className="space-y-2">
-                        {plan.limitations.map((limitation, limitIndex) => (
-                          <li key={limitIndex} className="text-slate-600 text-sm">
-                            • {limitation}
-                          </li>
-                        ))}
-                      </ul>
                     </div>
                   )}
-
-                  <Link
-                    href={plan.name === 'Enterprise' ? '/contact' : `/checkout?plan=${plan.name.toLowerCase()}`}
-                    className={`w-full block text-center px-6 py-3 rounded-xl font-semibold transition-colors ${plan.ctaVariant === 'default'
-                      ? 'bg-ink-950 text-alabaster-50 hover:bg-ink-900'
-                      : 'bg-alabaster-50 border border-ink-950 text-ink-950 hover:bg-alabaster-100'
-                      }`}
+                  <GlassCard
+                    className={`p-8 h-full flex flex-col ${plan.popular ? 'ring-2 ring-ink-950 shadow-xl' : 'mt-0'}`}
                   >
-                    {plan.cta}
-                  </Link>
 
-                  {/* Payment Methods */}
-                  {plan.name !== 'Enterprise' && (
-                    <div className="mt-4 space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="h-px flex-1 bg-alabaster-200" />
-                        <span className="text-xs text-slate-500">Pay with</span>
-                        <div className="h-px flex-1 bg-alabaster-200" />
-                      </div>
-                      <div className="flex items-center justify-center gap-3 text-slate-400">
-                        <FaCcVisa className="h-8 w-8 hover:text-[#1a1f71] transition-colors" />
-                        <FaCcMastercard className="h-8 w-8 hover:text-[#eb001b] transition-colors" />
-                        <FaCcAmex className="h-8 w-8 hover:text-[#006fcf] transition-colors" />
-                        <FaCcPaypal className="h-8 w-8 hover:text-[#003087] transition-colors" />
+                    <div className="text-center mb-8">
+                      <h3 className="font-display font-bold text-2xl text-ink-950 mb-2">{plan.name}</h3>
+                      <p className="text-slate-700 mb-6">{plan.description}</p>
+                      <div className="mb-6">
+                        <span className="font-display font-bold text-4xl text-ink-950">{plan.price}</span>
+                        <span className="text-slate-600 ml-2">/ {plan.period}</span>
                       </div>
                     </div>
-                  )}
-                </GlassCard>
+
+                    <div className="space-y-4 mb-8">
+                      {plan.features.map((feature, featureIndex) => (
+                        <div key={featureIndex} className="flex items-start gap-3">
+                          <Check className="h-5 w-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+                          <span className="text-slate-700 text-sm">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {plan.limitations.length > 0 && (
+                      <div className="mb-8">
+                        <h4 className="font-semibold text-ink-950 mb-3 text-sm">Limitations:</h4>
+                        <ul className="space-y-2">
+                          {plan.limitations.map((limitation, limitIndex) => (
+                            <li key={limitIndex} className="text-slate-600 text-sm">
+                              • {limitation}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    <Link
+                      href={plan.name === 'Enterprise' ? '/contact' : `/checkout?plan=${plan.name.toLowerCase()}`}
+                      className={`w-full block text-center px-6 py-3 rounded-xl font-semibold transition-colors ${plan.ctaVariant === 'default'
+                        ? 'bg-ink-950 text-alabaster-50 hover:bg-ink-900'
+                        : 'bg-alabaster-50 border border-ink-950 text-ink-950 hover:bg-alabaster-100'
+                        }`}
+                    >
+                      {plan.cta}
+                    </Link>
+
+                    {/* Payment Methods */}
+                    {plan.name !== 'Enterprise' && (
+                      <div className="mt-4 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <div className="h-px flex-1 bg-alabaster-200" />
+                          <span className="text-xs text-slate-500">Pay with</span>
+                          <div className="h-px flex-1 bg-alabaster-200" />
+                        </div>
+                        <div className="flex items-center justify-center gap-3 text-slate-400">
+                          <FaCcVisa className="h-8 w-8 hover:text-[#1a1f71] transition-colors" />
+                          <FaCcMastercard className="h-8 w-8 hover:text-[#eb001b] transition-colors" />
+                          <FaCcAmex className="h-8 w-8 hover:text-[#006fcf] transition-colors" />
+                          <FaCcPaypal className="h-8 w-8 hover:text-[#003087] transition-colors" />
+                        </div>
+                      </div>
+                    )}
+                  </GlassCard>
+                </div>
               ))}
             </div>
 
@@ -269,102 +246,7 @@ export default function Pricing() {
           </div>
         </section>
 
-        {/* Add-ons Section */}
-        <section className="py-24 px-6 lg:px-8 bg-white">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="font-display font-bold text-4xl text-ink-950 mb-6">
-                Add-ons & Extensions
-              </h2>
-              <p className="text-xl text-slate-700 max-w-3xl mx-auto">
-                Enhance your FiscAI experience with specialized modules and premium support options.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {addOns.map((addon, index) => (
-                <GlassCard key={index} className="p-8">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="font-display font-bold text-xl text-ink-950 mb-2">{addon.name}</h3>
-                      <p className="text-slate-700 text-sm">{addon.description}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="font-display font-bold text-2xl text-ink-950">{addon.price}</span>
-                      <span className="text-slate-600 text-sm ml-2">{addon.period}</span>
-                    </div>
-                    <Link href={`/checkout?plan=professional&addon=${encodeURIComponent(addon.name)}&addonPrice=${encodeURIComponent(addon.price)}&addonPeriod=${encodeURIComponent(addon.period)}`}>
-                      <Button variant="outline" size="sm">
-                        Add to Plan
-                      </Button>
-                    </Link>
-                  </div>
-                </GlassCard>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Calculator Section */}
-        <section className="py-24 px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="font-display font-bold text-4xl text-ink-950 mb-6">
-                ROI Calculator
-              </h2>
-              <p className="text-xl text-slate-700">
-                See how FiscAI can impact your bottom line
-              </p>
-            </div>
-
-            <GlassCard className="p-8">
-              <div className="grid lg:grid-cols-2 gap-12">
-                <div>
-                  <h3 className="font-semibold text-ink-950 mb-6">Average Customer Savings</h3>
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-700">Manual tax research reduction</span>
-                      <span className="font-semibold text-emerald-400">85% time saved</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-700">Document processing efficiency</span>
-                      <span className="font-semibold text-emerald-400">90% faster</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-700">Fraud detection improvement</span>
-                      <span className="font-semibold text-emerald-400">99.2% accuracy</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-700">Compliance cost reduction</span>
-                      <span className="font-semibold text-emerald-400">65% savings</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-ink-950 mb-6">Typical 12-Month ROI</h3>
-                  <div className="bg-champagne-200 rounded-2xl p-6 text-center">
-                    <div className="font-display font-bold text-4xl text-ink-950 mb-2">320%</div>
-                    <div className="text-slate-700 mb-4">Return on Investment</div>
-                    <div className="text-sm text-slate-600">
-                      Based on average customer savings across tax advisory, document processing, and fraud prevention.
-                    </div>
-                  </div>
-                  <div className="mt-6 text-center">
-                    <Link href="/roi-calculator">
-                      <Button>Calculate Your ROI</Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="py-24 px-6 lg:px-8 bg-white">
+        < section className="py-24 px-6 lg:px-8 bg-white" >
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-4xl text-ink-950 mb-6">
@@ -393,10 +275,10 @@ export default function Pricing() {
               </div>
             </div>
           </div>
-        </section>
+        </section >
 
         {/* CTA Section */}
-        <section className="py-24 px-6 lg:px-8 bg-ink-950">
+        < section className="py-24 px-6 lg:px-8 bg-ink-950" >
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="font-display font-bold text-4xl md:text-5xl text-alabaster-50 mb-6">
               Ready to Get Started?
@@ -417,9 +299,9 @@ export default function Pricing() {
               </Link>
             </div>
           </div>
-        </section>
-      </main>
+        </section >
+      </main >
       <Footer />
-    </div>
+    </div >
   );
 }

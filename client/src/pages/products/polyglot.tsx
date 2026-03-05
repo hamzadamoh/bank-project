@@ -28,6 +28,7 @@ export default function PolyGlot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const { toast } = useToast();
 
   const scrollToBottom = () => {
@@ -41,6 +42,14 @@ export default function PolyGlot() {
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
   useEffect(() => { setTimeout(() => scrollToBottom(), 100); }, [messages]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      const loadVoices = () => setVoices(window.speechSynthesis.getVoices());
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }, []);
 
   // --- Text Chat ---
   const handleSend = async () => {
@@ -138,9 +147,24 @@ export default function PolyGlot() {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
+
+    const availableVoices = voices.length > 0 ? voices : window.speechSynthesis.getVoices();
     const langCode = (lang === 'ar' || lang === 'darija') ? 'ar' : lang;
-    const voice = voices.find(v => v.lang.startsWith(langCode));
+
+    // Try to find a high-quality Google voice for the specific language
+    let voice = availableVoices.find(v => v.lang.startsWith(langCode) && v.name.includes('Google'));
+
+    // Fall back to other premium or natural-sounding voices (e.g., Microsoft Online)
+    if (!voice) {
+      voice = availableVoices.find(v => v.lang.startsWith(langCode) &&
+        (v.name.includes('Premium') || v.name.includes('Online') || v.name.includes('Natural') || v.name.includes('Microsoft')));
+    }
+
+    // Fall back to standard/local voices
+    if (!voice) {
+      voice = availableVoices.find(v => v.lang.startsWith(langCode));
+    }
+
     if (voice) utterance.voice = voice;
     utterance.rate = 1.0;
     utterance.pitch = 1.0;

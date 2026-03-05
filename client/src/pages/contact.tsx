@@ -182,301 +182,227 @@ export default function Contact() {
                   </div>
                 </div>
 
-                {/* Quick Links */}
-                <GlassCard className="p-6">
-                  <h4 className="font-semibold text-ink-950 mb-4">Quick Resources</h4>
-                  <div className="space-y-3">
-                    <Link href="/security" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
-                      → Download Security Datasheet
-                    </Link>
-                    <Link href="/security" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
-                      → API Documentation
-                    </Link>
-                    <Link href="/security" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
-                      → Integration Guide
-                    </Link>
-                    <Link href="/security" className="block text-sm text-slate-700 hover:text-ink-950 transition-colors">
-                      → Compliance Checklist
-                    </Link>
-                  </div>
-                </GlassCard>
-              </div>
+                {/* Contact Form */}
+                <div className="lg:col-span-2">
+                  <GlassCard className="p-8">
+                    <div className="mb-6">
+                      <div className="flex gap-4 mb-6">
+                        <button
+                          onClick={() => setFormType("demo")}
+                          className={`px-4 py-2 rounded-xl font-semibold transition-colors ${formType === "demo"
+                            ? "bg-ink-950 text-alabaster-50"
+                            : "bg-alabaster-100 text-slate-700 hover:bg-alabaster-200"
+                            }`}
+                        >
+                          Request Demo
+                        </button>
+                        <button
+                          onClick={() => setFormType("contact")}
+                          className={`px-4 py-2 rounded-xl font-semibold transition-colors ${formType === "contact"
+                            ? "bg-ink-950 text-alabaster-50"
+                            : "bg-alabaster-100 text-slate-700 hover:bg-alabaster-200"
+                            }`}
+                        >
+                          General Contact
+                        </button>
+                      </div>
 
-              {/* Contact Form */}
-              <div className="lg:col-span-2">
-                <GlassCard className="p-8">
-                  <div className="mb-6">
-                    <div className="flex gap-4 mb-6">
-                      <button
-                        onClick={() => setFormType("demo")}
-                        className={`px-4 py-2 rounded-xl font-semibold transition-colors ${formType === "demo"
-                          ? "bg-ink-950 text-alabaster-50"
-                          : "bg-alabaster-100 text-slate-700 hover:bg-alabaster-200"
-                          }`}
-                      >
-                        Request Demo
-                      </button>
-                      <button
-                        onClick={() => setFormType("contact")}
-                        className={`px-4 py-2 rounded-xl font-semibold transition-colors ${formType === "contact"
-                          ? "bg-ink-950 text-alabaster-50"
-                          : "bg-alabaster-100 text-slate-700 hover:bg-alabaster-200"
-                          }`}
-                      >
-                        General Contact
-                      </button>
+                      <h3 className="font-display font-bold text-2xl text-ink-950 mb-2">
+                        {formType === "demo" ? "Request a Personalized Demo" : "Send us a Message"}
+                      </h3>
+                      <p className="text-slate-700">
+                        {formType === "demo"
+                          ? "Get a tailored demonstration of FiscAI tools relevant to your use case"
+                          : "We'd love to hear from you. Send us a message and we'll respond as soon as possible."
+                        }
+                      </p>
                     </div>
 
-                    <h3 className="font-display font-bold text-2xl text-ink-950 mb-2">
-                      {formType === "demo" ? "Request a Personalized Demo" : "Send us a Message"}
-                    </h3>
-                    <p className="text-slate-700">
-                      {formType === "demo"
-                        ? "Get a tailored demonstration of FiscAI tools relevant to your use case"
-                        : "We'd love to hear from you. Send us a message and we'll respond as soon as possible."
-                      }
-                    </p>
-                  </div>
-
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <Label htmlFor="name">Full Name *</Label>
-                        <Input
-                          id="name"
-                          type="text"
-                          required
-                          value={formData.name}
-                          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                          placeholder="Your full name"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="email">Email Address *</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          required
-                          value={formData.email}
-                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                          placeholder="your@company.com"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <Label htmlFor="company">Company *</Label>
-                        <Input
-                          id="company"
-                          type="text"
-                          required
-                          value={formData.company}
-                          onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
-                          placeholder="Your company name"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="role">Job Title</Label>
-                        <Input
-                          id="role"
-                          type="text"
-                          value={formData.role}
-                          onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
-                          placeholder="Your job title"
-                        />
-                      </div>
-                    </div>
-
-                    {formType === "demo" ? (
-                      <>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                          <Label htmlFor="phone">Phone Number</Label>
+                          <Label htmlFor="name">Full Name *</Label>
                           <Input
-                            id="phone"
-                            type="tel"
-                            value={formData.phone}
-                            onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                            placeholder="+212 XXX XXX XXX"
-                          />
-                        </div>
-
-                        <div>
-                          <Label>Which tools are you interested in? *</Label>
-                          <div className="mt-3 grid md:grid-cols-2 gap-3">
-                            {tools.map((tool) => (
-                              <div key={tool} className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={tool}
-                                  checked={formData.tools.includes(tool)}
-                                  onCheckedChange={(checked) => handleToolChange(tool, checked as boolean)}
-                                />
-                                <Label htmlFor={tool} className="text-sm font-normal">
-                                  {tool}
-                                </Label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div>
-                            <Label htmlFor="timeline">Implementation Timeline</Label>
-                            <Select
-                              value={formData.timeline}
-                              onValueChange={(value) => setFormData(prev => ({ ...prev, timeline: value }))}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select timeline" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="immediate">Immediate (&lt; 1 month)</SelectItem>
-                                <SelectItem value="short">Short term (1-3 months)</SelectItem>
-                                <SelectItem value="medium">Medium term (3-6 months)</SelectItem>
-                                <SelectItem value="long">Long term (6+ months)</SelectItem>
-                                <SelectItem value="exploring">Just exploring</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Label htmlFor="employees">Company Size</Label>
-                            <Select
-                              value={formData.employees}
-                              onValueChange={(value) => setFormData(prev => ({ ...prev, employees: value }))}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Number of employees" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="1-10">1-10 employees</SelectItem>
-                                <SelectItem value="11-50">11-50 employees</SelectItem>
-                                <SelectItem value="51-200">51-200 employees</SelectItem>
-                                <SelectItem value="201-1000">201-1000 employees</SelectItem>
-                                <SelectItem value="1000+">1000+ employees</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="useCase">Describe Your Use Case *</Label>
-                          <Textarea
-                            id="useCase"
-                            required
-                            value={formData.useCase}
-                            onChange={(e) => setFormData(prev => ({ ...prev, useCase: e.target.value }))}
-                            placeholder="Tell us about your current challenges and how you'd like to use FiscAI..."
-                            rows={4}
-                          />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div>
-                          <Label htmlFor="subject">Subject *</Label>
-                          <Input
-                            id="subject"
+                            id="name"
                             type="text"
                             required
-                            value={formData.subject}
-                            onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-                            placeholder="What's this about?"
+                            value={formData.name}
+                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                            placeholder="Your full name"
                           />
                         </div>
-
                         <div>
-                          <Label htmlFor="message">Message *</Label>
-                          <Textarea
-                            id="message"
+                          <Label htmlFor="email">Email Address *</Label>
+                          <Input
+                            id="email"
+                            type="email"
                             required
-                            value={formData.message}
-                            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                            placeholder="Tell us how we can help..."
-                            rows={6}
+                            value={formData.email}
+                            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                            placeholder="your@company.com"
                           />
                         </div>
-                      </>
-                    )}
+                      </div>
 
-                    <div className="flex items-start gap-3">
-                      <Checkbox id="privacy" required />
-                      <Label htmlFor="privacy" className="text-sm font-normal text-slate-600">
-                        I agree to the privacy policy and terms of service. I understand that FiscAI will use my information to respond to my inquiry and may contact me about relevant products and services.
-                      </Label>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={submitMutation.isPending}
-                    >
-                      {submitMutation.isPending ? (
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-alabaster-50 border-t-transparent" />
-                          Sending...
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <Label htmlFor="company">Company *</Label>
+                          <Input
+                            id="company"
+                            type="text"
+                            required
+                            value={formData.company}
+                            onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
+                            placeholder="Your company name"
+                          />
                         </div>
+                        <div>
+                          <Label htmlFor="role">Job Title</Label>
+                          <Input
+                            id="role"
+                            type="text"
+                            value={formData.role}
+                            onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+                            placeholder="Your job title"
+                          />
+                        </div>
+                      </div>
+
+                      {formType === "demo" ? (
+                        <>
+                          <div>
+                            <Label htmlFor="phone">Phone Number</Label>
+                            <Input
+                              id="phone"
+                              type="tel"
+                              value={formData.phone}
+                              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                              placeholder="+212 XXX XXX XXX"
+                            />
+                          </div>
+
+                          <div>
+                            <Label>Which tools are you interested in? *</Label>
+                            <div className="mt-3 grid md:grid-cols-2 gap-3">
+                              {tools.map((tool) => (
+                                <div key={tool} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={tool}
+                                    checked={formData.tools.includes(tool)}
+                                    onCheckedChange={(checked) => handleToolChange(tool, checked as boolean)}
+                                  />
+                                  <Label htmlFor={tool} className="text-sm font-normal">
+                                    {tool}
+                                  </Label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="grid md:grid-cols-2 gap-6">
+                            <div>
+                              <Label htmlFor="timeline">Implementation Timeline</Label>
+                              <Select
+                                value={formData.timeline}
+                                onValueChange={(value) => setFormData(prev => ({ ...prev, timeline: value }))}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select timeline" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="immediate">Immediate (&lt; 1 month)</SelectItem>
+                                  <SelectItem value="short">Short term (1-3 months)</SelectItem>
+                                  <SelectItem value="medium">Medium term (3-6 months)</SelectItem>
+                                  <SelectItem value="long">Long term (6+ months)</SelectItem>
+                                  <SelectItem value="exploring">Just exploring</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <Label htmlFor="employees">Company Size</Label>
+                              <Select
+                                value={formData.employees}
+                                onValueChange={(value) => setFormData(prev => ({ ...prev, employees: value }))}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Number of employees" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="1-10">1-10 employees</SelectItem>
+                                  <SelectItem value="11-50">11-50 employees</SelectItem>
+                                  <SelectItem value="51-200">51-200 employees</SelectItem>
+                                  <SelectItem value="201-1000">201-1000 employees</SelectItem>
+                                  <SelectItem value="1000+">1000+ employees</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label htmlFor="useCase">Describe Your Use Case *</Label>
+                            <Textarea
+                              id="useCase"
+                              required
+                              value={formData.useCase}
+                              onChange={(e) => setFormData(prev => ({ ...prev, useCase: e.target.value }))}
+                              placeholder="Tell us about your current challenges and how you'd like to use FiscAI..."
+                              rows={4}
+                            />
+                          </div>
+                        </>
                       ) : (
-                        formType === "demo" ? "Request Demo" : "Send Message"
+                        <>
+                          <div>
+                            <Label htmlFor="subject">Subject *</Label>
+                            <Input
+                              id="subject"
+                              type="text"
+                              required
+                              value={formData.subject}
+                              onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+                              placeholder="What's this about?"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="message">Message *</Label>
+                            <Textarea
+                              id="message"
+                              required
+                              value={formData.message}
+                              onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                              placeholder="Tell us how we can help..."
+                              rows={6}
+                            />
+                          </div>
+                        </>
                       )}
-                    </Button>
-                  </form>
-                </GlassCard>
+
+                      <div className="flex items-start gap-3">
+                        <Checkbox id="privacy" required />
+                        <Label htmlFor="privacy" className="text-sm font-normal text-slate-600">
+                          I agree to the privacy policy and terms of service. I understand that FiscAI will use my information to respond to my inquiry and may contact me about relevant products and services.
+                        </Label>
+                      </div>
+
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={submitMutation.isPending}
+                      >
+                        {submitMutation.isPending ? (
+                          <div className="flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-alabaster-50 border-t-transparent" />
+                            Sending...
+                          </div>
+                        ) : (
+                          formType === "demo" ? "Request Demo" : "Send Message"
+                        )}
+                      </Button>
+                    </form>
+                  </GlassCard>
+                </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Enterprise Section */}
-        <section className="py-24 px-6 lg:px-8 bg-white">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="font-display font-bold text-4xl text-ink-950 mb-6">
-                Enterprise Customers
-              </h2>
-              <p className="text-xl text-slate-700 max-w-3xl mx-auto">
-                For large organizations with specific requirements, we offer dedicated support and custom solutions.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              <GlassCard className="p-8 text-center">
-                <div className="w-16 h-16 bg-champagne-200 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                  <Phone className="h-8 w-8 text-ink-950" />
-                </div>
-                <h3 className="font-display font-bold text-xl text-ink-950 mb-3">Dedicated Support</h3>
-                <p className="text-slate-700 text-sm mb-4">
-                  Get a dedicated customer success manager and technical account manager for white-glove service.
-                </p>
-                <Link href="/dedicated-support">
-                  <Button variant="outline" size="sm">Learn More</Button>
-                </Link>
-              </GlassCard>
-
-              <GlassCard className="p-8 text-center">
-                <div className="w-16 h-16 bg-champagne-200 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                  <Calendar className="h-8 w-8 text-ink-950" />
-                </div>
-                <h3 className="font-display font-bold text-xl text-ink-950 mb-3">Custom Training</h3>
-                <p className="text-slate-700 text-sm mb-4">
-                  On-site training, custom workshops, and certification programs for your team members.
-                </p>
-                <Link href="/custom-training">
-                  <Button variant="outline" size="sm">Schedule Training</Button>
-                </Link>
-              </GlassCard>
-
-              <GlassCard className="p-8 text-center">
-                <div className="w-16 h-16 bg-champagne-200 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                  <MapPin className="h-8 w-8 text-ink-950" />
-                </div>
-                <h3 className="font-display font-bold text-xl text-ink-950 mb-3">On-Site Deployment</h3>
-                <p className="text-slate-700 text-sm mb-4">
-                  Complete on-premises deployment with air-gapped environments and custom integrations.
-                </p>
-                <Link href="/on-site-deployment">
-                  <Button variant="outline" size="sm">Request Quote</Button>
-                </Link>
-              </GlassCard>
             </div>
           </div>
         </section>

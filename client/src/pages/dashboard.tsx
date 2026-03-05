@@ -134,7 +134,7 @@ export default function Dashboard() {
     const filteredOrders = roleFilteredOrders.filter(order =>
         order.customerEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.planName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.id.toLowerCase().includes(searchQuery.toLowerCase())
+        order.id?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -359,8 +359,8 @@ export default function Dashboard() {
                                                     </tr>
                                                 ) : filteredOrders.length ? (
                                                     filteredOrders.map((order) => (
-                                                        <tr key={order.id} className="hover:bg-alabaster-50 transition-colors">
-                                                            <td className="px-8 py-4 font-mono text-xs text-slate-600">#{order.id.slice(0, 8)}</td>
+                                                        <tr key={order.id || Math.random().toString()} className="hover:bg-alabaster-50 transition-colors">
+                                                            <td className="px-8 py-4 font-mono text-xs text-slate-600">#{order.id?.slice(0, 8)}</td>
                                                             <td className="px-8 py-4 font-medium text-ink-950">{order.customerEmail}</td>
                                                             <td className="px-8 py-4">
                                                                 <Badge variant="outline" className="text-xs">{order.planName}</Badge>

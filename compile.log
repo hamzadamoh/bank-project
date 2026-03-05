@@ -1,0 +1,81 @@
+client/src/hooks/use-auth.tsx(20,35): error TS2344: Type 'string' does not satisfy the constraint 'never'.
+  Type 'string' is not assignable to type 'never'.
+client/src/pages/dashboard.tsx(137,9): error TS18048: 'order.id' is possibly 'undefined'.
+client/src/pages/dashboard.tsx(363,122): error TS18048: 'order.id' is possibly 'undefined'.
+server/auth.ts(75,59): error TS2345: Argument of type '{ name: string; region: string; tier: string; queryLimit: string; }' is not assignable to parameter of type '{ name: string; region: string; tier: string; queryLimit: string; retentionDays: string; mfaEnforced: boolean; ssoConfig: { enabled: boolean; provider: string; domain: string; }; }'.
+  Type '{ name: string; region: string; tier: string; queryLimit: string; }' is missing the following properties from type '{ name: string; region: string; tier: string; queryLimit: string; retentionDays: string; mfaEnforced: boolean; ssoConfig: { enabled: boolean; provider: string; domain: string; }; }': retentionDays, mfaEnforced, ssoConfig
+server/middleware.ts(39,13): error TS2339: Property 'isAuthenticated' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/middleware.ts(39,36): error TS2339: Property 'isAuthenticated' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/middleware.ts(40,40): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/middleware.ts(40,57): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/middleware.ts(59,13): error TS2339: Property 'isAuthenticated' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/middleware.ts(59,36): error TS2339: Property 'isAuthenticated' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/middleware.ts(59,62): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/middleware.ts(66,15): error TS2339: Property 'isAuthenticated' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/middleware.ts(66,38): error TS2339: Property 'isAuthenticated' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/middleware.ts(67,49): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/middleware.ts(70,58): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(44,61): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(46,39): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(48,54): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(49,71): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(65,46): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(70,41): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(87,16): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(92,58): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(116,68): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(149,9): error TS2339: Property 'login' does not exist on type 'Request<{}, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(149,22): error TS7006: Parameter 'err' implicitly has an 'any' type.
+server/routes.ts(204,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(217,21): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(242,21): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(242,38): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(242,61): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(268,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(279,21): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(305,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(316,21): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(343,53): error TS2339: Property 'user' does not exist on type 'Request<{}, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(368,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(377,21): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(395,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(407,21): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(425,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(432,21): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(450,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(457,21): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(476,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(477,26): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(516,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(517,26): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(570,60): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(570,85): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(571,16): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(572,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(585,21): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(585,38): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(585,61): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(595,28): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(610,43): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(619,26): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(621,11): error TS2339: Property 'logout' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(621,19): error TS7006: Parameter 'err' implicitly has an 'any' type.
+server/routes.ts(632,46): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(642,53): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+server/routes.ts(669,26): error TS2339: Property 'user' does not exist on type 'Request<{}, any, any, ParsedQs, Record<string, any>>'.
+server/storage.ts(141,14): error TS2339: Property 'createdAt' does not exist on type '{ username: string; password: string; tenantId: string; role: string; consentSettings: { analytics: boolean; marketing: boolean; thirdParty: boolean; }; mfaEnabled: boolean; id?: string | undefined; mfaSecret?: string | ... 1 more ... | undefined; }'.
+server/storage.ts(141,33): error TS2339: Property 'createdAt' does not exist on type '{ username: string; password: string; tenantId: string; role: string; consentSettings: { analytics: boolean; marketing: boolean; thirdParty: boolean; }; mfaEnabled: boolean; id?: string | undefined; mfaSecret?: string | ... 1 more ... | undefined; }'.
+server/storage.ts(142,12): error TS2339: Property 'createdAt' does not exist on type '{ username: string; password: string; tenantId: string; role: string; consentSettings: { analytics: boolean; marketing: boolean; thirdParty: boolean; }; mfaEnabled: boolean; id?: string | undefined; mfaSecret?: string | ... 1 more ... | undefined; }'.
+server/storage.ts(142,30): error TS2339: Property 'createdAt' does not exist on type '{ username: string; password: string; tenantId: string; role: string; consentSettings: { analytics: boolean; marketing: boolean; thirdParty: boolean; }; mfaEnabled: boolean; id?: string | undefined; mfaSecret?: string | ... 1 more ... | undefined; }'.
+server/storage.ts(152,14): error TS2339: Property 'createdAt' does not exist on type '{ username: string; password: string; tenantId: string; role: string; consentSettings: { analytics: boolean; marketing: boolean; thirdParty: boolean; }; mfaEnabled: boolean; id?: string | undefined; mfaSecret?: string | ... 1 more ... | undefined; }'.
+server/storage.ts(152,33): error TS2339: Property 'createdAt' does not exist on type '{ username: string; password: string; tenantId: string; role: string; consentSettings: { analytics: boolean; marketing: boolean; thirdParty: boolean; }; mfaEnabled: boolean; id?: string | undefined; mfaSecret?: string | ... 1 more ... | undefined; }'.
+server/storage.ts(153,12): error TS2339: Property 'createdAt' does not exist on type '{ username: string; password: string; tenantId: string; role: string; consentSettings: { analytics: boolean; marketing: boolean; thirdParty: boolean; }; mfaEnabled: boolean; id?: string | undefined; mfaSecret?: string | ... 1 more ... | undefined; }'.
+server/storage.ts(153,30): error TS2339: Property 'createdAt' does not exist on type '{ username: string; password: string; tenantId: string; role: string; consentSettings: { analytics: boolean; marketing: boolean; thirdParty: boolean; }; mfaEnabled: boolean; id?: string | undefined; mfaSecret?: string | ... 1 more ... | undefined; }'.
+server/storage.ts(160,11): error TS2739: Type '{ id: `${string}-${string}-${string}-${string}-${string}`; tenantId: any; role: any; consentSettings: { analytics: true; marketing: false; thirdParty: false; }; mfaEnabled: false; mfaSecret: null; }' is missing the following properties from type '{ username: string; password: string; tenantId: string; role: string; consentSettings: { analytics: boolean; marketing: boolean; thirdParty: boolean; }; mfaEnabled: boolean; id?: string | undefined; mfaSecret?: string | ... 1 more ... | undefined; }': username, password
+server/storage.ts(163,28): error TS2339: Property 'tenantId' does not exist on type '{}'.
+server/storage.ts(164,24): error TS2339: Property 'role' does not exist on type '{}'.
+server/tests/repro_500.ts(21,41): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+server/tests/repro_500.ts(48,45): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+shared/schema.ts(140,62): error TS2322: Type 'boolean' is not assignable to type 'never'.

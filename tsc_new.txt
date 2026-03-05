@@ -1,0 +1,6 @@
+server/routes.ts(144,9): error TS2353: Object literal may only specify known properties, and 'tenantId' does not exist in type '{ username: string; password: string; }'.
+server/tests/repro_500.ts(12,13): error TS2353: Object literal may only specify known properties, and 'tenantId' does not exist in type '{ username: string; password: string; }'.
+server/tests/repro_500.ts(21,41): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+server/tests/repro_500.ts(48,45): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
