@@ -50,13 +50,30 @@ export function setupAuth(app: Express) {
 
         try {
             const decodedToken = await adminAuth.verifyIdToken(idToken);
-            const user = await storage.getUser(decodedToken.uid);
+            let user = await storage.getUser(decodedToken.uid);
+
+            if (!user) {
+                console.log(`[AUTH] User not found in database for UID: ${decodedToken.uid}. Attempting auto-provisioning...`);
+                try {
+                    // Auto-provision user profile for social/external logins
+                    user = await storage.createUser({
+                        username: decodedToken.email || `user_${decodedToken.uid.substring(0, 8)}`,
+                        password: "firebase_managed",
+                        tenantId: "tenant_default",
+                        role: "client"
+                    });
+                    console.log(`[AUTH] Auto-provisioned user: ${user.username} (UID: ${decodedToken.uid})`);
+                } catch (provisionError: any) {
+                    console.error('[AUTH] Auto-provisioning failed:', provisionError.message);
+                    return res.status(500).send('Internal Server Error: Failed to create user profile.');
+                }
+            }
+
             if (user) {
                 req.user = user;
                 next();
             } else {
-                console.log(`[AUTH] User not found in database for UID: ${decodedToken.uid}`);
-                res.status(401).send('Unauthorized: User not found in database. Please register first.');
+                res.status(401).send('Unauthorized: User profile could not be retrieved or created.');
             }
         } catch (error: any) {
             console.error('[AUTH] Token verification failed:', error.message);
