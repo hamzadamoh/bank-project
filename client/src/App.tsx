@@ -13,8 +13,6 @@ import SkillForge from "@/pages/products/skillforge";
 import PolyGlot from "@/pages/products/polyglot";
 import WellPulse from "@/pages/products/wellpulse";
 import FeedbackIQ from "@/pages/products/feedbackiq";
-import Solutions from "@/pages/solutions";
-import Security from "@/pages/security";
 import Pricing from "@/pages/pricing";
 import Contact from "@/pages/contact";
 import Newsletter from "@/pages/newsletter";
@@ -24,17 +22,8 @@ import CookiePolicy from "@/pages/cookie-policy";
 import RefundPolicy from "@/pages/refund-policy";
 import Checkout from "@/pages/checkout";
 import Login from "@/pages/login";
-import DedicatedSupport from "@/pages/dedicated-support";
-import CustomTraining from "@/pages/custom-training";
-import OnSiteDeployment from "@/pages/on-site-deployment";
 import About from "@/pages/about";
 import Careers from "@/pages/careers";
-import Waitlist from "@/pages/waitlist";
-import ROICalculator from "@/pages/roi-calculator";
-import IndustryAssessment from "@/pages/industry-assessment";
-import Apply from "@/pages/apply";
-import RequestAccess from "./pages/request-access";
-import TrustCenter from "./pages/trust-center";
 import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
 
@@ -65,8 +54,6 @@ function Router() {
         <Route path="/products/polyglot" component={PolyGlot} />
         <Route path="/products/wellpulse" component={WellPulse} />
         <Route path="/products/feedbackiq" component={FeedbackIQ} />
-        <Route path="/solutions" component={Solutions} />
-        <Route path="/security" component={Security} />
         <Route path="/pricing" component={Pricing} />
         <Route path="/contact" component={Contact} />
         <Route path="/newsletter" component={Newsletter} />
@@ -76,17 +63,8 @@ function Router() {
         <Route path="/refund-policy" component={RefundPolicy} />
         <Route path="/checkout" component={Checkout} />
         <Route path="/login" component={Login} />
-        <Route path="/dedicated-support" component={DedicatedSupport} />
-        <Route path="/custom-training" component={CustomTraining} />
-        <Route path="/on-site-deployment" component={OnSiteDeployment} />
         <Route path="/about" component={About} />
         <Route path="/careers" component={Careers} />
-        <Route path="/waitlist" component={Waitlist} />
-        <Route path="/roi-calculator" component={ROICalculator} />
-        <Route path="/industry-assessment" component={IndustryAssessment} />
-        <Route path="/apply" component={Apply} />
-        <Route path="/request-access" component={RequestAccess} />
-        <Route path="/trust-center" component={TrustCenter} />
         <Route path="/dashboard" component={Dashboard} />
         <Route component={NotFound} />
       </Switch>

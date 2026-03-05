@@ -39,203 +39,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 
-interface UsageStats {
-    totalRevenue: string;
-    activeOrders: number;
-    aiRequests: number;
-    tokensSaved: string;
-    distribution: Array<{ label: string; value: number; color: string }>;
-    revenueTrend: number[];
-}
 
-const AIInsightsPanel = ({ userRole }: { userRole: string }) => {
-    const adminInsights = [
-        { title: "Security Health", content: "All 24/7 monitors active. No abnormal ingress detected in the last 72 hours.", icon: Shield, color: "text-emerald-500" },
-        { title: "Revenue Forecast", content: "AI predicts a 14% growth in Enterprise expansions for Q2 based on current trial volumes.", icon: TrendingUp, color: "text-blue-500" },
-        { title: "Compute Efficiency", content: "SQL processing is 12% more efficient after last week's model fine-tuning.", icon: Zap, color: "text-amber-500" }
-    ];
-
-    const clientInsights = [
-        { title: "Spend Optimization", content: "AI detected $450 in redundant cloud compute tokens. Switch to Tier 2 to save $120/mo.", icon: ShoppingBag, color: "text-emerald-500" },
-        { title: "Query Prediction", content: "Most of your team's queries happen between 9-11 AM. Pre-warming models could save 2s latency.", icon: Zap, color: "text-blue-500" },
-        { title: "Tax Alert", content: "New regional regulation (v4.2) may affect your Q3 filing. TaxWise is ready to review.", icon: Info, color: "text-amber-500" }
-    ];
-
-    const insights = userRole === "admin" ? adminInsights : clientInsights;
-
-    return (
-        <GlassCard className="p-6 bg-gradient-to-r from-emerald-500/5 to-blue-500/5 border-emerald-400/20">
-            <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-emerald-400 rounded-xl flex items-center justify-center text-ink-950">
-                    <Zap className="h-6 w-6" />
-                </div>
-                <div>
-                    <h3 className="text-lg font-bold text-ink-950">FiscAI Insights</h3>
-                    <p className="text-xs text-slate-500 font-medium uppercase tracking-widest">Real-time Intelligent Analysis</p>
-                </div>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-                {insights.map((insight, i) => (
-                    <div key={i} className="space-y-2">
-                        <div className="flex items-center gap-2">
-                            <insight.icon className={`h-4 w-4 ${insight.color}`} />
-                            <h4 className="font-bold text-sm text-ink-950">{insight.title}</h4>
-                        </div>
-                        <p className="text-xs text-slate-600 leading-relaxed">{insight.content}</p>
-                    </div>
-                ))}
-            </div>
-        </GlassCard>
-    );
-};
-
-const AuditLogTab = () => {
-    const logs = [
-        { event: "Admin Login", user: "Admin User", ip: "192.168.1.1", time: "Now", status: "Success" },
-        { event: "API Key Generated", user: "Client User", ip: "45.12.89.22", time: "12m ago", status: "Success" },
-        { event: "Sensitive Data Export", user: "John Doe", ip: "10.0.0.4", time: "1h ago", status: "Warning" },
-        { event: "Role Changed: 'Client' -> 'Admin'", user: "Admin User", ip: "192.168.1.1", time: "3h ago", status: "Critical" },
-        { event: "DPA Request Submitted", user: "Sarah Smith", ip: "172.16.0.5", time: "5h ago", status: "Success" },
-    ];
-
-    return (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-            <GlassCard className="overflow-hidden">
-                <div className="p-8 border-b border-alabaster-100 flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-ink-950">System Audit Logs</h2>
-                        <p className="text-slate-500 text-sm">Real-time security and governance event trail.</p>
-                    </div>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-alabaster-50 text-xs font-bold uppercase tracking-wider text-slate-500">
-                            <tr>
-                                <th className="px-8 py-4">Event</th>
-                                <th className="px-8 py-4">Initiator</th>
-                                <th className="px-8 py-4">IP Address</th>
-                                <th className="px-8 py-4">Time</th>
-                                <th className="px-8 py-4">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-alabaster-100">
-                            {logs.map((log, i) => (
-                                <tr key={i} className="hover:bg-alabaster-50 transition-colors">
-                                    <td className="px-8 py-4 text-sm font-bold text-ink-950">{log.event}</td>
-                                    <td className="px-8 py-4 text-sm text-slate-600">{log.user}</td>
-                                    <td className="px-8 py-4 text-xs font-mono text-slate-400">{log.ip}</td>
-                                    <td className="px-8 py-4 text-xs text-slate-500">{log.time}</td>
-                                    <td className="px-8 py-4">
-                                        <Badge className={`${log.status === 'Critical' ? 'bg-red-50 text-red-600' :
-                                            log.status === 'Warning' ? 'bg-amber-50 text-amber-600' :
-                                                'bg-emerald-50 text-emerald-600'
-                                            }`}>
-                                            {log.status}
-                                        </Badge>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </GlassCard>
-        </motion.div>
-    );
-};
-
-const UsageAnalyticsTab = ({ stats }: { stats?: UsageStats }) => {
-    const displayStats = stats || {
-        distribution: [
-            { label: "TaxWise", value: 65, color: "bg-emerald-400" },
-            { label: "QueryForge", value: 20, color: "bg-blue-400" },
-            { label: "PolyGlot", value: 15, color: "bg-slate-400" },
-        ],
-        revenueTrend: [30, 45, 25, 60, 80, 55, 90]
-    };
-
-    return (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-            <div className="grid md:grid-cols-2 gap-8">
-                <GlassCard className="p-8">
-                    <h3 className="text-lg font-bold text-ink-950 mb-6 flex items-center gap-2">
-                        <Zap className="h-5 w-5 text-amber-500" />
-                        AI Token Distribution
-                    </h3>
-                    <div className="space-y-4">
-                        {displayStats.distribution.map((item, i) => (
-                            <div key={i}>
-                                <div className="flex justify-between text-xs font-bold mb-2">
-                                    <span>{item.label}</span>
-                                    <span>{item.value}%</span>
-                                </div>
-                                <div className="w-full bg-alabaster-100 h-2 rounded-full">
-                                    <div className={`${item.color} h-2 rounded-full`} style={{ width: `${item.value}%` }}></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </GlassCard>
-                <GlassCard className="p-8">
-                    <h3 className="text-lg font-bold text-ink-950 mb-6 flex items-center gap-2">
-                        <ShoppingBag className="h-5 w-5 text-emerald-500" />
-                        Spend Analytics (Monthly)
-                    </h3>
-                    <div className="flex items-end justify-between h-32 gap-2">
-                        {displayStats.revenueTrend.map((h, i) => (
-                            <div key={i} className="flex-1 bg-ink-950/10 rounded-t-lg relative group">
-                                <motion.div
-                                    initial={{ height: 0 }}
-                                    animate={{ height: `${h}%` }}
-                                    className="absolute bottom-0 left-0 right-0 bg-emerald-400 rounded-t-lg group-hover:bg-emerald-500 transition-colors"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                    <div className="flex justify-between mt-4 text-[10px] text-slate-400 font-bold">
-                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-                    </div>
-                </GlassCard>
-            </div>
-            <GlassCard className="p-8 bg-ink-950 text-alabaster-50 overflow-hidden relative">
-                <div className="relative z-10">
-                    <h3 className="text-xl font-bold mb-2">Resource Efficiency Score</h3>
-                    <p className="text-alabaster-400 text-sm mb-6">Your current AI usage is 14% more efficient than the industry average.</p>
-                    <div className="text-4xl font-bold text-emerald-400">92/100</div>
-                </div>
-                <TrendingUp className="absolute -bottom-4 -right-4 w-32 h-32 text-emerald-400 opacity-10" />
-            </GlassCard>
-        </motion.div>
-    );
-};
-
-const SystemHealth = () => {
-    return (
-        <div className="p-4 mt-auto border-t border-ink-900 bg-ink-950/50">
-            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                <Server className="h-3 w-3" />
-                Infrastructure Status
-            </h4>
-            <div className="space-y-3">
-                {[
-                    { label: "Global API", status: "Healthy" },
-                    { label: "AI Models", status: "Healthy" },
-                    { label: "Database", status: "Optimal" },
-                ].map((s, i) => (
-                    <div key={i} className="flex items-center justify-between text-[10px]">
-                        <span className="text-alabaster-200">{s.label}</span>
-                        <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
-                            <span className="text-emerald-400 font-bold uppercase">{s.status}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <div className="mt-4 pt-4 border-t border-ink-900">
-                <p className="text-[10px] text-slate-500">Last health check: <span className="text-alabaster-50 font-medium ml-1">Just now</span></p>
-            </div>
-        </div>
-    );
-};
 
 export default function Dashboard() {
     const { toast } = useToast();
@@ -270,10 +74,7 @@ export default function Dashboard() {
         queryKey: ["/api/orders"],
     });
 
-    const { data: stats } = useQuery<UsageStats>({
-        queryKey: ["/api/analytics/usage"],
-        enabled: !!user,
-    });
+
 
 
     const queryClient = useQueryClient();
@@ -371,63 +172,7 @@ export default function Dashboard() {
                         <ShoppingBag className="w-5 h-5" />
                         Orders
                     </button>
-                    {userRole === "admin" ? (
-                        <button
-                            onClick={() => setActiveTab("activity")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'activity' ? 'bg-emerald-400 text-ink-950 font-semibold' : 'hover:bg-ink-900 text-alabaster-200'}`}
-                        >
-                            <Activity className="w-5 h-5" />
-                            Audit Logs
-                        </button>
-                    ) : (
-                        <button
-                            onClick={() => setActiveTab("analytics")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'analytics' ? 'bg-emerald-400 text-ink-950 font-semibold' : 'hover:bg-ink-900 text-alabaster-200'}`}
-                        >
-                            <PieChart className="w-5 h-5" />
-                            Analytics
-                        </button>
-                    )}
-                    {userRole === "admin" && (
-                        <button
-                            onClick={() => setActiveTab("users")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'users' ? 'bg-emerald-400 text-ink-950 font-semibold' : 'hover:bg-ink-900 text-alabaster-200'}`}
-                        >
-                            <Users className="w-5 h-5" />
-                            Users
-                        </button>
-                    )}
-                    <div className="pt-8 pb-4">
-                        <span className="px-4 text-xs font-semibold uppercase tracking-widest opacity-40">Account</span>
-                    </div>
-                    <button
-                        onClick={() => setActiveTab("settings")}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'settings' ? 'bg-emerald-400 text-ink-950 font-semibold' : 'hover:bg-ink-900 text-alabaster-200'}`}
-                    >
-                        <Settings className="w-5 h-5" />
-                        Settings
-                    </button>
-                    <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-900/40 text-red-200 transition-colors"
-                    >
-                        <LogOut className="w-5 h-5" />
-                        Logout
-                    </button>
                 </nav>
-
-                <div className="p-4">
-                    <div className="bg-ink-900 p-4 rounded-2xl border border-ink-800">
-                        <p className="text-xs font-medium text-emerald-400 mb-1">PRO PLAN</p>
-                        <p className="text-sm font-semibold mb-2">Enterprise Plus</p>
-                        <div className="w-full bg-ink-800 rounded-full h-1.5 mb-2">
-                            <div className="bg-emerald-400 h-1.5 rounded-full" style={{ width: '75%' }}></div>
-                        </div>
-                        <p className="text-[10px] opacity-60">75% of compute used</p>
-                    </div>
-                </div>
-
-                <SystemHealth />
             </aside>
 
             {/* Main Content */}
@@ -535,92 +280,32 @@ export default function Dashboard() {
                                 exit={{ opacity: 0, y: -10 }}
                                 className="space-y-8"
                             >
-                                <AIInsightsPanel userRole={userRole} />
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     {[
-                                        { label: "Total Revenue", value: stats?.totalRevenue || "$0", icon: CreditCard, color: "text-emerald-500", trend: "+12.5%" },
-                                        { label: "Active Orders", value: stats?.activeOrders || 0, icon: Package, color: "text-blue-500", trend: "+5.2%" },
-                                        { label: "AI Requests", value: stats?.aiRequests || 0, icon: Zap, color: "text-amber-500", trend: "+25.1%" },
-                                        { label: userRole === "admin" ? "User Growth" : "Tokens Saved", value: userRole === "admin" ? "+12%" : (stats?.tokensSaved || "0"), icon: TrendingUp, color: "text-purple-500", trend: "+2.3%" },
-                                    ].map((stat, i) => (
-                                        <GlassCard key={i} className="p-6">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div className={`p-3 rounded-xl bg-white shadow-sm ${stat.color}`}>
-                                                    <stat.icon className="w-6 h-6" />
-                                                </div>
-                                                <span className="text-emerald-500 text-xs font-bold leading-none py-1 px-2 bg-emerald-50 rounded-lg">{stat.trend}</span>
-                                            </div>
-                                            <p className="text-slate-500 text-sm font-medium mb-1">{stat.label}</p>
-                                            <p className="text-2xl font-bold text-ink-950">{stat.value}</p>
-                                        </GlassCard>
-                                    ))}
-                                </div>
-
-                                <div className="grid lg:grid-cols-3 gap-8">
-                                    <div className="lg:col-span-2">
-                                        <GlassCard className="p-8">
-                                            <div className="flex items-center justify-between mb-8">
+                                        { name: "TaxWise", route: "/products/taxwise", color: "bg-emerald-400", desc: "Automate tax rules" },
+                                        { name: "QueryForge", route: "/products/queryforge", color: "bg-blue-400", desc: "Natural language SQL" },
+                                        { name: "PolyGlot Chat", route: "/products/polyglot", color: "bg-amber-400", desc: "Multilingual advisory" },
+                                        { name: "SkillForge", route: "/products/skillforge", color: "bg-purple-400", desc: "Team training platform" },
+                                        { name: "ContractMind", route: "/products/contractmind", color: "bg-indigo-400", desc: "Legal document review" },
+                                        { name: "AutoRecon", route: "/products/autorecon", color: "bg-rose-400", desc: "Smart reconciliation" },
+                                        { name: "ComplianceGuard", route: "/products/complianceguard", color: "bg-teal-400", desc: "Regulatory monitoring" },
+                                    ].map((tool, i) => (
+                                        <Link href={tool.route} key={i}>
+                                            <GlassCard className="p-6 hover:ring-2 ring-ink-950 transition-all cursor-pointer group h-full flex flex-col justify-between bg-white/50 hover:bg-white">
                                                 <div>
-                                                    <h3 className="text-lg font-bold text-ink-950">
-                                                        {userRole === "admin" ? "Revenue Analytics" : "Spend Analytics"}
-                                                    </h3>
-                                                    <p className="text-sm text-slate-500">Performance over the last 30 days</p>
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className={`w-3 h-3 rounded-full ${tool.color}`}></div>
+                                                        <span className="text-lg font-bold text-ink-950">{tool.name}</span>
+                                                    </div>
+                                                    <p className="text-sm text-slate-600 mb-6">{tool.desc}</p>
                                                 </div>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handleAction("Export")}
-                                                >
-                                                    Export Data
-                                                </Button>
-                                            </div>
-                                            <div className="h-[300px] w-full bg-alabaster-50 rounded-2xl flex items-end justify-between p-6 gap-2">
-                                                {[40, 65, 45, 90, 85, 55, 75, 95, 80, 60, 70, 45].map((h, i) => (
-                                                    <motion.div
-                                                        key={i}
-                                                        initial={{ height: 0 }}
-                                                        animate={{ height: `${h}%` }}
-                                                        transition={{ delay: i * 0.05 }}
-                                                        className="flex-1 bg-ink-950 rounded-t-lg group relative"
-                                                    >
-                                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-ink-950 text-alabaster-50 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            ${h}k
-                                                        </div>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                            <div className="flex justify-between mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                                                <span>Jan 01</span>
-                                                <span>Jan 15</span>
-                                                <span>Jan 30</span>
-                                            </div>
-                                        </GlassCard>
-                                    </div>
-
-                                    <div>
-                                        <GlassCard className="p-8 h-full">
-                                            <h3 className="text-lg font-bold text-ink-950 mb-6">Quick Tools</h3>
-                                            <div className="space-y-4">
-                                                {[
-                                                    { name: "TaxWise", route: "/products/taxwise", color: "bg-emerald-400" },
-                                                    { name: "QueryForge", route: "/products/queryforge", color: "bg-blue-400" },
-                                                    { name: "PolyGlot Chat", route: "/products/polyglot", color: "bg-amber-400" },
-                                                    { name: "SkillForge", route: "/products/skillforge", color: "bg-purple-400" },
-                                                ].map((tool, i) => (
-                                                    <Link href={tool.route} key={i}>
-                                                        <div className="p-4 rounded-xl border border-alabaster-200 hover:border-ink-950/20 transition-all cursor-pointer group bg-white shadow-sm flex items-center justify-between">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className={`w-2 h-2 rounded-full ${tool.color}`}></div>
-                                                                <span className="text-sm font-semibold text-slate-700">{tool.name}</span>
-                                                            </div>
-                                                            <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-ink-950" />
-                                                        </div>
-                                                    </Link>
-                                                ))}
-                                            </div>
-                                        </GlassCard>
-                                    </div>
+                                                <div className="flex items-center text-sm font-semibold text-slate-500 group-hover:text-ink-950 transition-colors">
+                                                    Launch Tool
+                                                    <ExternalLink className="w-4 h-4 ml-2" />
+                                                </div>
+                                            </GlassCard>
+                                        </Link>
+                                    ))}
                                 </div>
                             </motion.div>
                         )}
@@ -709,13 +394,7 @@ export default function Dashboard() {
                             </motion.div>
                         )}
 
-                        {activeTab === "activity" && userRole === "admin" && (
-                            <AuditLogTab />
-                        )}
 
-                        {activeTab === "analytics" && userRole === "client" && (
-                            <UsageAnalyticsTab stats={stats} />
-                        )}
 
                         {activeTab === "users" && userRole === "admin" && (
                             <motion.div

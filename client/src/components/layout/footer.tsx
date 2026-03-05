@@ -38,22 +38,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-ink-950 mb-4">Solutions</h3>
-            <ul className="space-y-2 text-sm text-slate-700">
-              <li><Link href="/solutions#banking" className="hover:text-ink-950 transition-colors">Banking</Link></li>
-              <li><Link href="/solutions#fintech" className="hover:text-ink-950 transition-colors">Fintech</Link></li>
-              <li><Link href="/solutions#audit" className="hover:text-ink-950 transition-colors">Audit</Link></li>
-              <li><Link href="/solutions#smb" className="hover:text-ink-950 transition-colors">SMB Accounting</Link></li>
-            </ul>
-          </div>
-
-          <div>
             <h3 className="font-semibold text-ink-950 mb-4">Company</h3>
             <ul className="space-y-2 text-sm text-slate-700">
               <li><Link href="/about" className="hover:text-ink-950 transition-colors">About</Link></li>
               <li><Link href="/careers" className="hover:text-ink-950 transition-colors">Careers</Link></li>
-              <li><Link href="/waitlist" className="hover:text-ink-950 transition-colors">Join Waitlist</Link></li>
-              <li><Link href="/security" className="hover:text-ink-950 transition-colors">Security</Link></li>
               <li><Link href="/contact" className="hover:text-ink-950 transition-colors">Contact</Link></li>
             </ul>
           </div>
