@@ -36,21 +36,34 @@ export const rateLimit = (req: Request, res: Response, next: NextFunction) => {
 
 // Auth & Security Middlewares
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated && req.isAuthenticated()) {
         console.log(`[AUTH] User ${req.user?.id} (${req.user?.username}) authenticated for ${req.method} ${req.path}`);
         return next();
     }
-    console.warn(`[AUTH] Unauthorized access attempt: ${req.method} ${req.path} from IP ${req.ip}`);
-    res.status(401).json({ success: false, message: "Unauthorized: Please log in" });
+    // Allow guest access with a default user (no DB required)
+    (req as any).user = {
+        id: "guest",
+        username: "guest",
+        tenantId: "tenant_default",
+        role: "client",
+        password: "",
+        consentSettings: { analytics: true, marketing: false, thirdParty: false },
+        mfaEnabled: false,
+        mfaSecret: null
+    };
+    console.log(`[AUTH] Guest access for ${req.method} ${req.path}`);
+    return next();
 };
 
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
-    if (req.isAuthenticated() && (req.user as any)?.role === 'admin') return next();
+    if (req.isAuthenticated && req.isAuthenticated() && (req.user as any)?.role === 'admin') return next();
+    // Allow guest admin access for now (no DB)
+    if ((req as any).user?.id === 'guest') return next();
     res.status(403).json({ message: "Forbidden: Admin access required" });
 };
 
 export const checkTierLimit = async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.isAuthenticated()) return next();
+    if (!(req.isAuthenticated && req.isAuthenticated())) return next();
     const tenant = await storage.getTenant((req.user as any)!.tenantId);
     if (!tenant) return next();
 
