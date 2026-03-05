@@ -61,7 +61,7 @@ export default function Footer() {
 
         <div className="border-t border-alabaster-200 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-sm text-slate-600 mb-4 md:mb-0">
-            © 2024 FiscAI. All rights reserved.
+            © 2026 FiscAI. All rights reserved.
           </div>
           <div className="flex gap-6 text-sm text-slate-600">
             <Link href="/privacy-policy" className="hover:text-ink-950 transition-colors">Privacy Policy</Link>
