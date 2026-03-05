@@ -59,6 +59,7 @@ export function setupAuth(app: Express) {
                     const isBootstrapAdmin = decodedToken.email === ADMIN_EMAIL;
                     // Auto-provision user profile for social/external logins
                     user = await storage.createUser({
+                        id: decodedToken.uid,
                         username: decodedToken.email || `user_${decodedToken.uid.substring(0, 8)}`,
                         password: "firebase_managed",
                         tenantId: "tenant_default",

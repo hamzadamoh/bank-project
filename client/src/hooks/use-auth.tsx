@@ -121,14 +121,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const res = await apiRequest("GET", "/api/user");
             const profile = await safeJsonParse(res);
 
-            if (!profile) {
-                // If profile doesn't exist yet, we might need to create it
-                // For simplicity, we assume the server handles user creation/sync on first SSO login
-                // or the user needs to register first. 
-                // However, based on the backend auth.ts, it expects the user to exist in storage.
-                // Let's check user existence and redirect if needed or toast.
-                throw new Error("No profile found for this Google account. Please register first.");
-            }
             return profile;
         },
         onSuccess: (user: SelectUser) => {
