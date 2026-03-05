@@ -35,8 +35,11 @@ export function setupAuth(app: Express) {
 
     // Custom middleware to verify Firebase tokens
     const verifyToken = async (req: any, res: any, next: any) => {
-        const idToken = req.headers.authorization?.split('Bearer ')[1];
+        const authHeader = req.headers.authorization;
+        const idToken = authHeader?.split('Bearer ')[1];
+
         if (!idToken) {
+            console.log(`[AUTH] Unauthorized: No token provided for ${req.method} ${req.path}`);
             return res.status(401).send('Unauthorized: No token provided');
         }
 
@@ -47,11 +50,15 @@ export function setupAuth(app: Express) {
                 req.user = user;
                 next();
             } else {
+                console.log(`[AUTH] User not found in database for UID: ${decodedToken.uid}`);
                 res.status(401).send('Unauthorized: User not found in database');
             }
-        } catch (error) {
-            console.error('Error verifying token:', error);
-            res.status(401).send('Unauthorized: Invalid token');
+        } catch (error: any) {
+            console.error('[AUTH] Token verification failed:', error.message);
+            if (error.code === 'auth/id-token-expired') {
+                return res.status(401).send('Unauthorized: Token expired');
+            }
+            res.status(401).send(`Unauthorized: ${error.message}`);
         }
     };
 
