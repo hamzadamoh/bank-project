@@ -636,6 +636,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin User Management
+  app.get("/api/admin/users", isAuthenticated, isAdmin, async (req: any, res: any) => {
+    try {
+      console.log(`[ADMIN] Fetching users for tenant: ${req.user!.tenantId}`);
+      const users = await storage.getUsersByTenant(req.user!.tenantId);
+      res.json({ success: true, data: users });
+    } catch (error) {
+      console.error("[ADMIN] Failed to fetch users:", error);
+      res.status(500).json({ success: false, message: "Failed to fetch users" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id/role", isAuthenticated, isAdmin, async (req: any, res: any) => {
+    try {
+      const { role } = req.body;
+      if (!['admin', 'client'].includes(role)) {
+        return res.status(400).json({ success: false, message: "Invalid role. Must be 'admin' or 'client'." });
+      }
+      console.log(`[ADMIN] Updating role for user ${req.params.id} to ${role}`);
+      await storage.updateUserRole(req.params.id, role);
+      res.json({ success: true, message: `User role updated to ${role}` });
+    } catch (error) {
+      console.error("[ADMIN] Failed to update user role:", error);
+      res.status(500).json({ success: false, message: "Failed to update user role" });
+    }
+  });
+
   // Analytics endpoints
   app.get("/api/analytics/usage", isAuthenticated, async (req: any, res) => {
     try {

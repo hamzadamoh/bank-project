@@ -31,6 +31,8 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  getUsersByTenant(tenantId: string): Promise<User[]>;
+  updateUserRole(userId: string, role: string): Promise<void>;
 
   // Audit Logs (New)
   createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
@@ -182,6 +184,21 @@ export class FirestoreStorage implements IStorage {
     };
     await db.collection("users").doc(id).set(user);
     return user;
+  }
+
+  async getUsersByTenant(tenantId: string): Promise<User[]> {
+    const snapshot = await db.collection("users").where("tenantId", "==", tenantId).get();
+    return snapshot.docs.map(doc => {
+      const data = doc.data() as User;
+      if (data.createdAt && (data.createdAt as any).toDate) {
+        data.createdAt = (data.createdAt as any).toDate();
+      }
+      return { ...data, id: doc.id };
+    });
+  }
+
+  async updateUserRole(userId: string, role: string): Promise<void> {
+    await db.collection("users").doc(userId).update({ role });
   }
 
   // Audit Logs

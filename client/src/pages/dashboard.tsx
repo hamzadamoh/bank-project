@@ -112,6 +112,22 @@ export default function Dashboard() {
         }
     });
 
+    const { data: usersData, isLoading: isLoadingUsers } = useQuery<{ success: boolean; data: any[] }>({
+        queryKey: ["/api/admin/users"],
+        enabled: userRole === "admin" && activeTab === "users",
+    });
+
+    const { mutate: updateRole, isPending: isUpdatingRole } = useMutation({
+        mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+            const res = await apiRequest("PATCH", `/api/admin/users/${userId}/role`, { role });
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+            toast({ title: "Role Updated ✅", description: "User permissions have been modified successfully." });
+        }
+    });
+
     const handleLogout = async () => {
         await logoutMutation.mutateAsync();
         setLocation("/login");
@@ -423,30 +439,43 @@ export default function Dashboard() {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-alabaster-100">
-                                                {[
-                                                    { name: "Admin User", email: "admin@fiscai.co", role: "Super Admin", status: "Active", last: "Now" },
-                                                    { name: "John Doe", email: "john@client.com", role: "Technical Lead", status: "Active", last: "2h ago" },
-                                                    { name: "Sarah Smith", email: "sarah@enterprise.io", role: "Contributor", status: "Inactive", last: "3d ago" },
-                                                ].map((u, i) => (
-                                                    <tr key={i} className="hover:bg-alabaster-50 transition-colors">
+                                                {isLoadingUsers ? (
+                                                    <tr>
+                                                        <td colSpan={5} className="px-8 py-12 text-center text-slate-400 italic">Loading user directory...</td>
+                                                    </tr>
+                                                ) : (usersData?.data || []).map((u, i) => (
+                                                    <tr key={u.id || i} className="hover:bg-alabaster-50 transition-colors">
                                                         <td className="px-8 py-4">
                                                             <div className="flex items-center gap-3">
-                                                                <div className="w-8 h-8 rounded-full bg-alabaster-200 flex items-center justify-center text-xs font-bold">{u.name.charAt(0)}</div>
+                                                                <div className="w-8 h-8 rounded-full bg-alabaster-200 flex items-center justify-center text-xs font-bold text-ink-950">
+                                                                    {(u.username || "U").charAt(0).toUpperCase()}
+                                                                </div>
                                                                 <div>
-                                                                    <p className="text-sm font-bold text-ink-950 leading-none">{u.name}</p>
-                                                                    <p className="text-xs text-slate-500 mt-1">{u.email}</p>
+                                                                    <p className="text-sm font-bold text-ink-950 leading-none">{u.username}</p>
+                                                                    <p className="text-xs text-slate-500 mt-1">{u.username.includes('@') ? u.username : 'FiscAI Identity'}</p>
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-4 text-sm font-medium">{u.role}</td>
-                                                        <td className="px-8 py-4">
-                                                            <Badge className={u.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}>
-                                                                {u.status}
+                                                        <td className="px-8 py-4 text-sm font-medium">
+                                                            <Badge variant="outline" className={u.role === 'admin' ? 'border-emerald-200 text-emerald-700 bg-emerald-50' : ''}>
+                                                                {u.role.toUpperCase()}
                                                             </Badge>
                                                         </td>
-                                                        <td className="px-8 py-4 text-xs text-slate-500">{u.last}</td>
                                                         <td className="px-8 py-4">
-                                                            <Button variant="ghost" size="sm" onClick={() => handleAction("Edit User")}>Edit</Button>
+                                                            <Badge className="bg-emerald-50 text-emerald-600 border-none">Active</Badge>
+                                                        </td>
+                                                        <td className="px-8 py-4 text-xs text-slate-500">
+                                                            {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Instant Profile'}
+                                                        </td>
+                                                        <td className="px-8 py-4">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                disabled={isUpdatingRole || (u.id === user?.id)}
+                                                                onClick={() => updateRole({ userId: u.id, role: u.role === 'admin' ? 'client' : 'admin' })}
+                                                            >
+                                                                {u.role === 'admin' ? 'Demote' : 'Promote'}
+                                                            </Button>
                                                         </td>
                                                     </tr>
                                                 ))}
