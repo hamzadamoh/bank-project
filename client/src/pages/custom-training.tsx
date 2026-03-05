@@ -158,7 +158,7 @@ export default function CustomTraining() {
 
             <div className="grid md:grid-cols-2 gap-8">
               <GlassCard className="p-8">
-                <h3 className="font-display font-bold text-2xl text-ink-950 mb-6">Tax Counsel Mastery</h3>
+                <h3 className="font-display font-bold text-2xl text-ink-950 mb-6">TaxWise Mastery</h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-ink-950 rounded-full mt-2"></div>
@@ -192,7 +192,7 @@ export default function CustomTraining() {
               </GlassCard>
 
               <GlassCard className="p-8">
-                <h3 className="font-display font-bold text-2xl text-ink-950 mb-6">Query Architect Expertise</h3>
+                <h3 className="font-display font-bold text-2xl text-ink-950 mb-6">QueryForge Expertise</h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-ink-950 rounded-full mt-2"></div>
@@ -219,14 +219,14 @@ export default function CustomTraining() {
                     <div className="w-2 h-2 bg-ink-950 rounded-full mt-2"></div>
                     <div>
                       <h4 className="font-semibold text-ink-950">Integration Strategies</h4>
-                      <p className="text-sm text-slate-700">Embedding Query Architect in existing workflows</p>
+                      <p className="text-sm text-slate-700">Embedding QueryForge in existing workflows</p>
                     </div>
                   </div>
                 </div>
               </GlassCard>
 
               <GlassCard className="p-8">
-                <h3 className="font-display font-bold text-2xl text-ink-950 mb-6">Factoring Guardian Proficiency</h3>
+                <h3 className="font-display font-bold text-2xl text-ink-950 mb-6">DocuGuard Proficiency</h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-ink-950 rounded-full mt-2"></div>
@@ -396,7 +396,7 @@ export default function CustomTraining() {
                   </div>
                 </div>
                 <p className="text-slate-700 text-sm italic">
-                  "Custom training on Tax Counsel enabled our advisory team to handle complex multi-jurisdiction
+                  "Custom training on TaxWise enabled our advisory team to handle complex multi-jurisdiction
                   queries with confidence. Client satisfaction scores increased by 25% in the first quarter."
                 </p>
               </div>

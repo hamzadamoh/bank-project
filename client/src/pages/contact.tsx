@@ -104,13 +104,13 @@ export default function Contact() {
   };
 
   const tools = [
-    "FiscAI Tax Counsel",
-    "Factoring Guardian",
-    "Query Architect",
-    "SkillArcade",
-    "OmniServe",
-    "Rhalia",
-    "SatisfAI"
+    "FiscAI TaxWise",
+    "DocuGuard",
+    "QueryForge",
+    "SkillForge",
+    "PolyGlot",
+    "WellPulse",
+    "FeedbackIQ"
   ];
 
   return (

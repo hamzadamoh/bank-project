@@ -19,7 +19,7 @@ const categories = [
   { id: 'growth', label: 'Growth', icon: '📈' },
 ];
 
-export default function SatisfAI() {
+export default function FeedbackIQ() {
   const [ratings, setRatings] = useState<Record<string, number>>({
     work: 7,
     relationships: 7,
@@ -60,7 +60,7 @@ export default function SatisfAI() {
     } catch (error: any) {
       console.error('Error analyzing satisfaction:', error);
       const message = error.message?.includes('401')
-        ? 'Please log in to use SatisfAI.'
+        ? 'Please log in to use FeedbackIQ.'
         : 'Failed to analyze satisfaction. Please try again.';
       alert(message);
     } finally {
@@ -84,7 +84,7 @@ export default function SatisfAI() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="font-display font-bold text-4xl md:text-5xl text-ink-950 mb-6">
-                SatisfAI
+                FeedbackIQ
               </h1>
               <p className="text-xl text-slate-700 max-w-3xl mx-auto">
                 Measure and understand your emotional satisfaction. Get insights into what drives your happiness.

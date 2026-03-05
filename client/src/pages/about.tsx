@@ -129,7 +129,7 @@ export default function About() {
                   <div className="flex-1">
                     <h3 className="font-display font-bold text-xl text-ink-950 mb-2">First Product Launch</h3>
                     <p className="text-slate-700 leading-relaxed">
-                      Launched Tax Counsel, our flagship AI tax advisory tool, specifically designed for 
+                      Launched TaxWise, our flagship AI tax advisory tool, specifically designed for 
                       Moroccan tax law with multi-jurisdiction capabilities. Gained our first enterprise 
                       customers in banking and accounting sectors.
                     </p>
@@ -143,7 +143,7 @@ export default function About() {
                   <div className="flex-1">
                     <h3 className="font-display font-bold text-xl text-ink-950 mb-2">Platform Expansion</h3>
                     <p className="text-slate-700 leading-relaxed">
-                      Expanded to a full AI suite with Query Architect and Factoring Guardian. 
+                      Expanded to a full AI suite with QueryForge and DocuGuard. 
                       Established partnerships with major Moroccan banks and international expansion 
                       into MENA markets. Achieved SOC 2 certification.
                     </p>

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 
-export default function QueryArchitectDemo() {
+export default function QueryForgeDemo() {
   const [mode, setMode] = useState<"nl_to_sql" | "sql_to_nl">("nl_to_sql");
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<any>(null);

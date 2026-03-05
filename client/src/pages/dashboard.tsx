@@ -58,7 +58,7 @@ const AIInsightsPanel = ({ userRole }: { userRole: string }) => {
     const clientInsights = [
         { title: "Spend Optimization", content: "AI detected $450 in redundant cloud compute tokens. Switch to Tier 2 to save $120/mo.", icon: ShoppingBag, color: "text-emerald-500" },
         { title: "Query Prediction", content: "Most of your team's queries happen between 9-11 AM. Pre-warming models could save 2s latency.", icon: Zap, color: "text-blue-500" },
-        { title: "Tax Alert", content: "New regional regulation (v4.2) may affect your Q3 filing. Tax Counsel is ready to review.", icon: Info, color: "text-amber-500" }
+        { title: "Tax Alert", content: "New regional regulation (v4.2) may affect your Q3 filing. TaxWise is ready to review.", icon: Info, color: "text-amber-500" }
     ];
 
     const insights = userRole === "admin" ? adminInsights : clientInsights;
@@ -146,9 +146,9 @@ const AuditLogTab = () => {
 const UsageAnalyticsTab = ({ stats }: { stats?: UsageStats }) => {
     const displayStats = stats || {
         distribution: [
-            { label: "Tax Counsel", value: 65, color: "bg-emerald-400" },
-            { label: "Query Architect", value: 20, color: "bg-blue-400" },
-            { label: "OmniServe", value: 15, color: "bg-slate-400" },
+            { label: "TaxWise", value: 65, color: "bg-emerald-400" },
+            { label: "QueryForge", value: 20, color: "bg-blue-400" },
+            { label: "PolyGlot", value: 15, color: "bg-slate-400" },
         ],
         revenueTrend: [30, 45, 25, 60, 80, 55, 90]
     };
@@ -603,10 +603,10 @@ export default function Dashboard() {
                                             <h3 className="text-lg font-bold text-ink-950 mb-6">Quick Tools</h3>
                                             <div className="space-y-4">
                                                 {[
-                                                    { name: "Tax Counsel", route: "/products/tax-counsel", color: "bg-emerald-400" },
-                                                    { name: "Query Architect", route: "/products/query-architect", color: "bg-blue-400" },
-                                                    { name: "OmniServe Chat", route: "/products/omniserve", color: "bg-amber-400" },
-                                                    { name: "SkillArcade", route: "/products/skillarcade", color: "bg-purple-400" },
+                                                    { name: "TaxWise", route: "/products/tax-counsel", color: "bg-emerald-400" },
+                                                    { name: "QueryForge", route: "/products/query-architect", color: "bg-blue-400" },
+                                                    { name: "PolyGlot Chat", route: "/products/PolyGlot", color: "bg-amber-400" },
+                                                    { name: "SkillForge", route: "/products/SkillForge", color: "bg-purple-400" },
                                                 ].map((tool, i) => (
                                                     <Link href={tool.route} key={i}>
                                                         <div className="p-4 rounded-xl border border-alabaster-200 hover:border-ink-950/20 transition-all cursor-pointer group bg-white shadow-sm flex items-center justify-between">
@@ -851,7 +851,7 @@ export default function Dashboard() {
 
                                     <div className="md:col-span-1">
                                         <h3 className="font-bold text-ink-950 mb-2">API Management</h3>
-                                        <p className="text-sm text-slate-500">Manage your access keys for OmniServe and Custom Training integration.</p>
+                                        <p className="text-sm text-slate-500">Manage your access keys for PolyGlot and Custom Training integration.</p>
                                     </div>
                                     <div className="md:col-span-2">
                                         <GlassCard className="p-8 space-y-6">

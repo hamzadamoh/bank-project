@@ -210,7 +210,7 @@ export default function Waitlist() {
                   <div>
                     <h3 className="font-semibold text-ink-950 mb-1">Seven AI Tools</h3>
                     <p className="text-slate-700 text-sm">
-                      Access to Tax Counsel, Factoring Guardian, Query Architect, SkillArcade, OmniServe, Rhalia, and SatisfAI.
+                      Access to TaxWise, DocuGuard, QueryForge, SkillForge, PolyGlot, WellPulse, and FeedbackIQ.
                     </p>
                   </div>
                 </div>

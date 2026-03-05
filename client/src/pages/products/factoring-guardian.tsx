@@ -150,7 +150,7 @@ export default function FactoringGuardian() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="font-display font-bold text-4xl md:text-5xl text-ink-950 mb-6">
-                Factoring Guardian
+                DocuGuard
               </h1>
               <p className="text-xl text-slate-700 max-w-3xl mx-auto">
                 Intelligent fraud detection and document analysis for factoring operations. Catch anomalies before they become losses.

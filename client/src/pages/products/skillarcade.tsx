@@ -7,10 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Target, TrendingUp, Award, ArrowRight, ArrowLeft } from "lucide-react";
-import { questionsByCategory, type Question } from "@/lib/skillarcade-questions";
+import { questionsByCategory, type Question } from "@/lib/SkillForge-questions";
 import { apiRequest } from "@/lib/queryClient";
 
-export default function SkillArcade() {
+export default function SkillForge() {
   const [category, setCategory] = useState("technical");
   const [isAssessing, setIsAssessing] = useState(false);
   const [assessment, setAssessment] = useState<any>(null);
@@ -77,7 +77,7 @@ export default function SkillArcade() {
     } catch (error: any) {
       console.error('Error assessing skills:', error);
       const message = error.message?.includes('401')
-        ? 'Please log in to use SkillArcade.'
+        ? 'Please log in to use SkillForge.'
         : 'Failed to assess skills. Please try again.';
       alert(message);
     } finally {
@@ -94,7 +94,7 @@ export default function SkillArcade() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="font-display font-bold text-4xl md:text-5xl text-ink-950 mb-6">
-                SkillArcade
+                SkillForge
               </h1>
               <p className="text-xl text-slate-700 max-w-3xl mx-auto">
                 Gamified skills assessment with AI-powered insights. Level up your professional capabilities.

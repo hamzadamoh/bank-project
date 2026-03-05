@@ -16,7 +16,7 @@ interface Message {
   timestamp: Date;
 }
 
-export default function OmniServe() {
+export default function PolyGlot() {
   const [language, setLanguage] = useState<"fr" | "ar" | "darija" | "en" | "auto">("auto");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -111,7 +111,7 @@ export default function OmniServe() {
     formData.append('audio', audioBlob, 'voice_query.webm');
 
     try {
-      const response = await fetch('/api/omniserve/voice', {
+      const response = await fetch('/api/PolyGlot/voice', {
         method: 'POST',
         body: formData,
         credentials: 'include',
@@ -162,7 +162,7 @@ export default function OmniServe() {
         <section className="py-16 px-6 lg:px-8 bg-gradient-to-br from-alabaster-50 to-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
-              <h1 className="font-display font-bold text-4xl md:text-5xl text-ink-950 mb-6">OmniServe</h1>
+              <h1 className="font-display font-bold text-4xl md:text-5xl text-ink-950 mb-6">PolyGlot</h1>
               <p className="text-xl text-slate-700 max-w-3xl mx-auto">
                 Multilingual AI chatbot with voice support. Speak or type in English, French, Arabic, and Darija.
               </p>

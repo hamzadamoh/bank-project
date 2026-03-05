@@ -10,7 +10,7 @@ import { FileText, Download, Search, ThumbsUp, Brain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
-export default function TaxCounsel() {
+export default function TaxWise() {
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [jurisdiction, setJurisdiction] = useState("morocco");
@@ -38,7 +38,7 @@ export default function TaxCounsel() {
     } catch (error: any) {
       console.error('Error fetching tax advice:', error);
       const message = error.message?.includes('401')
-        ? 'Please log in to use Tax Counsel.'
+        ? 'Please log in to use TaxWise.'
         : 'Failed to get tax advice. Please try again.';
       alert(message);
     } finally {
@@ -69,7 +69,7 @@ export default function TaxCounsel() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="font-display font-bold text-4xl md:text-5xl text-ink-950 mb-6">
-                FiscAI Tax Counsel
+                FiscAI TaxWise
               </h1>
               <p className="text-xl text-slate-700 max-w-3xl mx-auto">
                 Get instant, grounded tax advice with multi-jurisdiction support. Every answer includes citations and export options.

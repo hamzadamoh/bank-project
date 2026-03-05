@@ -246,9 +246,9 @@ export class MemStorage implements IStorage {
     const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
 
     const analytics = [
-      { label: "Tax Counsel", value: Math.round((counts.TAX_COUNSEL / total) * 100), color: "bg-emerald-400" },
-      { label: "Query Architect", value: Math.round((counts.QUERY_ARCHITECT / total) * 100), color: "bg-blue-400" },
-      { label: "OmniServe", value: Math.round((counts.OMNISERVE / total) * 100), color: "bg-slate-400" },
+      { label: "TaxWise", value: Math.round((counts.TAX_COUNSEL / total) * 100), color: "bg-emerald-400" },
+      { label: "QueryForge", value: Math.round((counts.QUERY_ARCHITECT / total) * 100), color: "bg-blue-400" },
+      { label: "PolyGlot", value: Math.round((counts.OMNISERVE / total) * 100), color: "bg-slate-400" },
     ];
 
     // Mock spend (for now, based on query volume)

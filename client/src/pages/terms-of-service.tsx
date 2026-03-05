@@ -45,9 +45,9 @@ export default function TermsOfService() {
                 FiscAI provides AI-powered financial and tax advisory tools including:
               </p>
               <ul className="list-disc list-inside text-slate-700 space-y-2">
-                <li>Tax Counsel: Multi-jurisdiction tax advisory and compliance guidance</li>
-                <li>Query Architect: Natural language to SQL conversion and data analysis</li>
-                <li>Factoring Guardian: Document fraud detection and invoice analysis</li>
+                <li>TaxWise: Multi-jurisdiction tax advisory and compliance guidance</li>
+                <li>QueryForge: Natural language to SQL conversion and data analysis</li>
+                <li>DocuGuard: Document fraud detection and invoice analysis</li>
                 <li>Additional AI tools for financial operations and compliance</li>
               </ul>
             </section>

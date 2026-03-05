@@ -11,7 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { Heart, Brain, Users, TrendingUp, CheckCircle, AlertTriangle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
-export default function Rhalia() {
+export default function WellPulse() {
   const [metrics, setMetrics] = useState({
     sleepHours: 7,
     exerciseMinutes: 30,
@@ -50,7 +50,7 @@ export default function Rhalia() {
     } catch (error: any) {
       console.error('Error analyzing wellbeing:', error);
       const message = error.message?.includes('401')
-        ? 'Please log in to use Rhalia.'
+        ? 'Please log in to use WellPulse.'
         : 'Failed to analyze wellbeing. Please try again.';
       alert(message);
     } finally {
@@ -86,7 +86,7 @@ export default function Rhalia() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="font-display font-bold text-4xl md:text-5xl text-ink-950 mb-6">
-                Rhalia
+                WellPulse
               </h1>
               <p className="text-xl text-slate-700 max-w-3xl mx-auto">
                 Holistic well-being analytics platform. Track and improve your physical, mental, and social health.

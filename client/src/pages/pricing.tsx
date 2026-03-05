@@ -16,7 +16,7 @@ export default function Pricing() {
       period: "14 days trial",
       popular: false,
       features: [
-        "3 AI tools included (Tax Counsel, Query Architect, Basic Analytics)",
+        "3 AI tools included (TaxWise, QueryForge, Basic Analytics)",
         "100 queries per month",
         "Email support",
         "Basic document processing",
@@ -82,7 +82,7 @@ export default function Pricing() {
   const addOns = [
     {
       name: "Additional Jurisdictions",
-      description: "Extend tax counsel to additional countries and regions",
+      description: "Extend TaxWise to additional countries and regions",
       price: "$500",
       period: "per jurisdiction/month"
     },
@@ -109,7 +109,7 @@ export default function Pricing() {
   const faqs = [
     {
       question: "What's included in the free trial?",
-      answer: "The 14-day free trial includes access to FiscAI Tax Counsel, Query Architect, and basic analytics with up to 100 queries. No credit card required."
+      answer: "The 14-day free trial includes access to FiscAI TaxWise, QueryForge, and basic analytics with up to 100 queries. No credit card required."
     },
     {
       question: "Can I change plans anytime?",

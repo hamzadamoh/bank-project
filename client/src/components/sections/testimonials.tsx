@@ -3,19 +3,19 @@ import { GlassCard } from "@/components/ui/glass-card";
 export default function Testimonials() {
   const testimonials = [
     {
-      quote: "FiscAI Tax Counsel has transformed our advisory practice. Multi-jurisdiction support and citation accuracy are exceptional.",
+      quote: "FiscAI TaxWise has transformed our advisory practice. Multi-jurisdiction support and citation accuracy are exceptional.",
       author: "Sarah Benali",
       role: "Partner, KPMG Morocco",
       rating: 5
     },
     {
-      quote: "Factoring Guardian caught fraudulent invoices our manual process missed. ROI was immediate.",
+      quote: "DocuGuard caught fraudulent invoices our manual process missed. ROI was immediate.",
       author: "Ahmed Tazi",
       role: "Risk Director, Al Barid Bank",
       rating: 5
     },
     {
-      quote: "Query Architect democratized data access across our organization. Non-technical teams now run complex analyses.",
+      quote: "QueryForge democratized data access across our organization. Non-technical teams now run complex analyses.",
       author: "Marie Dubois",
       role: "CFO, Société Générale Maroc",
       rating: 5

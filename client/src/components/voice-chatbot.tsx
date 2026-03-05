@@ -70,7 +70,7 @@ export function VoiceChatbot() {
         formData.append('audio', audioBlob, 'voice_query.webm');
 
         try {
-            const response = await fetch('/api/omniserve/voice', {
+            const response = await fetch('/api/PolyGlot/voice', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include',
@@ -149,7 +149,7 @@ export function VoiceChatbot() {
                             <div className="flex justify-between items-center mb-4 pb-2 border-b">
                                 <h3 className="font-semibold flex items-center gap-2">
                                     <Mic className="w-4 h-4 text-primary" />
-                                    OmniServe Voice
+                                    PolyGlot Voice
                                 </h3>
                                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsOpen(false)}>
                                     <X className="w-4 h-4" />

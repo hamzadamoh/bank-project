@@ -6,13 +6,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect } from "react";
 import { VoiceChatbot } from "@/components/voice-chatbot";
 import Home from "@/pages/home";
-import TaxCounsel from "@/pages/products/tax-counsel";
-import QueryArchitect from "@/pages/products/query-architect";
+import TaxWise from "@/pages/products/tax-counsel";
+import QueryForge from "@/pages/products/query-architect";
 import FactoringGuardian from "@/pages/products/factoring-guardian";
-import SkillArcade from "@/pages/products/skillarcade";
-import OmniServe from "@/pages/products/omniserve";
-import Rhalia from "@/pages/products/rhalia";
-import SatisfAI from "@/pages/products/satisfai";
+import SkillForge from "@/pages/products/SkillForge";
+import PolyGlot from "@/pages/products/PolyGlot";
+import WellPulse from "@/pages/products/WellPulse";
+import FeedbackIQ from "@/pages/products/FeedbackIQ";
 import Solutions from "@/pages/solutions";
 import Security from "@/pages/security";
 import Pricing from "@/pages/pricing";
@@ -58,13 +58,13 @@ function Router() {
       <ScrollToTop />
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/products/tax-counsel" component={TaxCounsel} />
-        <Route path="/products/query-architect" component={QueryArchitect} />
+        <Route path="/products/tax-counsel" component={TaxWise} />
+        <Route path="/products/query-architect" component={QueryForge} />
         <Route path="/products/factoring-guardian" component={FactoringGuardian} />
-        <Route path="/products/skillarcade" component={SkillArcade} />
-        <Route path="/products/omniserve" component={OmniServe} />
-        <Route path="/products/rhalia" component={Rhalia} />
-        <Route path="/products/satisfai" component={SatisfAI} />
+        <Route path="/products/SkillForge" component={SkillForge} />
+        <Route path="/products/PolyGlot" component={PolyGlot} />
+        <Route path="/products/WellPulse" component={WellPulse} />
+        <Route path="/products/FeedbackIQ" component={FeedbackIQ} />
         <Route path="/solutions" component={Solutions} />
         <Route path="/security" component={Security} />
         <Route path="/pricing" component={Pricing} />

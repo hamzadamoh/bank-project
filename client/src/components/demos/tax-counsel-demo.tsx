@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-export default function TaxCounselDemo() {
+export default function TaxWiseDemo() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [response, setResponse] = useState<any>(null);
   const { toast } = useToast();

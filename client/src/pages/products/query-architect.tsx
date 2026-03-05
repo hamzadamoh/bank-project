@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Database, Zap, Shield } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
-export default function QueryArchitect() {
+export default function QueryForge() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +47,7 @@ export default function QueryArchitect() {
     } catch (error: any) {
       console.error('Error converting query:', error);
       const message = error.message?.includes('401')
-        ? 'Please log in to use Query Architect.'
+        ? 'Please log in to use QueryForge.'
         : 'Failed to convert query. Please try again.';
       alert(message);
     } finally {
@@ -69,7 +69,7 @@ export default function QueryArchitect() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="font-display font-bold text-4xl md:text-5xl text-ink-950 mb-6">
-                Query Architect
+                QueryForge
               </h1>
               <p className="text-xl text-slate-700 max-w-3xl mx-auto">
                 Bidirectional NL ⇄ SQL conversion with expert guidance. Transform business questions into optimized queries and complex SQL into plain English explanations.
@@ -230,7 +230,7 @@ export default function QueryArchitect() {
                 Smart Schema Understanding
               </h2>
               <p className="text-xl text-slate-700 max-w-3xl mx-auto">
-                Query Architect learns your database structure and business logic to generate contextually aware SQL.
+                QueryForge learns your database structure and business logic to generate contextually aware SQL.
               </p>
             </div>
 
