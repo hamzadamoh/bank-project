@@ -41,10 +41,10 @@ export async function chat(request: ChatRequest): Promise<ChatResponse> {
 
   try {
     const systemPrompts: Record<string, string> = {
-      en: `You are OmniServe, the multilingual AI assistant for FiscAI. Respond in English. Be concise and helpful.`,
-      fr: `Tu es OmniServe, l'assistant IA multilingue de FiscAI. Réponds en français. Sois concis et utile.`,
-      ar: `أنت OmniServe، المساعد الذكي متعدد اللغات لـ FiscAI. أجب باللغة العربية. كن موجزاً ومفيداً.`,
-      darija: `نتي OmniServe، المساعد الذكي ديال FiscAI. جاوبي بالدارجة المغربية. كوني مختصرة ومفيدة.`,
+      en: `You are polyglot, the multilingual AI assistant for FiscAI. Respond in English. Be concise and helpful.`,
+      fr: `Tu es polyglot, l'assistant IA multilingue de FiscAI. Réponds en français. Sois concis et utile.`,
+      ar: `أنت polyglot، المساعد الذكي متعدد اللغات لـ FiscAI. أجب باللغة العربية. كن موجزاً ومفيداً.`,
+      darija: `نتي polyglot، المساعد الذكي ديال FiscAI. جاوبي بالدارجة المغربية. كوني مختصرة ومفيدة.`,
     };
 
     const systemPrompt = systemPrompts[language] || systemPrompts.en;
@@ -122,10 +122,10 @@ function detectLanguage(text: string): 'fr' | 'ar' | 'darija' | 'en' {
 
 function getDefaultResponse(message: string, language: string): string {
   const responses: Record<string, string> = {
-    en: "Hello! I'm OmniServe, your multilingual AI assistant. How can I help you today with your financial questions?",
-    fr: "Bonjour ! Je suis OmniServe, votre assistant IA multilingue. Comment puis-je vous aider aujourd'hui avec vos questions financières ?",
-    ar: "مرحباً! أنا OmniServe، مساعدك الذكي متعدد اللغات. كيف يمكنني مساعدتك اليوم في أسئلتك المالية؟",
-    darija: "أهلاً! أنا OmniServe، مساعدك الذكي ديال الخدمات المالية. كيفاش يمكنني نخدمك اليوم؟",
+    en: "Hello! I'm polyglot, your multilingual AI assistant. How can I help you today with your financial questions?",
+    fr: "Bonjour ! Je suis polyglot, votre assistant IA multilingue. Comment puis-je vous aider aujourd'hui avec vos questions financières ?",
+    ar: "مرحباً! أنا polyglot، مساعدك الذكي متعدد اللغات. كيف يمكنني مساعدتك اليوم في أسئلتك المالية؟",
+    darija: "أهلاً! أنا polyglot، مساعدك الذكي ديال الخدمات المالية. كيفاش يمكنني نخدمك اليوم؟",
   };
 
   const lowerMessage = message.toLowerCase();

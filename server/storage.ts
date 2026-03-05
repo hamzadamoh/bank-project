@@ -240,7 +240,7 @@ export class MemStorage implements IStorage {
     const counts: Record<string, number> = {
       "TAX_COUNSEL": logs.filter(l => l.resource === "TAX_COUNSEL").length,
       "QUERY_ARCHITECT": logs.filter(l => l.resource === "QUERY_ARCHITECT").length,
-      "OMNISERVE": logs.filter(l => l.resource === "OMNISERVE").length,
+      "polyglot": logs.filter(l => l.resource === "polyglot").length,
     };
 
     const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
@@ -248,7 +248,7 @@ export class MemStorage implements IStorage {
     const analytics = [
       { label: "TaxWise", value: Math.round((counts.TAX_COUNSEL / total) * 100), color: "bg-emerald-400" },
       { label: "QueryForge", value: Math.round((counts.QUERY_ARCHITECT / total) * 100), color: "bg-blue-400" },
-      { label: "PolyGlot", value: Math.round((counts.OMNISERVE / total) * 100), color: "bg-slate-400" },
+      { label: "PolyGlot", value: Math.round((counts.polyglot / total) * 100), color: "bg-slate-400" },
     ];
 
     // Mock spend (for now, based on query volume)

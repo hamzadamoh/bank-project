@@ -27,13 +27,13 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-ink-950 mb-4">Products</h3>
             <ul className="space-y-2 text-sm text-slate-700">
-              <li><Link href="/products/tax-counsel" className="hover:text-ink-950 transition-colors">TaxWise</Link></li>
-              <li><Link href="/products/factoring-guardian" className="hover:text-ink-950 transition-colors">DocuGuard</Link></li>
-              <li><Link href="/products/query-architect" className="hover:text-ink-950 transition-colors">QueryForge</Link></li>
-              <li><Link href="/products/SkillForge" className="hover:text-ink-950 transition-colors">SkillForge</Link></li>
-              <li><Link href="/products/PolyGlot" className="hover:text-ink-950 transition-colors">PolyGlot</Link></li>
-              <li><Link href="/products/WellPulse" className="hover:text-ink-950 transition-colors">WellPulse</Link></li>
-              <li><Link href="/products/FeedbackIQ" className="hover:text-ink-950 transition-colors">FeedbackIQ</Link></li>
+              <li><Link href="/products/taxwise" className="hover:text-ink-950 transition-colors">TaxWise</Link></li>
+              <li><Link href="/products/docuguard" className="hover:text-ink-950 transition-colors">DocuGuard</Link></li>
+              <li><Link href="/products/queryforge" className="hover:text-ink-950 transition-colors">QueryForge</Link></li>
+              <li><Link href="/products/skillforge" className="hover:text-ink-950 transition-colors">SkillForge</Link></li>
+              <li><Link href="/products/polyglot" className="hover:text-ink-950 transition-colors">PolyGlot</Link></li>
+              <li><Link href="/products/wellpulse" className="hover:text-ink-950 transition-colors">WellPulse</Link></li>
+              <li><Link href="/products/feedbackiq" className="hover:text-ink-950 transition-colors">FeedbackIQ</Link></li>
             </ul>
           </div>
 

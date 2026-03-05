@@ -1,0 +1,3 @@
+﻿client/src/pages/products/skillforge.tsx(10,52): error TS2307: Cannot find module '@/lib/SkillForge-questions' or its corresponding type declarations.
+client/src/pages/products/skillforge.tsx(155,70): error TS7006: Parameter 'option' implicitly has an 'any' type.
+client/src/pages/products/skillforge.tsx(155,78): error TS7006: Parameter 'index' implicitly has an 'any' type.

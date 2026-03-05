@@ -603,10 +603,10 @@ export default function Dashboard() {
                                             <h3 className="text-lg font-bold text-ink-950 mb-6">Quick Tools</h3>
                                             <div className="space-y-4">
                                                 {[
-                                                    { name: "TaxWise", route: "/products/tax-counsel", color: "bg-emerald-400" },
-                                                    { name: "QueryForge", route: "/products/query-architect", color: "bg-blue-400" },
-                                                    { name: "PolyGlot Chat", route: "/products/PolyGlot", color: "bg-amber-400" },
-                                                    { name: "SkillForge", route: "/products/SkillForge", color: "bg-purple-400" },
+                                                    { name: "TaxWise", route: "/products/taxwise", color: "bg-emerald-400" },
+                                                    { name: "QueryForge", route: "/products/queryforge", color: "bg-blue-400" },
+                                                    { name: "PolyGlot Chat", route: "/products/polyglot", color: "bg-amber-400" },
+                                                    { name: "SkillForge", route: "/products/skillforge", color: "bg-purple-400" },
                                                 ].map((tool, i) => (
                                                     <Link href={tool.route} key={i}>
                                                         <div className="p-4 rounded-xl border border-alabaster-200 hover:border-ink-950/20 transition-all cursor-pointer group bg-white shadow-sm flex items-center justify-between">

@@ -12,13 +12,13 @@ import {
 } from "../shared/schema.js";
 import { z } from "zod";
 // Import all services statically to ensure they're bundled
-import { getTaxAdvice } from "./services/tax-counsel.js";
-import { convertQuery } from "./services/query-architect.js";
-import { analyzeDocument } from "./services/factoring-guardian.js";
-import { assessSkills } from "./services/skillarcade.js";
-import { chat, transcribeAudioWithGroq } from "./services/omniserve.js";
-import { analyzeWellbeing } from "./services/rhalia.js";
-import { analyzeSatisfaction } from "./services/satisfai.js";
+import { getTaxAdvice } from "./services/taxwise.js";
+import { convertQuery } from "./services/queryforge.js";
+import { analyzeDocument } from "./services/docuguard.js";
+import { assessSkills } from "./services/skillforge.js";
+import { chat, transcribeAudioWithGroq } from "./services/polyglot.js";
+import { analyzeWellbeing } from "./services/wellpulse.js";
+import { analyzeSatisfaction } from "./services/feedbackiq.js";
 import multer from "multer";
 import { securityService } from "./services/security.js";
 import { financialAssessor } from "./services/financial-assessor.js";
@@ -361,7 +361,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // OmniServe chat endpoint
+  // polyglot chat endpoint
   app.post("/api/chat", isAuthenticated, checkTierLimit, async (req, res) => {
     try {
       const { message, conversationId, language } = req.body;
@@ -376,7 +376,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tenantId,
         userId: req.user!.id,
         action: 'QUERY',
-        resource: 'OMNISERVE',
+        resource: 'polyglot',
         details: `Chat interaction processed`,
         severity: 'INFO',
         ipAddress: req.ip
@@ -388,8 +388,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // OmniServe voice chat endpoint
-  app.post("/api/omniserve/voice", isAuthenticated, checkTierLimit, upload.single('audio'), async (req, res) => {
+  // polyglot voice chat endpoint
+  app.post("/api/polyglot/voice", isAuthenticated, checkTierLimit, upload.single('audio'), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ success: false, message: "No audio file provided" });
       const tenantId = req.user!.tenantId;
@@ -406,7 +406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tenantId,
         userId: req.user!.id,
         action: 'QUERY',
-        resource: 'OMNISERVE_VOICE',
+        resource: 'polyglot_VOICE',
         details: `Voice interaction processed`,
         severity: 'INFO',
         ipAddress: req.ip

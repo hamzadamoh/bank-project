@@ -1,7 +1,7 @@
 import { Link } from "wouter";
-import TaxWiseDemo from "@/components/demos/tax-counsel-demo";
-import QueryForgeDemo from "@/components/demos/query-architect-demo";
-import FactoringGuardianDemo from "@/components/demos/factoring-guardian-demo";
+import TaxWiseDemo from "@/components/demos/taxwise-demo";
+import QueryForgeDemo from "@/components/demos/queryforge-demo";
+import FactoringGuardianDemo from "@/components/demos/docuguard-demo";
 import { GlassCard } from "@/components/ui/glass-card";
 
 export default function ProductsShowcase() {
@@ -28,14 +28,14 @@ export default function ProductsShowcase() {
                 </div>
                 <div className="bg-emerald-400 text-ink-950 px-3 py-1 rounded-xl text-sm font-semibold">FLAGSHIP</div>
               </div>
-              
+
               <TaxWiseDemo />
-              
+
               <div className="flex items-center justify-between mt-6">
                 <div className="text-sm text-slate-600">
                   <span className="font-medium">Features:</span> Multi-jurisdiction • Citations • Export memos
                 </div>
-                <Link href="/products/tax-counsel" className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
+                <Link href="/products/taxwise" className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
                   Try Demo →
                 </Link>
               </div>
@@ -47,10 +47,10 @@ export default function ProductsShowcase() {
             <GlassCard className="p-8 hover:scale-[1.02] transition-all duration-300 h-full">
               <h3 className="font-display font-bold text-2xl text-ink-950 mb-2">DocuGuard</h3>
               <p className="text-slate-700 mb-6">Intelligent fraud detection for factoring operations</p>
-              
+
               <FactoringGuardianDemo />
-              
-              <Link href="/products/factoring-guardian">
+
+              <Link href="/products/docuguard">
                 <button className="w-full bg-ink-950 text-alabaster-50 py-3 rounded-xl font-semibold hover:bg-ink-900 transition-colors mt-6">
                   View Dashboard
                 </button>
@@ -67,18 +67,18 @@ export default function ProductsShowcase() {
               <p className="text-slate-700 mb-6">Bidirectional NL ⇄ SQL conversion with expert guidance</p>
             </div>
             <div>
-              <Link href="/products/query-architect" className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
+              <Link href="/products/queryforge" className="text-ink-950 font-semibold text-sm hover:text-slate-700 transition-colors">
                 Try Full Demo →
               </Link>
             </div>
           </div>
-          
+
           <QueryForgeDemo />
         </GlassCard>
 
         {/* Other Tools Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Link href="/products/SkillForge">
+          <Link href="/products/skillforge">
             <GlassCard className="p-6 hover:scale-[1.02] transition-all duration-300 cursor-pointer">
               <h4 className="font-display font-bold text-lg text-ink-950 mb-2">SkillForge</h4>
               <p className="text-sm text-slate-700 mb-4">Gamified skills assessment with AI insights</p>
@@ -97,7 +97,7 @@ export default function ProductsShowcase() {
             </GlassCard>
           </Link>
 
-          <Link href="/products/PolyGlot">
+          <Link href="/products/polyglot">
             <GlassCard className="p-6 hover:scale-[1.02] transition-all duration-300 cursor-pointer">
               <h4 className="font-display font-bold text-lg text-ink-950 mb-2">PolyGlot</h4>
               <p className="text-sm text-slate-700 mb-4">Multilingual AI chatbot (FR/AR/Darija)</p>
@@ -115,7 +115,7 @@ export default function ProductsShowcase() {
             </GlassCard>
           </Link>
 
-          <Link href="/products/WellPulse">
+          <Link href="/products/wellpulse">
             <GlassCard className="p-6 hover:scale-[1.02] transition-all duration-300 cursor-pointer">
               <h4 className="font-display font-bold text-lg text-ink-950 mb-2">WellPulse</h4>
               <p className="text-sm text-slate-700 mb-4">Holistic well-being analytics platform</p>
@@ -137,7 +137,7 @@ export default function ProductsShowcase() {
             </GlassCard>
           </Link>
 
-          <Link href="/products/FeedbackIQ">
+          <Link href="/products/feedbackiq">
             <GlassCard className="p-6 hover:scale-[1.02] transition-all duration-300 cursor-pointer">
               <h4 className="font-display font-bold text-lg text-ink-950 mb-2">FeedbackIQ</h4>
               <p className="text-sm text-slate-700 mb-4">Emotional satisfaction measurement</p>

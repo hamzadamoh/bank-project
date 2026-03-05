@@ -6,13 +6,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect } from "react";
 import { VoiceChatbot } from "@/components/voice-chatbot";
 import Home from "@/pages/home";
-import TaxWise from "@/pages/products/tax-counsel";
-import QueryForge from "@/pages/products/query-architect";
-import FactoringGuardian from "@/pages/products/factoring-guardian";
-import SkillForge from "@/pages/products/SkillForge";
-import PolyGlot from "@/pages/products/PolyGlot";
-import WellPulse from "@/pages/products/WellPulse";
-import FeedbackIQ from "@/pages/products/FeedbackIQ";
+import TaxWise from "@/pages/products/taxwise";
+import QueryForge from "@/pages/products/queryforge";
+import FactoringGuardian from "@/pages/products/docuguard";
+import SkillForge from "@/pages/products/skillforge";
+import PolyGlot from "@/pages/products/polyglot";
+import WellPulse from "@/pages/products/wellpulse";
+import FeedbackIQ from "@/pages/products/feedbackiq";
 import Solutions from "@/pages/solutions";
 import Security from "@/pages/security";
 import Pricing from "@/pages/pricing";
@@ -58,13 +58,13 @@ function Router() {
       <ScrollToTop />
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/products/tax-counsel" component={TaxWise} />
-        <Route path="/products/query-architect" component={QueryForge} />
-        <Route path="/products/factoring-guardian" component={FactoringGuardian} />
-        <Route path="/products/SkillForge" component={SkillForge} />
-        <Route path="/products/PolyGlot" component={PolyGlot} />
-        <Route path="/products/WellPulse" component={WellPulse} />
-        <Route path="/products/FeedbackIQ" component={FeedbackIQ} />
+        <Route path="/products/taxwise" component={TaxWise} />
+        <Route path="/products/queryforge" component={QueryForge} />
+        <Route path="/products/docuguard" component={FactoringGuardian} />
+        <Route path="/products/skillforge" component={SkillForge} />
+        <Route path="/products/polyglot" component={PolyGlot} />
+        <Route path="/products/wellpulse" component={WellPulse} />
+        <Route path="/products/feedbackiq" component={FeedbackIQ} />
         <Route path="/solutions" component={Solutions} />
         <Route path="/security" component={Security} />
         <Route path="/pricing" component={Pricing} />
