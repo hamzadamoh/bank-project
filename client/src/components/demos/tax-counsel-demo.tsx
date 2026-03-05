@@ -14,7 +14,7 @@ export default function TaxCounselDemo() {
     setResponse(null);
 
     try {
-      const res = await apiRequest("POST", "/api/tax-queries", {
+      const res = await apiRequest("POST", "/api/demo/tax-queries", {
         query: "What are the VAT implications for a Moroccan company providing SaaS services to EU clients?",
         jurisdiction: "MA-EU"
       });

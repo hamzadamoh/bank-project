@@ -182,6 +182,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public demo endpoint (no auth required)
+  app.post("/api/demo/tax-queries", async (req, res) => {
+    try {
+      const { query, jurisdiction } = req.body;
+      if (!query || !jurisdiction) {
+        return res.status(400).json({ success: false, message: "Query and jurisdiction are required" });
+      }
+      const taxResponse = await getTaxAdvice({ query, jurisdiction });
+      res.json({ success: true, response: taxResponse });
+    } catch (error) {
+      console.error("[DEMO] Tax query error:", error);
+      res.status(500).json({ success: false, message: "Demo query failed" });
+    }
+  });
+
   // Tax counsel query endpoint
   app.post("/api/tax-queries", isAuthenticated, checkTierLimit, async (req, res) => {
     try {
@@ -228,6 +243,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           stack: error.stack?.substring(0, 500)
         }
       });
+    }
+  });
+
+  // Public demo endpoint for SQL queries
+  app.post("/api/demo/sql-queries", async (req, res) => {
+    try {
+      const { type, input } = req.body;
+      if (!type || !input) {
+        return res.status(400).json({ success: false, message: "Type and input are required" });
+      }
+      const conversionResult = await convertQuery({ type, input });
+      res.json({ success: true, ...conversionResult });
+    } catch (error) {
+      console.error("[DEMO] SQL query error:", error);
+      res.status(500).json({ success: false, message: "Demo query failed" });
     }
   });
 

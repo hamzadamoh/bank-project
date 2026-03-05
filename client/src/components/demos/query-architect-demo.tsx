@@ -17,7 +17,7 @@ export default function QueryArchitectDemo() {
         ? "Show me total revenue by region for the last quarter, excluding refunds"
         : "SELECT customer_id, COUNT(*) FROM transactions WHERE amount > 1000 GROUP BY customer_id HAVING COUNT(*) > 5;";
 
-      const res = await apiRequest("POST", "/api/sql-queries", {
+      const res = await apiRequest("POST", "/api/demo/sql-queries", {
         type: mode,
         input
       });
