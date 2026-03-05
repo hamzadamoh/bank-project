@@ -50,14 +50,16 @@ export function setupAuth(app: Express) {
 
         try {
             const decodedToken = await adminAuth.verifyIdToken(idToken);
-            const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "hamzadamoh06@gmail.com";
+            const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "hamzadamoh06@gmail.com").toLowerCase();
+            const userEmail = (decodedToken.email || "").toLowerCase();
+
             let user = await storage.getUser(decodedToken.uid);
 
             if (!user) {
-                console.log(`[AUTH] User not found in database for UID: ${decodedToken.uid}. Attempting auto-provisioning...`);
+                console.log(`[AUTH] Auto-provisioning user for UID: ${decodedToken.uid}`);
                 try {
-                    const isBootstrapAdmin = decodedToken.email === ADMIN_EMAIL;
-                    // Auto-provision user profile for social/external logins
+                    const isBootstrapAdmin = userEmail === ADMIN_EMAIL;
+
                     user = await storage.createUser({
                         id: decodedToken.uid,
                         username: decodedToken.email || `user_${decodedToken.uid.substring(0, 8)}`,
@@ -65,13 +67,13 @@ export function setupAuth(app: Express) {
                         tenantId: "tenant_default",
                         role: isBootstrapAdmin ? "admin" : "client"
                     });
-                    console.log(`[AUTH] Auto-provisioned user: ${user.username} (UID: ${decodedToken.uid}, Role: ${user.role})`);
+                    console.log(`[AUTH] Auto-provisioned user: ${user.username} (Role: ${user.role})`);
                 } catch (provisionError: any) {
                     console.error('[AUTH] Auto-provisioning failed:', provisionError.message);
                     return res.status(500).send('Internal Server Error: Failed to create user profile.');
                 }
-            } else if (decodedToken.email === ADMIN_EMAIL && user.role !== "admin") {
-                console.log(`[AUTH] Promoting user ${user.username} (ID: ${user.id}) to admin based on bootstrap email.`);
+            } else if (userEmail === ADMIN_EMAIL && user.role !== "admin") {
+                console.log(`[AUTH] Promoting existing user ${user.username} to admin.`);
                 if (user.id) {
                     await storage.updateUserRole(user.id, "admin");
                     user.role = "admin";

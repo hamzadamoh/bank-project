@@ -1,0 +1,55 @@
+﻿Found service account file, initializing...
+Firebase Admin initialized successfully using service account file.
+[SECURITY] Encryption Key initialized. Length: 32 bytes
+Re-optimizing dependencies because lockfile has changed
+node.exe : 
+node:events:496
+At C:\Program Files\nod
+ejs\npx.ps1:29 char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (node:events:4   
+ 96:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+      throw er; // 
+Unhandled 'error' event
+      ^
+
+Error: listen 
+EADDRINUSE: address 
+already in use 
+0.0.0.0:5000
+    at Server.setupList
+enHandle [as _listen2] 
+(node:net:1937:16)
+    at listenInCluster 
+(node:net:1994:12)
+    at node:net:2203:7
+    at process.processT
+icksAndRejections (node
+:internal/process/task_
+queues:90:21)
+Emitted 'error' event 
+on Server instance at:
+    at emitErrorNT 
+(node:net:1973:8)
+    at process.processT
+icksAndRejections (node
+:internal/process/task_
+queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 5000
+}
+
+Node.js v22.14.0
