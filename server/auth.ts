@@ -4,6 +4,8 @@ import { storage } from "./storage.js";
 import { User as SelectUser } from "../shared/schema.js";
 import MemoryStore from "memorystore";
 import { auth as adminAuth } from "./db.js";
+import fs from 'fs';
+import path from 'path';
 
 const SessionStore = MemoryStore(session);
 
@@ -52,6 +54,10 @@ export function setupAuth(app: Express) {
             const decodedToken = await adminAuth.verifyIdToken(idToken);
             const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "hamzadamoh06@gmail.com").toLowerCase();
             const userEmail = (decodedToken.email || "").toLowerCase();
+
+            // Debug logging to specific file
+            const debugLog = `[${new Date().toISOString()}] AUTH CHECK: Email="${userEmail}", AdminEmail="${ADMIN_EMAIL}", Match=${userEmail === ADMIN_EMAIL}, UID=${decodedToken.uid}\n`;
+            fs.appendFileSync(path.resolve(process.cwd(), 'admin-debug.log'), debugLog);
 
             let user = await storage.getUser(decodedToken.uid);
 
