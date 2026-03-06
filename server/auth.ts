@@ -37,6 +37,7 @@ export function setupAuth(app: Express) {
 
     // Custom middleware to verify Firebase tokens
     const verifyToken = async (req: any, res: any, next: any) => {
+        console.log(`[AUTH] --- VERIFY TOKEN START --- ${req.method} ${req.path}`);
         const authHeader = req.headers.authorization;
         const idToken = authHeader?.split('Bearer ')[1];
 
@@ -51,20 +52,21 @@ export function setupAuth(app: Express) {
         }
 
         try {
+            console.log(`[AUTH] Verifying token via Firebase Admin...`);
             const decodedToken = await adminAuth.verifyIdToken(idToken);
             const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "hamzadamoh06@gmail.com").toLowerCase();
             const userEmail = (decodedToken.email || "").toLowerCase();
 
-            // Debug logging to specific file
-            const debugLog = `[${new Date().toISOString()}] AUTH CHECK: Email="${userEmail}", AdminEmail="${ADMIN_EMAIL}", Match=${userEmail === ADMIN_EMAIL}, UID=${decodedToken.uid}\n`;
-            fs.appendFileSync(path.resolve(process.cwd(), 'admin-debug.log'), debugLog);
+            console.log(`[AUTH] Token verified. Email: ${userEmail}, UID: ${decodedToken.uid}`);
+            console.log(`[AUTH] Looking for user in DB with UID: ${decodedToken.uid}`);
 
             let user = await storage.getUser(decodedToken.uid);
 
             if (!user) {
-                console.log(`[AUTH] Auto-provisioning user for UID: ${decodedToken.uid}`);
+                console.log(`[AUTH] User profile NOT FOUND in DB. Auto-provisioning...`);
                 try {
                     const isBootstrapAdmin = userEmail === ADMIN_EMAIL;
+                    console.log(`[AUTH] Is ${userEmail} the admin email ${ADMIN_EMAIL}? ${isBootstrapAdmin}`);
 
                     user = await storage.createUser({
                         id: decodedToken.uid,
@@ -78,22 +80,27 @@ export function setupAuth(app: Express) {
                     console.error('[AUTH] Auto-provisioning failed:', provisionError.message);
                     return res.status(500).send('Internal Server Error: Failed to create user profile.');
                 }
-            } else if (userEmail === ADMIN_EMAIL && user.role !== "admin") {
-                console.log(`[AUTH] Promoting existing user ${user.username} to admin.`);
-                if (user.id) {
-                    await storage.updateUserRole(user.id, "admin");
-                    user.role = "admin";
+            } else {
+                console.log(`[AUTH] Existing user found in DB: ${user.username} (Role: ${user.role})`);
+                if (userEmail === ADMIN_EMAIL && user.role !== "admin") {
+                    console.log(`[AUTH] Promoting existing user ${user.username} to admin.`);
+                    if (user.id) {
+                        await storage.updateUserRole(user.id, "admin");
+                        user.role = "admin";
+                    }
                 }
             }
 
             if (user) {
                 req.user = user;
+                console.log(`[AUTH] Authorized user: ${user.username}, Role: ${user.role}`);
                 next();
             } else {
+                console.error('[AUTH] Failed to resolve user after all checks.');
                 res.status(401).send('Unauthorized: User profile could not be retrieved or created.');
             }
         } catch (error: any) {
-            console.error('[AUTH] Token verification failed:', error.message);
+            console.error('[AUTH] Token verification error:', error.message);
             if (error.code === 'auth/id-token-expired') {
                 return res.status(401).send('Unauthorized: Token expired');
             }
@@ -134,22 +141,18 @@ export function setupAuth(app: Express) {
             // Create user in Firestore via storage wrapper
             const user = await storage.createUser({
                 ...req.body,
-                password: "firebase_managed", // We don't store passwords locally anymore
+                password: "firebase_managed",
                 tenantId,
                 role: "client"
             });
 
-            // If we're fully migrating, the actual account creation happens on the client via Firebase Auth,
-            // and this endpoint should probably verify the token and then sync the user profile into Firestore.
-            // For now, returning the created profile.
             res.status(201).json(user);
         } catch (err) {
             next(err);
         }
     });
 
-    // In a pure Firebase setup, login is handled purely client side. 
-    // This endpoint is left here to provide legacy support if the client hasn't migrated UI yet.
+    // Login is handled client side via Firebase.
     app.post("/api/login", async (req, res, next) => {
         return res.status(400).json({ message: "Please use Firebase client authentication." });
     });

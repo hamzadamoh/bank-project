@@ -84,3 +84,257 @@ ate-db#readme
 [2m10:42:49 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/hooks/use-auth.tsx, /src/index.css?v=PWzdbfrAQVc8GjFigMYM1[22m
 [2m11:10:06 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/dashboard.tsx, /src/index.css?v=PWzdbfrAQVc8GjFigMYM1[22m
 [2m11:18:22 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/hooks/use-auth.tsx, /src/index.css?v=PWzdbfrAQVc8GjFigMYM1[22m
+Found service account file, initializing...
+Firebase Admin initialized successfully using service account file.
+[SECURITY] Encryption Key initialized. Length: 32 bytes
+4:25:36 AM [express] serving on port 5000
+node.exe : Failed to seed 
+default tenant: Error: 7 
+PERMISSION_DENIED: Cloud 
+Firestore API has not been 
+used in project bank-abe75 
+before or it is disabled. 
+Enable it by visiting https
+://console.developers.googl
+e.com/apis/api/firestore.go
+ogleapis.com/overview?proje
+ct=bank-abe75 then retry. 
+If you enabled this API 
+recently, wait a few 
+minutes for the action to 
+propagate to our systems 
+and retry.
+At C:\Program 
+Files\nodejs\npx.ps1:29 
+char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~
+    + CategoryInfo         
+     : NotSpecifi    ed: 
+(Failed to see    d 
+...tems and retr    
+y.:String) [], Rem    
+oteException
+    + FullyQualifiedEr    
+rorId : NativeComm    
+andError
+ 
+    at callErrorFromStatus 
+(C:\Users\LENOVO\Desktop\il
+yas project\node_modules\go
+ogle-gax\node_modules\@grpc
+\grpc-js\src\call.ts:84:17)
+    at 
+Object.onReceiveStatus (C:\
+Users\LENOVO\Desktop\ilyas 
+project\node_modules\google
+-gax\node_modules\@grpc\grp
+c-js\src\client.ts:612:51)
+    at 
+Object.onReceiveStatus (C:\
+Users\LENOVO\Desktop\ilyas 
+project\node_modules\google
+-gax\node_modules\@grpc\grp
+c-js\src\client-interceptor
+s.ts:424:48)
+    at <anonymous> (C:\User
+s\LENOVO\Desktop\ilyas proj
+ect\node_modules\google-gax
+\node_modules\@grpc\grpc-js
+\src\resolving-call.ts:170:
+24)
+    at process.processTicks
+AndRejections (node:interna
+l/process/task_queues:85:11
+)
+for call at
+    at ServiceClientImpl.ma
+keServerStreamRequest (C:\U
+sers\LENOVO\Desktop\ilyas p
+roject\node_modules\google-
+gax\node_modules\@grpc\grpc
+-js\src\client.ts:595:42)
+    at ServiceClientImpl.<a
+nonymous> (C:\Users\LENOVO\
+Desktop\ilyas project\node_
+modules\google-gax\node_mod
+ules\@grpc\grpc-js\src\make
+-client.ts:189:15)
+    at C:\Users\LENOVO\Desk
+top\ilyas project\node_modu
+les\@google-cloud\firestore
+\build\src\v1\firestore_cli
+ent.js:242:33
+    at <anonymous> (C:\User
+s\LENOVO\Desktop\ilyas proj
+ect\node_modules\google-gax
+\src\streamingCalls\streami
+ngApiCaller.ts:59:19)
+    at <anonymous> (C:\User
+s\LENOVO\Desktop\ilyas proj
+ect\node_modules\google-gax
+\src\normalCalls\timeout.ts
+:54:13)
+    at Object.request (C:\U
+sers\LENOVO\Desktop\ilyas p
+roject\node_modules\google-
+gax\src\streamingCalls\stre
+aming.ts:331:28)
+    at makeRequest (C:\User
+s\LENOVO\Desktop\ilyas proj
+ect\node_modules\retry-requ
+est\index.js:159:28)
+    at retryRequest (C:\Use
+rs\LENOVO\Desktop\ilyas pro
+ject\node_modules\retry-req
+uest\index.js:119:5)
+    at 
+StreamProxy.setStream (C:\U
+sers\LENOVO\Desktop\ilyas p
+roject\node_modules\google-
+gax\src\streamingCalls\stre
+aming.ts:322:29)
+    at 
+StreamingApiCaller.call (C:
+\Users\LENOVO\Desktop\ilyas
+ project\node_modules\googl
+e-gax\src\streamingCalls\st
+reamingApiCaller.ts:89:12)
+Caused by: Error
+    at C:\Users\LENOVO\Desk
+top\ilyas project\node_modu
+les\@google-cloud\firestore
+\build\src\index.js:1040:27
+    at C:\Users\LENOVO\Desk
+top\ilyas project\node_modu
+les\@google-cloud\firestore
+\build\src\telemetry\enable
+d-trace-util.js:110:30
+    at 
+NoopContextManager.with (C:
+\Users\LENOVO\Desktop\ilyas
+ project\node_modules\@open
+telemetry\api\src\context\N
+oopContextManager.ts:31:15)
+    at ContextAPI.with (C:\
+Users\LENOVO\Desktop\ilyas 
+project\node_modules\@opent
+elemetry\api\src\api\contex
+t.ts:77:42)
+    at 
+NoopTracer.startActiveSpan 
+(C:\Users\LENOVO\Desktop\il
+yas project\node_modules\@o
+pentelemetry\api\src\trace\
+NoopTracer.ts:98:27)
+    at ProxyTracer.startAct
+iveSpan (C:\Users\LENOVO\De
+sktop\ilyas project\node_mo
+dules\@opentelemetry\api\sr
+c\trace\ProxyTracer.ts:51:2
+0)
+    at EnabledTraceUtil.sta
+rtActiveSpan (C:\Users\LENO
+VO\Desktop\ilyas project\no
+de_modules\@google-cloud\fi
+restore\build\src\telemetry
+\enabled-trace-util.js:102:
+28)
+    at Firestore.getAll (C:
+\Users\LENOVO\Desktop\ilyas
+ project\node_modules\@goog
+le-cloud\firestore\build\sr
+c\index.js:1031:32)
+    at C:\Users\LENOVO\Desk
+top\ilyas project\node_modu
+les\@google-cloud\firestore
+\build\src\reference\docume
+nt-reference.js:182:36
+    at C:\Users\LENOVO\Desk
+top\ilyas project\node_modu
+les\@google-cloud\firestore
+\build\src\telemetry\enable
+d-trace-util.js:110:30 {
+  code: 7,
+  details: 'Cloud 
+Firestore API has not been 
+used in project bank-abe75 
+before or it is disabled. 
+Enable it by visiting https
+://console.developers.googl
+e.com/apis/api/firestore.go
+ogleapis.com/overview?proje
+ct=bank-abe75 then retry. 
+If you enabled this API 
+recently, wait a few 
+minutes for the action to 
+propagate to our systems 
+and retry.',
+  metadata: Metadata {
+    internalRepr: Map(5) {
+      
+'google.rpc.errorinfo-bin' 
+=> [Array],
+      
+'google.rpc.help-bin' => 
+[Array],
+      'google.rpc.localized
+message-bin' => [Array],
+      
+'grpc-status-details-bin' 
+=> [Array],
+      
+'x-debug-tracking-id' => 
+[Array]
+    },
+    opaqueData: Map(0) {},
+    options: {}
+  },
+  statusDetails: [
+    ErrorInfo {
+      metadata: [Object],
+      reason: 
+'SERVICE_DISABLED',
+      domain: 
+'googleapis.com'
+    },
+    LocalizedMessage {
+      locale: 'en-US',
+      message: 'Cloud 
+Firestore API has not been 
+used in project bank-abe75 
+before or it is disabled. 
+Enable it by visiting https
+://console.developers.googl
+e.com/apis/api/firestore.go
+ogleapis.com/overview?proje
+ct=bank-abe75 then retry. 
+If you enabled this API 
+recently, wait a few 
+minutes for the action to 
+propagate to our systems 
+and retry.'
+    },
+    Help { links: [Array] }
+  ],
+  reason: 
+'SERVICE_DISABLED',
+  domain: 'googleapis.com',
+  errorInfoMetadata: {
+    containerInfo: 
+'bank-abe75',
+    consumer: 
+'projects/bank-abe75',
+    serviceTitle: 'Cloud 
+Firestore API',
+    service: 
+'firestore.googleapis.com',
+    activationUrl: 'https:/
+/console.developers.google.
+com/apis/api/firestore.goog
+leapis.com/overview?project
+=bank-abe75'
+  }
+}
