@@ -38,11 +38,32 @@ app.use((req, res, next) => {
 });
 
 import { setupAuth } from "./auth";
-import { securityHeaders, rateLimit } from "./middleware";
+import { securityHeaders, generalApiLimiter, strictApiLimiter } from "./middleware";
+import { xssSanitizer } from "./sanitizer";
+
+function assertEnvironmentVariables() {
+  const required = ['OPENAI_API_KEY', 'GROQ_API_KEY', 'FIREBASE_SERVICE_ACCOUNT'];
+  const missing = required.filter(key => !process.env[key]);
+  if (missing.length > 0) {
+    console.warn(`[WARNING] Missing recommended environment variables: ${missing.join(', ')}`);
+  }
+}
 
 (async () => {
+  assertEnvironmentVariables();
+
   app.use(securityHeaders);
-  app.use("/api/login", rateLimit);
+
+  // Apply general rate limits to all API routes
+  app.use("/api/", generalApiLimiter);
+
+  // Apply strict rate limits to auth routes (handled in auth.ts usually, but we can do it here for /api/login if it existed)
+  app.use("/api/auth", strictApiLimiter);
+
+  // Apply XSS Sanitization to public submission forms where arbitrary text is stored and later viewed
+  app.use("/api/demo-requests", xssSanitizer);
+  app.use("/api/contact", xssSanitizer);
+  app.use("/api/waitlist", xssSanitizer);
 
   // Diagnostic endpoint
   app.get("/api/debug/status", async (req, res) => {

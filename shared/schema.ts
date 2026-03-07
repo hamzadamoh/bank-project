@@ -46,24 +46,24 @@ export const auditLogsSchema = z.object({
 
 export const demoRequestsSchema = z.object({
   id: z.string().optional(),
-  name: z.string(),
-  email: z.string().email(),
-  company: z.string(),
-  role: z.string(),
-  tools: z.array(z.string()),
-  message: z.string().nullable().optional(),
+  name: z.string().trim().min(2).max(100),
+  email: z.string().email().max(100),
+  company: z.string().trim().max(100),
+  role: z.string().trim().max(50),
+  tools: z.array(z.string().max(50)).max(10),
+  message: z.string().trim().max(2000).nullable().optional(),
   createdAt: z.date().optional(),
-});
+}).strict();
 
 export const contactSubmissionsSchema = z.object({
   id: z.string().optional(),
-  name: z.string(),
-  email: z.string().email(),
-  company: z.string().nullable().optional(),
-  subject: z.string(),
-  message: z.string(),
+  name: z.string().trim().min(2).max(100),
+  email: z.string().email().max(100),
+  company: z.string().trim().max(100).nullable().optional(),
+  subject: z.string().trim().min(1).max(200),
+  message: z.string().trim().min(1).max(5000),
   createdAt: z.date().optional(),
-});
+}).strict();
 
 export const taxQueriesSchema = z.object({
   id: z.string().optional(),
@@ -98,22 +98,22 @@ export const documentAnalysisSchema = z.object({
 
 export const waitlistSchema = z.object({
   id: z.string().optional(),
-  email: z.string().email(),
-  name: z.string().nullable().optional(),
+  email: z.string().email().max(100),
+  name: z.string().trim().max(100).nullable().optional(),
   createdAt: z.date().optional(),
-});
+}).strict();
 
 export const ordersSchema = z.object({
   id: z.string().optional(),
-  tenantId: z.string().default("tenant_default"),
-  planId: z.string(),
-  planName: z.string(),
-  amount: z.string(),
-  status: z.string(),
-  customerEmail: z.string().email(),
-  paymentMethod: z.string(),
+  tenantId: z.string().max(100).default("tenant_default"),
+  planId: z.string().max(100),
+  planName: z.string().max(100),
+  amount: z.string().max(20),
+  status: z.string().max(50),
+  customerEmail: z.string().email().max(100),
+  paymentMethod: z.string().max(50),
   createdAt: z.date().optional(),
-});
+}).strict();
 
 export const kycRecordsSchema = z.object({
   id: z.string().optional(),

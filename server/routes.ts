@@ -28,7 +28,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 import {
   securityHeaders,
-  rateLimit,
+  generalApiLimiter,
+  strictApiLimiter,
   isAuthenticated,
   isAdmin,
   checkTierLimit
@@ -153,7 +154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Demo request endpoint (Public-ish)
-  app.post("/api/demo-requests", async (req, res) => {
+  app.post("/api/demo-requests", strictApiLimiter, async (req, res) => {
     try {
       const validatedData = insertDemoRequestSchema.parse(req.body);
       const demoRequest = await storage.createDemoRequest(validatedData);
@@ -168,7 +169,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Contact submission endpoint
-  app.post("/api/contact", async (req, res) => {
+  app.post("/api/contact", strictApiLimiter, async (req, res) => {
     try {
       const validatedData = insertContactSubmissionSchema.parse(req.body);
       const contact = await storage.createContactSubmission(validatedData);
@@ -183,7 +184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Public demo endpoint (no auth required)
-  app.post("/api/demo/tax-queries", async (req, res) => {
+  app.post("/api/demo/tax-queries", strictApiLimiter, async (req, res) => {
     try {
       const { query, jurisdiction } = req.body;
       if (!query || !jurisdiction) {
@@ -247,7 +248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Public demo endpoint for SQL queries
-  app.post("/api/demo/sql-queries", async (req, res) => {
+  app.post("/api/demo/sql-queries", strictApiLimiter, async (req, res) => {
     try {
       const { type, input } = req.body;
       if (!type || !input) {
@@ -548,7 +549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Waitlist endpoint
-  app.post("/api/waitlist", async (req, res) => {
+  app.post("/api/waitlist", strictApiLimiter, async (req, res) => {
     try {
       const validatedData = insertWaitlistSchema.parse(req.body);
       const waitlistEntry = await storage.createWaitlistEntry(validatedData);

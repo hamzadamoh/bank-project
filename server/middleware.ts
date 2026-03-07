@@ -13,27 +13,27 @@ export const securityHeaders = (req: Request, res: Response, next: NextFunction)
     next();
 };
 
-const loginRateLimiter = new Map<string, { count: number, lastAttempt: number }>();
-export const rateLimit = (req: Request, res: Response, next: NextFunction) => {
-    const ip = req.ip || 'unknown';
-    const now = Date.now();
-    const limit = 5; // 5 attempts
-    const window = 15 * 60 * 1000; // 15 minutes
+import rateLimit from "express-rate-limit";
 
-    const entry = loginRateLimiter.get(ip) || { count: 0, lastAttempt: 0 };
-    if (now - entry.lastAttempt > window) {
-        entry.count = 0;
-    }
+// General API Rate Limiter
+export const generalApiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100, // Limit each IP to 100 requests per `window`
+    standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+    keyGenerator: (req: any) => req.user?.id || req.ip,
+    message: { message: "Too many requests from this IP or user, please try again after 15 minutes" }
+});
 
-    if (entry.count >= limit) {
-        return res.status(429).json({ message: "Too many login attempts. Please try again later." });
-    }
-
-    entry.count++;
-    entry.lastAttempt = now;
-    loginRateLimiter.set(ip, entry);
-    next();
-};
+// Strict Rate Limiter for public endpoints and auth
+export const strictApiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 10, // Limit each IP to 10 requests per `window`
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    keyGenerator: (req: any) => req.user?.id || req.ip,
+    message: { message: "Too many login/public API attempts. Please try again later." }
+});
 
 // Auth & Security Middlewares
 export const isAuthenticated = (req: any, res: Response, next: NextFunction) => {
